@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/windowBackground"
+    android:orientation="vertical"
+    tools:context=".Activity.FileManagerActivity">
+
+    <RelativeLayout
+        android:id="@+id/file_manager_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/colorPrimary">
+
+        <ImageView
+            android:id="@+id/file_manager_iv_back"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:onClick="back"
+            android:paddingBottom="7dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:paddingTop="7dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/topbar_back" />
+
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_toRightOf="@id/file_manager_iv_back"
+            android:background="@color/listdiver" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:text="文件管理" />
+
+        <ImageView
+            android:id="@+id/file_manager_iv_add"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:background="@drawable/topbarimg"
+            android:layout_alignParentRight="true"
+            android:onClick="add"
+            android:paddingBottom="7dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:paddingTop="7dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_add_white_36dp" />
+
+        <!--<View-->
+            <!--android:id="@+id/file_manager_iv_temp"-->
+            <!--android:layout_width="1dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:layout_marginTop="8dp"-->
+            <!--android:layout_toLeftOf="@+id/file_manager_iv_more"-->
+            <!--android:background="@color/listdiver" />-->
+
+        <!--<ImageView-->
+            <!--android:id="@+id/file_manager_iv_more"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:onClick="more"-->
+            <!--android:paddingBottom="7dp"-->
+            <!--android:paddingLeft="7dp"-->
+            <!--android:paddingRight="7dp"-->
+            <!--android:paddingTop="7dp"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@mipmap/actionbar_more_icon" />-->
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/file_manager_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
+</LinearLayout>

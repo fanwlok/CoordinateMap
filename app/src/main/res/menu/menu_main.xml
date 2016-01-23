@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+  >
+    <item android:id="@+id/menu_search"
+          android:title="search"
+        android:icon="@mipmap/ic_search_white_36dp"
+        android:orderInCategory="120"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/add_file"
+        android:title="@string/add_file"
+        app:showAsAction="ifRoom" />
+</menu>

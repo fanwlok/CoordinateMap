@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></android.support.v7.widget.Toolbar>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true" />
+
+        <com.fanweilin.coordinatemap.widget.ZoomControlsView
+            android:id="@+id/activity_main_zoomcontrols"
+            android:layout_width="@dimen/imgbtn"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="80dp"
+            android:layout_marginRight="10dp"></com.fanweilin.coordinatemap.widget.ZoomControlsView>
+
+        <ImageButton
+            android:id="@+id/imgbtn_layer"
+            android:layout_width="@dimen/imgbtn"
+            android:layout_height="@dimen/imgbtn"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/imagebutton"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_layers_grey600_36dp"
+            android:tint="@color/colorPrimary" />
+
+        <ImageButton
+            android:id="@+id/imgbtn_clearall"
+            android:layout_width="@dimen/imgbtn"
+            android:layout_height="@dimen/imgbtn"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/imgbtn_layer"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/imagebutton"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_clear_all_grey600_36dp"
+            android:tint="@color/colorPrimary" />
+
+        <ImageButton
+            android:id="@+id/imgbtn_mylocation"
+            android:layout_width="@dimen/imgbtn"
+            android:layout_height="@dimen/imgbtn"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/imgbtn_clearall"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/imagebutton"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_my_location_grey600_36dp"
+            android:tint="@color/colorPrimary" />
+    </RelativeLayout>
+
+</LinearLayout>

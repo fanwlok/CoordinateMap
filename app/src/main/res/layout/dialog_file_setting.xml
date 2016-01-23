@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true">
+
+        <RadioGroup
+            android:id="@+id/rg_codstyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_wgs84"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="WGS84坐标系" />
+
+            <RadioButton
+                android:id="@+id/rb_bd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="百度坐标系" />
+
+            <RadioButton
+                android:id="@+id/rb_other"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="其他坐标系" />
+        </RadioGroup>
+        <RadioGroup
+            android:id="@+id/rg_datastyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/rg_codstyle"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_decimal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="小数" />
+
+            <RadioButton
+                android:id="@+id/rb_dms"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="度分秒" />
+        </RadioGroup>
+
+    </RelativeLayout>
+</RelativeLayout>
