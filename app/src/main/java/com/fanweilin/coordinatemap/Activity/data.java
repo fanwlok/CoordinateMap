@@ -3,7 +3,6 @@ package com.fanweilin.coordinatemap.Activity;
 import android.app.Application;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.baidu.mapapi.map.offline.MKOfflineMap;
 import com.fanweilin.greendao.DaoMaster;
 import com.fanweilin.greendao.DaoSession;
 

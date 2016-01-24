@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +11,13 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
-import com.baidu.mapapi.map.offline.MKOfflineMap;
-import com.baidu.mapapi.map.offline.MKOfflineMapListener;
 import com.fanweilin.coordinatemap.Activity.Bdoffilin_activity;
 import com.fanweilin.coordinatemap.Activity.MainActivity;
-import com.fanweilin.coordinatemap.Activity.OfflineDemo;
 import com.fanweilin.coordinatemap.R;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2016/1/19 0019.

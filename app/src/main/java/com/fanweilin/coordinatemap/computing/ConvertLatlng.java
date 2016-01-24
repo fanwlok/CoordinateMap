@@ -4,8 +4,6 @@ package com.fanweilin.coordinatemap.computing;
  * Created by Administrator on 2015/12/29 0029.
  */
 
-import com.baidu.mapapi.model.LatLng;
-
 import java.math.BigDecimal;
 
 public class ConvertLatlng {

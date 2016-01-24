@@ -109,8 +109,8 @@ public class FileManagerActivity extends Activity {
                 public void onClick(DialogInterface dialog, int which) {
                 }
             });
-            builder.show();
-            return false;
+            builder.create().show();
+            return true;
         }
     }
 

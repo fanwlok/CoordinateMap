@@ -3,11 +3,8 @@ package com.fanweilin.coordinatemap.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
-
-import com.fanweilin.coordinatemap.R;
 
 /**
  * Created by Administrator on 2016/1/1 0001.

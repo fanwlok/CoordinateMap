@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:gravity="center"
-        android:text="度分秒转换"
+        android:text="@string/dufenmiao"
         android:textColor="@color/colorPrimary"
         android:textSize="30sp" />
 
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:text="度数"
+            android:text="@string/du"
             android:textSize="20sp" />
 
         <EditText
@@ -58,7 +58,7 @@
             android:id="@+id/btn_dci"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="计算" />
+            android:text="@string/computer" />
     </LinearLayout>
 
     <LinearLayout
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:gravity="center_vertical"
-            android:text="结果:"
+            android:text="@string/result"
             android:textSize="20sp" />
 
         <TextView
@@ -112,7 +112,7 @@
             android:singleLine="true" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:text="分" />
 

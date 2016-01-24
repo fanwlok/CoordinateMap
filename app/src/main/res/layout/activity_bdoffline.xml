@@ -41,7 +41,7 @@
                 style="@style/RadioButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="下载管理" />
+                android:text="@string/downmanager" />
 
             <RadioButton
                 android:id="@+id/rb_city"
@@ -49,7 +49,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="城市列表" />
+                android:text="@string/citylist" />
         </info.hoang8f.android.segmented.SegmentedGroup>
     </RelativeLayout>
     <android.support.v4.view.ViewPager

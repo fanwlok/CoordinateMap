@@ -29,7 +29,7 @@ public class FilesDao extends AbstractDao<Files, Long> {
         public final static Property Date = new Property(3, String.class, "date", false, "DATE");
         public final static Property Cdstyle = new Property(4, Integer.class, "cdstyle", false, "CDSTYLE");
         public final static Property Datastyle = new Property(5, Integer.class, "datastyle", false, "DATASTYLE");
-    };
+    }
 
 
     public FilesDao(DaoConfig config) {

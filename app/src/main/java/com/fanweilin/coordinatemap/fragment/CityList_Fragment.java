@@ -35,7 +35,7 @@ public class CityList_Fragment extends Fragment {
 
     // Container Activity must implement this interface
     public interface OnHeadlineSelectedListener {
-        public void onArticleSelected(String cityid);
+        void onArticleSelected(String cityid);
     }
 
     @Override

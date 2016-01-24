@@ -75,7 +75,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, BaiduMap.OnMapLoadedCallback {
     public Toolbar toolbar;
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle mDrawerToggle;
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 about();
                                 break;
                             case R.id.nav_quit:
-                              finish();
+                                finish();
                                 break;
 
                         }
@@ -172,20 +172,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void computer() {
         Intent intent = new Intent();
-      intent.setClass(MainActivity.this,ConvertActivity.class);
+        intent.setClass(MainActivity.this, ConvertActivity.class);
         startActivity(intent);
     }
-private void about(){
-    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-    builder.setMessage("本软件为第一版,难免会存在一些bug和不足zhich。如果你在使用过程中发现一些问题或有好的建议可以联系作者。\nqq897481601");
-    builder.setTitle("关于");
-    builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-        }
-    });
-    builder.create().show();
-}
+
+    private void about() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage("本软件为第一版,难免会存在一些bug和不足。如果你在使用过程中发现问题或有好的建议可以联系作者。\n897481601@qq.com");
+        builder.setTitle("关于");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        builder.create().show();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -233,6 +235,11 @@ private void about(){
                 setMapCenter(latitude, lontitude);
                 break;
         }
+    }
+
+    @Override
+    public void onMapLoaded() {
+
     }
 
     public class MyItem implements ClusterItem {
@@ -309,7 +316,7 @@ private void about(){
                 LatLng point = new LatLng(intent.getDoubleExtra("Lat", 0.0), intent.getDoubleExtra("Lng", 0.0));
                 int coordstyle = intent.getIntExtra("CoordStyle", 0);
                 int datastyle = intent.getIntExtra("DataStyle", 0);
-                Log.d("test1_main",String.valueOf(datastyle));
+                Log.d("test1_main", String.valueOf(datastyle));
                 LatLng baidupoint = ComanLngConvertBdLngt(point, coordstyle, datastyle);
                 Bundle bundle = new Bundle();
                 bundle.putInt(MAKER_STYLE, INTENT_MARKER);

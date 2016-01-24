@@ -36,6 +36,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile 'com.github.nirhart:parallaxscroll:1.0'
     compile files('libs/BaiduLBS_Android.jar')
-    compile files('libs/httpmime-4.1.2.jar')
     compile 'info.hoang8f:android-segmented:1.0.6'
 }
