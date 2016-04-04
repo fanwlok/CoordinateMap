@@ -15,3 +15,23 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keep class com.baidu.** {*;}
+-keep class vi.com.** {*;}
+-dontwarn com.baidu.**
+-keep class com.baidu.kirin.** {*;}
+-keep class com.baidu.mobstat.** {*;}
+-keep class com.baidu.**{public protected *;}
+-keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}
+# # -------------------------------------------
+
+# #  ######## greenDao混淆  ##########
+
+# # -------------------------------------------
+
+
+-keep class de.greenrobot.dao.** {*;}
+
+-keepclassmembers class * extends de.greenrobot.dao.AbstractDao {
+    public static java.lang.String TABLENAME;
+}
+-keep class **$Properties

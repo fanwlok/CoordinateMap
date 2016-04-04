@@ -28,8 +28,10 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
         public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
         public final static Property Cdstyle = new Property(4, Integer.class, "cdstyle", false, "CDSTYLE");
-        public final static Property Datastyle = new Property(5, Integer.class, "datastyle", false, "DATASTYLE");
-    }
+        public final static Property Fileid = new Property(5, Long.class, "fileid", false, "FILEID");
+        public final static Property Pointid = new Property(6, Long.class, "pointid", false, "POINTID");
+        public final static Property Datastyle = new Property(7, Integer.class, "datastyle", false, "DATASTYLE");
+    };
 
 
     public ShowDataDao(DaoConfig config) {
@@ -49,7 +51,9 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
                 "'LATITUDE' TEXT," + // 2: latitude
                 "'LONGITUDE' TEXT," + // 3: longitude
                 "'CDSTYLE' INTEGER," + // 4: cdstyle
-                "'DATASTYLE' INTEGER);"); // 5: datastyle
+                "'FILEID' INTEGER," + // 5: fileid
+                "'POINTID' INTEGER," + // 6: pointid
+                "'DATASTYLE' INTEGER);"); // 7: datastyle
     }
 
     /** Drops the underlying database table. */
@@ -84,9 +88,19 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
             stmt.bindLong(5, cdstyle);
         }
  
+        Long fileid = entity.getFileid();
+        if (fileid != null) {
+            stmt.bindLong(6, fileid);
+        }
+ 
+        Long pointid = entity.getPointid();
+        if (pointid != null) {
+            stmt.bindLong(7, pointid);
+        }
+ 
         Integer datastyle = entity.getDatastyle();
         if (datastyle != null) {
-            stmt.bindLong(6, datastyle);
+            stmt.bindLong(8, datastyle);
         }
     }
 
@@ -105,7 +119,9 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // longitude
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // cdstyle
-            cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5) // datastyle
+            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // fileid
+            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // pointid
+            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7) // datastyle
         );
         return entity;
     }
@@ -118,7 +134,9 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
         entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
         entity.setCdstyle(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
-        entity.setDatastyle(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
+        entity.setFileid(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
+        entity.setPointid(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
+        entity.setDatastyle(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
      }
     
     /** @inheritdoc */

@@ -12,6 +12,8 @@ public class ShowData {
     private String latitude;
     private String longitude;
     private Integer cdstyle;
+    private Long fileid;
+    private Long pointid;
     private Integer datastyle;
 
     public ShowData() {
@@ -21,12 +23,14 @@ public class ShowData {
         this.id = id;
     }
 
-    public ShowData(Long id, String title, String latitude, String longitude, Integer cdstyle, Integer datastyle) {
+    public ShowData(Long id, String title, String latitude, String longitude, Integer cdstyle, Long fileid, Long pointid, Integer datastyle) {
         this.id = id;
         this.title = title;
         this.latitude = latitude;
         this.longitude = longitude;
         this.cdstyle = cdstyle;
+        this.fileid = fileid;
+        this.pointid = pointid;
         this.datastyle = datastyle;
     }
 
@@ -70,6 +74,22 @@ public class ShowData {
 
     public void setCdstyle(Integer cdstyle) {
         this.cdstyle = cdstyle;
+    }
+
+    public Long getFileid() {
+        return fileid;
+    }
+
+    public void setFileid(Long fileid) {
+        this.fileid = fileid;
+    }
+
+    public Long getPointid() {
+        return pointid;
+    }
+
+    public void setPointid(Long pointid) {
+        this.pointid = pointid;
     }
 
     public Integer getDatastyle() {

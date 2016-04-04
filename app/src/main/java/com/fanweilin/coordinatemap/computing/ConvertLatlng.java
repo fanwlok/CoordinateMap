@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class ConvertLatlng {
 
     //经纬度度分秒转换为小数
-    public double convertToDecimal(double du, double fen, double miao) {
+    public static double convertToDecimal(double du, double fen, double miao) {
         if (du < 0)
             return -(Math.abs(du) + (Math.abs(fen) + (Math.abs(miao) / 60)) / 60);
 
@@ -18,7 +18,7 @@ public class ConvertLatlng {
     }
 
     //以字符串形式输入经纬度的转换
-    public double convertToDecimalByString(String latlng) {
+    public  double convertToDecimalByString(String latlng) {
           latlng=latlng+"0000";
         double du = Double.parseDouble(latlng.substring(0, latlng.indexOf(".")));
         double fen = Double.parseDouble(latlng.substring(latlng.indexOf(".") + 1, latlng.indexOf(".") + 3));
@@ -29,7 +29,7 @@ public class ConvertLatlng {
 
     }
     //将小数转换为度分秒
-    public String convertToSexagesimal(double num) {
+    public  String convertToSexagesimal(double num) {
 
         int du = (int) Math.floor(Math.abs(num));    //获取整数部分
         double temp = getdPoint(Math.abs(num)) * 60;
@@ -41,7 +41,6 @@ public class ConvertLatlng {
         return du + "°" + fen + "′" + miao + "″";
 
     }
-
     //获取小数部分
     public double getdPoint(double num) {
         double d = num;

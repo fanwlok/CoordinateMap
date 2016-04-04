@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/libs/BDAutoUpdateSDK_20150605_V1.2.0.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/libs/android_api_3.7.1.3.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/libs/baidu_appx_android_2.0.0.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/libs/baidu_cuid.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/libs/patchupdate.jar" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jniLibs/armeabi" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jniLibs/x86" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jniLibs/x86/libMD5_v1.so" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/actionbar_search_icon.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ex_doc.png" charset="GBK" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-hdpi/ex_folder.png" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/actionbar_add_icon.png" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/actionbar_more_icon.png" charset="GBK" />
-    <file url="file://$PROJECT_DIR$/app/src/main/res/mipmap-mdpi/actionbar_search_icon.png" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

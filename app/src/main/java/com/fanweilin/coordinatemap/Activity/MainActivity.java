@@ -1,19 +1,23 @@
 package com.fanweilin.coordinatemap.Activity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,16 +25,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.baidu.appx.BDBannerAd;
+import com.baidu.autoupdatesdk.BDAutoUpdateSDK;
+import com.baidu.autoupdatesdk.UICheckUpdateCallback;
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -55,21 +63,27 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviParaOption;
-import com.baidu.mapapi.search.core.SearchResult;
-import com.baidu.mapapi.search.geocode.GeoCodeResult;
-import com.baidu.mapapi.search.geocode.GeoCoder;
-import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
-import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.OpenClientUtil;
+import com.baidu.mobads.AdView;
+import com.baidu.mobads.AdViewListener;
+import com.baidu.mobads.AppActivity;
+import com.baidu.mobstat.SendStrategyEnum;
+import com.baidu.mobstat.StatService;
 import com.fanweilin.coordinatemap.Class.LatStyle;
+import com.fanweilin.coordinatemap.Class.PointDataParcel;
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.coordinatemap.computing.ConvertLatlng;
 import com.fanweilin.coordinatemap.computing.DataItem;
+import com.fanweilin.coordinatemap.computing.JZLocationConverter;
 import com.fanweilin.coordinatemap.widget.ZoomControlsView;
 import com.fanweilin.greendao.DaoSession;
+import com.fanweilin.greendao.Files;
+import com.fanweilin.greendao.PointData;
+import com.fanweilin.greendao.ShowData;
 import com.fanweilin.greendao.ShowDataDao;
+
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -82,13 +96,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public LocationClient mLocationClient = null;
     public BaiduMap mBaiduMap;
     public MapView mMapView;
+    private Button btn_gone;
     public BDLocationListener myListener = new MyLocationListener();
     public double latitude;
     public double lontitude;
+    public static String GETPOINTDATAPARCE="getpointdataparcel";
+    public static String DATAMANAGERACTIVITY="datamanageractivity";
     public ZoomControlsView zoomControlsView;
-    private CoordinateConverter converter;
+    private static CoordinateConverter converter;
     private BitmapDescriptor bitmap;
-    private BitmapDescriptor bitmaplocation;
+    private ArrayList<BitmapDescriptor> bitmaplocation;
+    private BitmapDescriptor bitmaplocation1;
+    private BitmapDescriptor bitmaplocation2;
     private ClusterManager<MyItem> mClusterManager;
     private ImageButton imgLayerChange;
     private ImageButton imgClearall;
@@ -97,7 +116,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int coordstyle;
     private int datastyle;
     private NavigationView mNavigationView;
-
+    private FloatingActionButton fabLocation;
+    private View popupWindow;
+    private BDLocation bdLocationForpw;
+    private static String TAG = "AppX_BannerAd";
+    private String address="";
+    private String altitude="";
+    private RelativeLayout appxBannerContainer;
+   // private static BDBannerAd bannerAdView;
+    private ProgressDialog dialog;
+     private static final String MARKBUNDLE="markbundle";
+    AdView adView;
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -112,9 +141,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SDKInitializer.initialize(getApplicationContext());
         setContentView(R.layout.activity_main);
         init();
+        toolbar.setLogo(R.mipmap.earth_globe_48px);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close) {
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -134,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mLocationClient.start();
         mLocationClient.registerLocationListener(myListener);
         showdata();
+        dialog = new ProgressDialog(this);
+        dialog.setIndeterminate(true);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -155,7 +186,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             case R.id.nav_quit:
                                 finish();
                                 break;
-
+                            case R.id.nav_update:
+                                dialog.show();
+                                BDAutoUpdateSDK.uiUpdateAction(MainActivity.this, new MyUICheckUpdateCallback());
+                                break;
                         }
                         menuItem.setChecked(true);
                         drawerLayout.closeDrawers();
@@ -163,7 +197,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
     }
+    private class MyUICheckUpdateCallback implements UICheckUpdateCallback {
 
+        @Override
+        public void onCheckComplete() {
+            dialog.dismiss();
+        }
+
+    }
     private void download() {
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, Bdoffilin_activity.class);
@@ -178,7 +219,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void about() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setMessage("本软件为第一版,难免会存在一些bug和不足。如果你在使用过程中发现问题或有好的建议可以联系作者。\n897481601@qq.com");
+        builder.setMessage("本软件主要功能:\n一:通过经纬度值查询在地图上位置,可以添加数据到文件,也可导入数据到文件进行批量查询.\n" +
+              "二:查看当前位置经纬度,并记录下来." + "\n有bug和好的建议可发送邮件至897481601@qq.com");
         builder.setTitle("关于");
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
@@ -186,7 +228,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         builder.create().show();
+//        BDAutoUpdateSDK.uiUpdateAction(this, new MyUICheckUpdateCallback());
     }
+//    private class MyUICheckUpdateCallback implements UICheckUpdateCallback {
+//
+//        @Override
+//        public void onCheckComplete() {
+//                       Log.d("DSAF","UI");
+//        }
+//
+//    }
 
     @Override
     protected void onStart() {
@@ -213,8 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        data app = (data) getApplication();
-                        DaoSession mDaoSession = app.getmDaoSession();
+                        DaoSession mDaoSession = data.getmDaoSession();
                         ShowDataDao showDataDao = mDaoSession.getShowDataDao();
                         mBaiduMap.clear();
                         mClusterManager.clearItems();
@@ -234,6 +284,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.imgbtn_mylocation:
                 setMapCenter(latitude, lontitude);
                 break;
+            case R.id.fab_location:
+                popupWindow = showpopupwindow();
+                break;
+            case R.id.btn_main_gone:
+                RelativeLayout rl= (RelativeLayout) findViewById(R.id.rl_main_gone);
+                rl.setVisibility(View.GONE);
         }
     }
 
@@ -275,14 +331,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showdata() {
+        mBaiduMap.clear();
+        mClusterManager.clearItems();
         LatLngBounds mLatLngBounds;
         Cursor cursor;
         SQLiteDatabase db;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        data app = (data) getApplication();
-        DaoSession mDaoSession = app.getmDaoSession();
+        DaoSession mDaoSession = data.getmDaoSession();
         ShowDataDao showDataDao = mDaoSession.getShowDataDao();
-        db = app.getDb();
+        db = data.getDb();
         cursor = db.query(showDataDao.getTablename(), showDataDao.getAllColumns(), null, null, null, null, null);
         List<MyItem> items = new ArrayList<>();
         if (cursor.getCount() != 0) {
@@ -291,12 +348,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int CoordStyle = cursor.getInt(cursor.getColumnIndex(ShowDataDao.Properties.Cdstyle.columnName));
                 int DataStyle = cursor.getInt(cursor.getColumnIndex(ShowDataDao.Properties.Datastyle.columnName));
                 String name = cursor.getString(cursor.getColumnIndex(ShowDataDao.Properties.Title.columnName));
-                double lat = Double.parseDouble(cursor.getString(cursor.getColumnIndex(ShowDataDao.Properties.Latitude.columnName)).toString());
-                double lon = Double.parseDouble(cursor.getString(cursor.getColumnIndex(ShowDataDao.Properties.Longitude.columnName)).toString());
+                double lat = Double.parseDouble(cursor.getString(cursor.getColumnIndex(ShowDataDao.Properties.Latitude.columnName)));
+                double lon = Double.parseDouble(cursor.getString(cursor.getColumnIndex(ShowDataDao.Properties.Longitude.columnName)));
+                PointData pointData=data.findPointDataDaoById(cursor.getLong(cursor.getColumnIndex(ShowDataDao.Properties.Pointid.columnName)));
+                Files files=data.findOrderById(cursor.getLong(cursor.getColumnIndex(ShowDataDao.Properties.Fileid.columnName)));
                 LatLng point = new LatLng(lat, lon);
                 LatLng bdpoint = ComanLngConvertBdLngt(point, CoordStyle, DataStyle);
+                PointDataParcel pp=new PointDataParcel();
+                pp=setPointdataParcel(files,pointData);
                 mDataItem.setName(name);
                 mDataItem.setLatLng(point);
+                mDataItem.setPointDataParcel(pp);
                 items.add(new MyItem(bdpoint, mDataItem));
                 builder.include(bdpoint);
             }
@@ -308,24 +370,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean setlocation(Intent intent) {
+        mBaiduMap.clear();
         String name;
         String test = DataManagerActivity.class.getName();
-        name = intent.getStringExtra("activityname");
+        name = intent.getStringExtra(DATAMANAGERACTIVITY);
         if (name != null) {
             if (name.equals(test)) {
-                LatLng point = new LatLng(intent.getDoubleExtra("Lat", 0.0), intent.getDoubleExtra("Lng", 0.0));
-                int coordstyle = intent.getIntExtra("CoordStyle", 0);
-                int datastyle = intent.getIntExtra("DataStyle", 0);
-                Log.d("test1_main", String.valueOf(datastyle));
-                LatLng baidupoint = ComanLngConvertBdLngt(point, coordstyle, datastyle);
+                PointDataParcel pp =intent.getParcelableExtra(GETPOINTDATAPARCE);
+                LatLng baiduLng=new LatLng(Double.parseDouble(pp.getBaiduLatitude()),Double.parseDouble(pp.getBaiduLongitude()));
                 Bundle bundle = new Bundle();
-                bundle.putInt(MAKER_STYLE, INTENT_MARKER);
-                bundle.putDouble("latitude", point.latitude);
-                bundle.putDouble("longitude", point.longitude);
-                bundle.putString("name", intent.getStringExtra("name"));
-                OverlayOptions options2 = new MarkerOptions().position(baidupoint).icon(bitmaplocation).extraInfo(bundle);
+                bundle.putParcelable(MARKBUNDLE, pp);
+                OverlayOptions options2 = new MarkerOptions().position(baiduLng).icons(bitmaplocation).extraInfo(bundle).period(25);
                 mBaiduMap.addOverlay(options2);
-                setMapCenter(baidupoint.latitude, baidupoint.longitude);
+                setMapCenter(baiduLng.latitude, baiduLng.longitude);
                 return true;
 
             }
@@ -335,20 +392,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void init() {
         converter = new CoordinateConverter();
+        fabLocation = (FloatingActionButton) findViewById(R.id.fab_location);
         imgLayerChange = (ImageButton) findViewById(R.id.imgbtn_layer);
         imgClearall = (ImageButton) findViewById(R.id.imgbtn_clearall);
         imgMyloncation = (ImageButton) findViewById(R.id.imgbtn_mylocation);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        btn_gone= (Button) findViewById(R.id.btn_main_gone);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.showZoomControls(false);
+        mMapView.setScaleControlPosition(new Point(0,0));
         zoomControlsView = (ZoomControlsView) findViewById(R.id.activity_main_zoomcontrols);
         mBaiduMap = mMapView.getMap();
         zoomControlsView.setBaiduMap(mMapView);
-        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(14f));
+        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18f));
         bitmap = BitmapDescriptorFactory
-                .fromResource(R.mipmap.location_pin);
+                .fromResource(R.mipmap.blu_blank_map_pin_48px_552642_easyicon);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         setupDrawerContent(mNavigationView);
         mClusterManager = new ClusterManager<>(this, mBaiduMap);
@@ -356,8 +416,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mClusterManager.setOnClusterClickListener(onClusterClickListener);
         mClusterManager.setOnClusterItemClickListener(onClusterItemClickListener);
         mBaiduMap.setOnMarkerClickListener(mClusterManager);
-        bitmaplocation = BitmapDescriptorFactory
-                .fromResource(R.mipmap.location);
+        bitmaplocation1 = BitmapDescriptorFactory
+                .fromResource(R.mipmap.red_blank_48px_553042_easyicon);
+        bitmaplocation2 = BitmapDescriptorFactory
+                .fromResource(R.mipmap.blu_blank_map_pin_48px_552642_easyicon);
+        bitmaplocation=new ArrayList<BitmapDescriptor>();
+        bitmaplocation.add(bitmaplocation1);
+        bitmaplocation.add(bitmaplocation2);
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -365,10 +430,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+        startCount();
+        //createBananer();
+        createAD();
         imgLayerChange.setOnClickListener(this);
         imgClearall.setOnClickListener(this);
         imgMyloncation.setOnClickListener(this);
-
+        fabLocation.setOnClickListener(this);
+        btn_gone.setOnClickListener(this);
     }
 
     public ClusterManager.OnClusterItemClickListener<MyItem> onClusterItemClickListener = new ClusterManager.OnClusterItemClickListener<MyItem>() {
@@ -381,9 +450,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public ClusterManager.OnClusterClickListener<MyItem> onClusterClickListener = new ClusterManager.OnClusterClickListener<MyItem>() {
         @Override
         public boolean onClusterClick(Cluster<MyItem> cluster) {
-            LatLngBounds latLngBounds = null;
+            LatLngBounds latLngBounds;
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            List<MyItem> list = new ArrayList<MyItem>();
+            List<MyItem> list = new ArrayList<>();
             list = (List<MyItem>) cluster.getItems();
             for (int i = 0; i < list.size(); i++) {
                 builder.include(list.get(i).getPosition());
@@ -398,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy
         );//可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
-        option.setCoorType("bd09ll");//可选，默认gcj02，设置返回的定位结果坐标系
+        option.setCoorType("gcj02");//可选，默认gcj02，设置返回的定位结果坐标系
         int span = 1000;
         option.setScanSpan(span);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
         option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
@@ -411,32 +480,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
         mLocationClient.setLocOption(option);
     }
-
+    private LatLng bdLng = null;
 
     public class MyLocationListener implements BDLocationListener {
 
         @Override
         public void onReceiveLocation(BDLocation location) {
             // test(location);
+            bdLocationForpw = location;
+
+            LatLng gc02Lng = new LatLng(location.getLatitude(), location.getLongitude());
+            converter.from(CoordinateConverter.CoordType.COMMON);
+            converter.coord(gc02Lng);
+            bdLng = converter.convert();
             if (latitude == 0.0) {
-                latitude = location.getLatitude();
-                lontitude = location.getLongitude();
+                latitude = bdLng.latitude;
+                lontitude = bdLng.longitude;
                 setMapCenter(latitude, lontitude);
             } else {
-                latitude = location.getLatitude();
-                lontitude = location.getLongitude();
+                latitude = bdLng.latitude;
+                lontitude = bdLng.longitude;
             }
-            showLocation(location);
+            showLocation(location, bdLng);
+            if (popupWindow != null) {
+                DisplayLocationInfo(popupWindow, location, bdLng);
+            }
         }
 
     }
 
-    private void showLocation(BDLocation location) {
+    private void showLocation(BDLocation location, LatLng bdlat) {
         mBaiduMap.setMyLocationEnabled(true);
         MyLocationData locData = new MyLocationData.Builder()
                 .accuracy(location.getRadius())
-                .direction(100).latitude(location.getLatitude())
-                .longitude(location.getLongitude()).build();
+                .direction(location.getDirection()).latitude(bdlat.latitude)
+                .longitude(bdlat.longitude).build();
         mBaiduMap.setMyLocationData(locData);
         MyLocationConfiguration config = new MyLocationConfiguration(MyLocationConfiguration.LocationMode.NORMAL, true, null);
         mBaiduMap.setMyLocationConfigeration(config);
@@ -444,6 +522,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void setMapCenter(double latitude, double lontitude) {
         MapStatusUpdate mMapStatusUpdate = MapStatusUpdateFactory.newLatLng(new LatLng(latitude, lontitude));
+        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18f));
         mBaiduMap.animateMapStatus(mMapStatusUpdate);
     }
 
@@ -456,8 +535,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     break;
                 case R.id.add_file:
                     Intent intent = new Intent();
-                    intent.setClass(MainActivity.this, FileManagerActivity.class);
+                    intent.setClass(MainActivity.this, FileActivity.class);
                     startActivity(intent);
+                    break;
+                case R.id.menu_main_compass:
+                    Intent compassIntent=new Intent();
+                    compassIntent.setClass(MainActivity.this,CompassActivity.class);
+                    startActivity(compassIntent);
                     break;
             }
             return true;
@@ -475,24 +559,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
         mMapView.onPause();
+        StatService.onPause(this);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mMapView.onResume();
+        StatService.onResume(this);
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+
         mBaiduMap.setMyLocationEnabled(false);
-        bitmaplocation.recycle();
+        bitmaplocation1.recycle();
+        bitmaplocation2.recycle();
         BaiduMapNavigation.finish(this);
+         dialog.dismiss();
         mMapView.onDestroy();//销毁地图
+        super.onDestroy();
     }
 
-    public LatLng ComanLngConvertBdLngt(LatLng lat, int coordstyle, int datastyle) {
+    //wgs84 ，baidu 转换成百度格式
+    public static LatLng ComanLngConvertBdLngt(LatLng lat, int coordstyle, int datastyle) {
         LatLng bdLng = null;
         switch (coordstyle) {
             case LatStyle.GPSSYTELE://84
@@ -539,39 +630,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return bdLng;
     }
 
-    private final int INTENT_MARKER = 1;
-    private final int DIALOG_MARKER = 2;
-    private final String MAKER_STYLE = "marker_style";
 
-    private void addMark(LatLng bdlat, LatLng orlat, int markerstyle) {
-        Bundle bundle = new Bundle();
-        bundle.putInt(MAKER_STYLE, markerstyle);
-        bundle.putDouble("latitude", orlat.latitude);
-        bundle.putDouble("longitude", orlat.longitude);
-        OverlayOptions options2 = new MarkerOptions().position(bdlat).icon(bitmaplocation).extraInfo(bundle);
+    private void addMark(LatLng bdlat, Bundle bundle) {
+        OverlayOptions options2 = new MarkerOptions().position(bdlat).icons(bitmaplocation).extraInfo(bundle).period(25);
         mBaiduMap.addOverlay(options2);
         setMapCenter(bdlat.latitude, bdlat.longitude);
     }
 
     public void showpopupwindows(final MyItem item) {
         LayoutInflater inflater = getLayoutInflater();
-        android.support.v7.widget.CardView card;
+        LinearLayout ll;
         TextView lat;
-        TextView lng;
         TextView name;
-        ImageView iv;
+        Button btn_detail;
+        Button btn_navagation;
+        Button btn_share;
         View view = inflater.inflate(R.layout.popupwindow, null);
         final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         name = (TextView) view.findViewById(R.id.tv_name);
         lat = (TextView) view.findViewById(R.id.tv_lat);
-        lng = (TextView) view.findViewById(R.id.tv_lng);
-        card = (CardView) view.findViewById(R.id.card_popup);
-        iv = (ImageView) view.findViewById(R.id.iv_goto);
+        ll = (LinearLayout) view.findViewById(R.id.card_popup);
+        btn_detail= (Button) view.findViewById(R.id.btn_main_detailed);
+        btn_navagation= (Button) view.findViewById(R.id.btn_main_navigation);
+        btn_share= (Button) view.findViewById(R.id.btn_main_share);
         name.setText(item.getDataItem().getName());
         DecimalFormat df = new DecimalFormat("#.0000000");
-        lat.setText(String.valueOf(df.format(item.getDataItem().getLatLng().latitude)));
-        lng.setText(String.valueOf(df.format(item.getDataItem().getLatLng().longitude)));
-        card.setOnKeyListener(new View.OnKeyListener() {
+        lat.setText("LAT:"+String.valueOf(df.format(item.getDataItem().getLatLng().latitude))
+                +"LNG:"+String.valueOf(df.format(item.getDataItem().getLatLng().longitude)));
+        ll.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && i == KeyEvent.KEYCODE_BACK)
@@ -579,39 +665,197 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
-        iv.setOnClickListener(new View.OnClickListener() {
+        btn_detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               showDescribe(item.dataItem.getPointDataParcel());
+            }
+        });
+        btn_navagation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startnavi(item.getPosition());
             }
         });
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              shareText(item.dataItem.getPointDataParcel());
+            }
+        });
         popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAsDropDown(zoomControlsView);
+        popupWindow.showAtLocation(findViewById(R.id.main), Gravity.BOTTOM | Gravity.RELATIVE_LAYOUT_DIRECTION, 0, 0);
         popupWindow.setAnimationStyle(R.style.anim_menu_bottombar);
     }
+    public void showDescribe(PointDataParcel pp){
+        pp.setActivity(WayponitActivity.DATAMANAGERACTIVITY);
+        Intent intent=new Intent();
+        intent.putExtra(WayponitActivity.POINTDATA,pp);
+        intent.setClass(MainActivity.this, WayponitActivity.class);
+        startActivity(intent);
+    }
+    public void shareText( PointDataParcel pp) {
+        Intent shareIntent = new Intent();
+        String content="名称:"+pp.getPointname()+"\n"+"WGS经纬度"+pp.getWgsLatitude()+","+pp.getWgsLongitude()+"\n"+"baidu经纬度:"
+                +pp.getBaiduLatitude()+","+pp.getBaiduLongitude()+"\n"+"地址:"+pp.getAddress();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, content);
+        shareIntent.setType("text/plain");
+
+        //设置分享列表的标题，并且每次都显示分享列表
+        startActivity(Intent.createChooser(shareIntent, "分享到"));
+    }
+    private View showpopupwindow() {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.locationpopupwindow, null);
+        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        DisplayLocationInfo(view, bdLocationForpw, bdLng);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAsDropDown(toolbar);
+        popupWindow.setAnimationStyle(R.style.anim_menu_bottombar);
+        return view;
+
+    }
+
+    private int SELECT = 0;
+
+    public void DisplayLocationInfo(View view, BDLocation locationInfo, final LatLng bdLng) {
+        TextView tvAddress = (TextView) view.findViewById(R.id.et_address);
+        TextView tvNotice = (TextView) view.findViewById(R.id.et_notice_text);
+        final TextView tvLat = (TextView) view.findViewById(R.id.et_lat_text);
+        final TextView tvLong = (TextView) view.findViewById(R.id.et_lon_text);
+        TextView tvAccuracy = (TextView) view.findViewById(R.id.et_accuracy_text);
+        TextView tvSpeed = (TextView) view.findViewById(R.id.et_speed_text);
+        TextView tvAltitude = (TextView) view.findViewById(R.id.et_altitude_text);
+        TextView tvDerection = (TextView) view.findViewById(R.id.et_direction_text);
+        final TextView tvwgs = (TextView) view.findViewById(R.id.tv_wgs);
+        final TextView tvbaidu = (TextView) view.findViewById(R.id.tv_baidu);
+        final TextView tvlatitude = (TextView) view.findViewById(R.id.tv_latitude);
+        final TextView tvlongitude = (TextView) view.findViewById(R.id.tv_longtitude);
+        if(locationInfo.hasAddr())
+        {  address = locationInfo.getAddress().address;}
+
+        String notice ;
+        if (locationInfo.getLocType() != BDLocation.TypeGpsLocation) {
+            notice = "GPS未开启";
+        } else {
+            notice = "GPS已开启";
+        }
+        tvAddress.setText(address);
+        tvNotice.setText(notice);
+        DecimalFormat dfthree = new DecimalFormat("#.000");
+        if(locationInfo.hasAltitude())
+        { altitude = String.valueOf(dfthree.format(locationInfo.getAltitude()));}
+         if (locationInfo.hasAltitude()) {
+            tvAltitude.setText(altitude + "米");//海拔
+             }
+            if (locationInfo.hasSpeed()) {
+                tvSpeed.setText(String.valueOf(dfthree.format(locationInfo.getSpeed())) + "km/h");
+            }
+            if (locationInfo.hasRadius()) {
+                tvAccuracy.setText(String.valueOf(dfthree.format(locationInfo.getRadius())) + "米");
+            }
+            final DecimalFormat df = new DecimalFormat("#.0000000");
+            final JZLocationConverter.LatLng location = JZLocationConverter.gcj02ToWgs84(new JZLocationConverter.LatLng(locationInfo.getLatitude(), locationInfo.getLongitude()));
+            tvDerection.setText(String.valueOf(locationInfo.getDirection()));
+            final String wgsLatitude = String.valueOf((df.format(location.getLatitude())));
+            final String wgsLongitude = String.valueOf(df.format(location.getLongitude()));
+            final String baiduLatidude = String.valueOf((df.format(bdLng.latitude)));
+            final String baiduLongitude = String.valueOf(df.format(bdLng.longitude));
+            if (SELECT == 0) {
+                tvlatitude.setText("WGS纬度");
+                tvlongitude.setText("WGS经度");
+                tvwgs.setTextColor(getResources().getColor(R.color.white));
+                tvbaidu.setTextColor(getResources().getColor(R.color.colorPrimary));
+                tvLat.setText(wgsLatitude);
+                tvLong.setText(wgsLongitude);
+            } else {
+                tvlatitude.setText("baidu纬度");
+                tvlongitude.setText("baidu经度");
+                tvbaidu.setTextColor(getResources().getColor(R.color.white));
+                tvwgs.setTextColor(getResources().getColor(R.color.colorPrimary));
+                tvLat.setText(baiduLatidude);
+                tvLong.setText(baiduLongitude);
+            }
+
+            Button btnSave = (Button) view.findViewById(R.id.btn_save);
+
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PointDataParcel pointData = new PointDataParcel();
+                    pointData.setAddress(address);
+                    pointData.setWgsLatitude(wgsLatitude);
+                    pointData.setWgsLongitude(wgsLongitude);
+                    pointData.setBaiduLatitude(baiduLatidude);
+                    pointData.setBaiduLongitude(baiduLongitude);
+                    pointData.setAltitude(altitude);
+                    pointData.setPointname(null);
+                    pointData.setActivity(WayponitActivity.MAIACTIVTY);
+                    Intent intent = new Intent();
+                    intent.putExtra(WayponitActivity.POINTDATA, pointData);
+                    intent.setClass(MainActivity.this, WayponitActivity.class);
+                    startActivity(intent);
+
+                }
+            });
+
+
+            tvwgs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SELECT = 0;
+                    tvlatitude.setText("WGS纬度");
+                    tvlongitude.setText("WGS经度");
+                    tvwgs.setTextColor(getResources().getColor(R.color.white));
+                    tvbaidu.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvLat.setText(String.valueOf((df.format(location.getLatitude()))));
+                    tvLong.setText(String.valueOf(df.format(location.getLongitude())));
+                }
+            });
+            tvbaidu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SELECT = 1;
+                    tvlatitude.setText("baidu纬度");
+                    tvlongitude.setText("baidu经度");
+                    tvbaidu.setTextColor(getResources().getColor(R.color.white));
+                    tvwgs.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvLat.setText(String.valueOf((df.format(bdLng.latitude))));
+                    tvLong.setText(String.valueOf(df.format(bdLng.longitude)));
+                }
+            });
+        }
 
     public void showpopupwindows(final Marker marker, Bundle bundle) {
         LayoutInflater inflater = getLayoutInflater();
-        android.support.v7.widget.CardView card;
-        TextView lat;
-        TextView lng;
+        LinearLayout ll;
+        TextView address;
         TextView name;
-        ImageView iv;
+        Button btn_detail;
+        Button btn_navagation;
+        Button btn_share;
         View view = inflater.inflate(R.layout.popupwindow, null);
         final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         name = (TextView) view.findViewById(R.id.tv_name);
-        lat = (TextView) view.findViewById(R.id.tv_lat);
-        lng = (TextView) view.findViewById(R.id.tv_lng);
-        card = (CardView) view.findViewById(R.id.card_popup);
-        iv = (ImageView) view.findViewById(R.id.iv_goto);
-        if (bundle.getInt(MAKER_STYLE) == INTENT_MARKER) {
-            name.setText(bundle.getString("name"));
+        address = (TextView) view.findViewById(R.id.tv_lat);
+        ll = (LinearLayout) view.findViewById(R.id.card_popup);
+        btn_detail= (Button) view.findViewById(R.id.btn_main_detailed);
+        btn_navagation= (Button) view.findViewById(R.id.btn_main_navigation);
+        btn_share= (Button) view.findViewById(R.id.btn_main_share);
+        final PointDataParcel pp=bundle.getParcelable(MARKBUNDLE);
+        name.setText(pp.getPointname());
+        if(pp.getAddress().isEmpty()){
+            PointData pointData=data.findPointDataDaoById(pp.getPointdataid());
+
+            String text="LAT:"+pointData.getLatitude()+" "+"LNG:"+pointData.getLongitude();
+            address.setText(text);
+        }else {
+            address.setText(pp.getAddress());
         }
-        DecimalFormat df = new DecimalFormat("#.0000000");
-        lat.setText(String.valueOf(df.format(bundle.getDouble("latitude"))));
-        lng.setText(String.valueOf(df.format(bundle.getDouble("longitude"))));
-        card.setOnKeyListener(new View.OnKeyListener() {
+        ll.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN && i == KeyEvent.KEYCODE_BACK)
@@ -619,15 +863,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
-        iv.setOnClickListener(new View.OnClickListener() {
+        btn_detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              showDescribe(pp);
+            }
+        });
+        btn_navagation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startnavi(marker.getPosition());
+
+            }
+        });
+        btn_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shareText(pp);
             }
         });
         popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
         popupWindow.setOutsideTouchable(true);
-        popupWindow.showAsDropDown(zoomControlsView);
+        popupWindow.showAtLocation(findViewById(R.id.main), Gravity.BOTTOM|Gravity.RELATIVE_LAYOUT_DIRECTION,0,0);
         popupWindow.setAnimationStyle(R.style.anim_menu_bottombar);
     }
 
@@ -635,7 +892,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Bundle bundle = new Bundle();
         bundle = marker.getExtraInfo();
         if (bundle != null) {
-
             showpopupwindows(marker, bundle);
         }
 
@@ -643,31 +899,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void ShowDialog() {
         Spinner spinner;
-        datastyle = LatStyle.DEGREE;
+        datastyle =data.currentLatFormat;
+        coordstyle=data.currentCoordinate;
         final EditText edtLatitude;
         final EditText edtLongtitude;
         RadioGroup radioGroup;
-        final RadioButton radiobtnDecimal;
+        final RadioButton radiobtnDegree;
+        final RadioButton radiobtndms;
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.dialog_data, null);
         AlertDialog.Builder buildersearch = new AlertDialog.Builder(MainActivity.this);
         buildersearch.setView(dialogView);
         spinner = (Spinner) dialogView.findViewById(R.id.spn_cds);
+        spinner.setSelection(data.currentCoordinate);
+        radiobtnDegree= (RadioButton) dialogView.findViewById(R.id.radio_decimal);
+        radiobtndms= (RadioButton) dialogView.findViewById(R.id.radio_dms);
         edtLatitude = (EditText) dialogView.findViewById(R.id.edt_latitude);
         edtLongtitude = (EditText) dialogView.findViewById(R.id.edt_longtitude);
-        radiobtnDecimal = (RadioButton) dialogView.findViewById(R.id.radio_decimal);
+        if (datastyle==LatStyle.DEGREE){
+            radiobtnDegree.setChecked(true);
+        }else {
+            radiobtndms.setChecked(true);
+        }
         radioGroup = (RadioGroup) dialogView.findViewById(R.id.radgroup);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                if (i == radiobtnDecimal.getId()) {
+                if (i == radiobtnDegree.getId()) {
                     datastyle = LatStyle.DEGREE;
-                    edtLatitude.setHint("39.9631757745");
-                    edtLongtitude.setHint("116.4002442204");
+                    data.setCurrentLatFormat(LatStyle.DEGREE);
+                    edtLatitude.setHint("39.9631757");
+                    edtLongtitude.setHint("116.4002442");
                 } else {
                     datastyle = LatStyle.DMS;
-                    edtLatitude.setHint("30.3452458");
-                    edtLongtitude.setHint("120.1428354");
+                    data.setCurrentLatFormat(LatStyle.DMS);
+                    edtLatitude.setHint("30.345245");
+                    edtLongtitude.setHint("120.142835");
 
                 }
             }
@@ -677,23 +944,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onItemSelected(AdapterView parent, View view,
                                        int position, long id) {
                 coordstyle = position;
+                data.setCurrentCoordinate(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView parent) {
-// TODO Auto-generated method stub
             }
         });
         buildersearch.setTitle("经纬度查询");
         buildersearch.setPositiveButton("查看", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (edtLatitude.getText().toString().isEmpty() != true && edtLongtitude.getText().toString().isEmpty() != true) {
+                if (!edtLatitude.getText().toString().isEmpty()  && !edtLongtitude.getText().toString().isEmpty() ) {
                     LatLng point = new LatLng(Double.parseDouble(edtLatitude.getText().toString()), Double.parseDouble(edtLongtitude.getText().toString()));
-                    Log.d("showss", String.valueOf(point.latitude));
-                    Log.d("showss", String.valueOf(point.longitude));
                     LatLng bd = ComanLngConvertBdLngt(point, coordstyle, datastyle);
-                    addMark(bd, point, DIALOG_MARKER);
+                    PointData pointData=new PointData();
+                    pointData.setAddress("");
+                    DecimalFormat df=new DecimalFormat("#.0000000");
+                    pointData.setLatitude(edtLatitude.getText().toString());
+                    pointData.setLongitude(edtLongtitude.getText().toString());
+                    pointData.setBaidulatitude(String.valueOf(df.format(bd.latitude)));
+                    pointData.setBaidulongitude(String.valueOf(df.format(bd.longitude)));
+                    pointData.setName("");
+                    data.createPointData(data.findOrderByName("我的收藏"), pointData);
+                    ShowData showData=new ShowData();
+                    showData.setTitle(pointData.getName());
+                    showData.setLatitude(pointData.getBaidulatitude());
+                    showData.setLongitude(pointData.getBaidulongitude());
+                    showData.setCdstyle(LatStyle.BAIDUMAPSTYELE);
+                    showData.setDatastyle(LatStyle.DEGREE);
+                    showData.setPointid(pointData.getId());
+                    showData.setFileid(data.findOrderByName("我的收藏").getId());
+                    data.getmDaoSession().getShowDataDao().insert(showData);
+                    PointDataParcel pp=setPointdataParcel(data.findOrderByName("我的收藏"),pointData);
+                    Bundle bundle=new Bundle();
+                    bundle.putParcelable(MARKBUNDLE,pp);
+                    addMark(bd, bundle);
                 }
             }
         });
@@ -706,44 +992,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buildersearch.create().show();
     }
 
-    private String address;
+//    private String address;
 
-    private void getaddress(LatLng bdlat) {
-        address = "";
-        Log.d("address", "sfsa");
-        GeoCoder geoCoder = GeoCoder.newInstance();
-        //
-        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
-            // 反地理编码查询结果回调函数
-            @Override
-            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-                if (result == null
-                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
-                    // 没有检测到结果
-                    Toast.makeText(MainActivity.this, "抱歉，未能找到结果",
-                            Toast.LENGTH_LONG).show();
-                }
-                Toast.makeText(getApplicationContext(),
-                        "位置：" + result.getAddress(), Toast.LENGTH_LONG)
-                        .show();
-                address = result.getAddress();
-            }
-
-            // 地理编码查询结果回调函数
-            @Override
-            public void onGetGeoCodeResult(GeoCodeResult result) {
-                if (result == null
-                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
-                    // 没有检测到结果
-                }
-            }
-        };
-        // 设置地理编码检索监听者
-        geoCoder.setOnGetGeoCodeResultListener(listener);
-        //
-        geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(bdlat));
-        Log.d("address", address);
-    }
+//    private void getaddress(LatLng bdlat) {
+//        address = "";
+//        Log.d("address", "sfsa");
+//        GeoCoder geoCoder = GeoCoder.newInstance();
+//        //
+//        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
+//            // 反地理编码查询结果回调函数
+//            @Override
+//            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+//                if (result == null
+//                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
+//                    // 没有检测到结果
+//                    Toast.makeText(MainActivity.this, "抱歉，未能找到结果",
+//                            Toast.LENGTH_LONG).show();
+//                }
+//                Toast.makeText(getApplicationContext(),
+//                        "位置：" + result.getAddress(), Toast.LENGTH_LONG)
+//                        .show();
+//                address = result.getAddress();
+//            }
+//
+//            // 地理编码查询结果回调函数
+//            @Override
+//            public void onGetGeoCodeResult(GeoCodeResult result) {
+//                if (result == null
+//                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
+//                    // 没有检测到结果
+//                }
+//            }
+//        };
+//        // 设置地理编码检索监听者
+//        geoCoder.setOnGetGeoCodeResultListener(listener);
+//        //
+//        geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(bdlat));
+//        Log.d("address", address);
+//    }
 
     // 调起百度地图导航
     private void startnavi(LatLng latLng) {
@@ -781,4 +1067,141 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         builder.create().show();
 
     }
+
+//    private void createBananer() {
+//        bannerAdView = new BDBannerAd(this, "liVzL2XTz0ComDCCTtB01gNBdOKvOoPx",
+//                "5FTmGUDU0rFWg1meBLSO65tM");
+//
+//        // 设置横幅广告展示尺寸，如不设置，默认为SIZE_FLEXIBLE;
+//        bannerAdView.setAdSize(BDBannerAd.SIZE_FLEXIBLE);
+//
+//        // 设置横幅广告行为监听器
+//        bannerAdView.setAdListener(new BDBannerAd.BannerAdListener() {
+//
+//            @Override
+//            public void onAdvertisementDataDidLoadFailure() {
+//                Log.e(TAG, "load failure");
+//            }
+//
+//            @Override
+//            public void onAdvertisementDataDidLoadSuccess() {
+//                Log.e(TAG, "load success");
+//            }
+//
+//            @Override
+//            public void onAdvertisementViewDidClick() {
+//                Log.e(TAG, "on click");
+//            }
+//
+//            @Override
+//            public void onAdvertisementViewDidShow() {
+//                Log.e(TAG, "on show");
+//            }
+//
+//            @Override
+//            public void onAdvertisementViewWillStartNewIntent() {
+//                Log.e(TAG, "leave app");
+//            }
+//        });
+//
+//        // 创建广告容器
+//        appxBannerContainer = (RelativeLayout) findViewById(R.id.appx_banner_container);
+//
+//        // 显示广告视图
+//        appxBannerContainer.addView(bannerAdView);
+//    }
+public void createAD(){
+
+    AppActivity.setActionBarColorTheme(AppActivity.ActionBarColorTheme.ACTION_BAR_BLUE_THEME);
+//        另外，也可设置动作栏中单个元素的颜色, 颜色参数为四段制，0xFF(透明度, 一般填FF)DE(红)DA(绿)DB(蓝)
+//        AppActivity.getActionBarColorTheme().set[Background|Title|Progress|Close]Color(0xFFDEDADB);
+
+    // 创建广告View
+    String adPlaceId = "2431165";
+    adView = new AdView(this, adPlaceId);
+    // 设置监听器
+    adView.setListener(new AdViewListener() {
+        public void onAdSwitch() {
+            Log.w("", "onAdSwitch");
+        }
+
+        public void onAdShow(JSONObject info) {
+            // 广告已经渲染出来
+            Log.w("", "onAdShow " + info.toString());
+        }
+
+        public void onAdReady(AdView adView) {
+            // 资源已经缓存完毕，还没有渲染出来
+            Log.w("", "onAdReady " + adView);
+        }
+
+        public void onAdFailed(String reason) {
+            Log.w("", "onAdFailed " + reason);
+        }
+
+        public void onAdClick(JSONObject info) {
+            // Log.w("", "onAdClick " + info.toString());
+
+        }
+    });
+    appxBannerContainer = (RelativeLayout) findViewById(R.id.appx_banner_container);
+    appxBannerContainer.addView(adView);
 }
+    public void startCount() {
+        boolean isWear = getPackageManager().hasSystemFeature("android.hardware.type.watch");
+
+        Log.e("TEST", "isWear: " + isWear);
+
+        Log.e("TEAT", "manufacturer: " + Build.MANUFACTURER);
+
+        // 设置AppKey
+        // StatService.setAppKey("a9e2ad84a2"); // appkey必须在mtj网站上注册生成，该设置建议在AndroidManifest.xml中填写，代码设置容易丢失
+
+        /*
+         * 设置渠道的推荐方法。该方法同setAppChannel（String）， 如果第三个参数设置为true（防止渠道代码设置会丢失的情况），将会保存该渠道，每次设置都会更新保存的渠道，
+         * 如果之前的版本使用了该函数设置渠道，而后来的版本需要AndroidManifest.xml设置渠道，那么需要将第二个参数设置为空字符串,并且第三个参数设置为false即可。
+         * appChannel是应用的发布渠道，不需要在mtj网站上注册，直接填写就可以 该参数也可以设置在AndroidManifest.xml中
+         */
+//        StatService.setAppChannel(this, "RepleceWithYourChannel", true);
+        // 测试时，可以使用1秒钟session过期，这样不断的间隔1S启动退出会产生大量日志。
+        StatService.setSessionTimeOut(30);
+        // setOn也可以在AndroidManifest.xml文件中填写，BaiduMobAd_EXCEPTION_LOG，打开崩溃错误收集，默认是关闭的
+        StatService.setOn(this, StatService.EXCEPTION_LOG);
+        /*
+         * 设置启动时日志发送延时的秒数<br/> 单位为秒，大小为0s到30s之间<br/> 注：请在StatService.setSendLogStrategy之前调用，否则设置不起作用
+         *
+         * 如果设置的是发送策略是启动时发送，那么这个参数就会在发送前检查您设置的这个参数，表示延迟多少S发送。<br/> 这个参数的设置暂时只支持代码加入，
+         * 在您的首个启动的Activity中的onCreate函数中使用就可以。<br/>
+         */
+        StatService.setLogSenderDelayed(0);
+        /*
+         * 用于设置日志发送策略<br /> 嵌入位置：Activity的onCreate()函数中 <br />
+         *
+         * 调用方式：StatService.setSendLogStrategy(this,SendStrategyEnum. SET_TIME_INTERVAL, 1, false); 第二个参数可选：
+         * SendStrategyEnum.APP_START SendStrategyEnum.ONCE_A_DAY SendStrategyEnum.SET_TIME_INTERVAL 第三个参数：
+         * 这个参数在第二个参数选择SendStrategyEnum.SET_TIME_INTERVAL时生效、 取值。为1-24之间的整数,即1<=rtime_interval<=24，以小时为单位 第四个参数：
+         * 表示是否仅支持wifi下日志发送，若为true，表示仅在wifi环境下发送日志；若为false，表示可以在任何联网环境下发送日志
+         */
+        StatService.setSendLogStrategy(this, SendStrategyEnum.SET_TIME_INTERVAL, 1, false);
+        // 调试百度统计SDK的Log开关，可以在Eclipse中看到sdk打印的日志，发布时去除调用，或者设置为false
+        StatService.setDebugOn(true);
+
+        String sdkVersion = StatService.getSdkVersion();
+    }
+    private  PointDataParcel setPointdataParcel(Files files,PointData pointData){
+        PointDataParcel pp = new PointDataParcel();
+        pp.setActivity(WayponitActivity.DATAMANAGERACTIVITY);
+        pp.setAddress(pointData.getAddress());
+        pp.setPointname(pointData.getName());
+        pp.setAltitude(pointData.getAltitude());
+        pp.setBaiduLongitude(pointData.getBaidulongitude());
+        pp.setBaiduLatitude(pointData.getBaidulatitude());
+        pp.setWgsLatitude(pointData.getWgslatitude());
+        pp.setWgsLongitude(pointData.getWgslongitude());
+        pp.setDescribe(pointData.getDescribe());
+        pp.setPointdataid(pointData.getId());
+        pp.setFileid(files.getId());
+        return pp;
+    }
+}
+

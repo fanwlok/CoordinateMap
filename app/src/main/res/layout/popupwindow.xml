@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_popup"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="200dp"
     android:focusable="true"
+    android:orientation="vertical"
+    android:background="@color/white"
     android:focusableInTouchMode="true">
 
     <RelativeLayout
@@ -12,7 +14,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="16dp"
             android:orientation="vertical">
@@ -29,11 +31,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LAT:"
-                    android:textColor="@color/textcontent" />
+
 
                 <TextView
                     android:id="@+id/tv_lat"
@@ -41,11 +39,6 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/textcontent" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=" LNG:"
-                    android:textColor="@color/textcontent" />
 
                 <TextView
                     android:id="@+id/tv_lng"
@@ -53,25 +46,47 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/textcontent" />
 
-                <TextView
-                    android:id="@+id/tv_address"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/textcolor" />
+
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/iv_goto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/imagebutton"
-            android:clickable="true"
-            android:scaleType="centerInside"
-            android:src="@mipmap/ic_trending_up_grey600_36dp" />
-    </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/listdiver"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_main_detailed"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_popup"
+            android:text="详情"
+            android:textColor="@color/colorPrimary"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btn_main_navigation"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="导航"
+            android:background="@drawable/btn_popup"
+            android:textColor="@color/colorPrimary"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btn_main_share"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_popup"
+            android:text="分享"
+            android:textColor="@color/colorPrimary"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+</LinearLayout>

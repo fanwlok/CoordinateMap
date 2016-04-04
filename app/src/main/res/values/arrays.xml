@@ -3,6 +3,6 @@
     <string-array name="coordstyle">
         <item>WGS84坐标系</item>
         <item> 百度坐标系</item>
-        <item> GCJ-02</item>
+        <item> 其它</item>
     </string-array>
 </resources>

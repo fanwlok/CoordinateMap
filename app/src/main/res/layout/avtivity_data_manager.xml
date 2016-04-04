@@ -5,82 +5,82 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:id="@+id/data_manager_topbar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/colorPrimary">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/data_manager_topbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dp"-->
+        <!--android:background="@color/colorPrimary">-->
 
-        <ImageView
-            android:id="@+id/data_manager_iv_back"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:onClick="back"
-            android:paddingBottom="7dp"
-            android:paddingLeft="7dp"
-            android:paddingRight="7dp"
-            android:paddingTop="7dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/topbar_back" />
+        <!--<ImageView-->
+            <!--android:id="@+id/data_manager_iv_back"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:onClick="back"-->
+            <!--android:paddingBottom="7dp"-->
+            <!--android:paddingLeft="7dp"-->
+            <!--android:paddingRight="7dp"-->
+            <!--android:paddingTop="7dp"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@drawable/topbar_back" />-->
 
-        <TextView
-            android:id="@+id/data_manager_text_filname"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:textColor="@color/icons"
-            android:textSize="20sp" />
+        <!--<TextView-->
+            <!--android:id="@+id/data_manager_text_filname"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:gravity="center"-->
+            <!--android:textColor="@color/icons"-->
+            <!--android:textSize="20sp" />-->
 
-        <ImageView
-            android:id="@+id/data_navigation"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/data_search"
-            android:background="@drawable/topbarimg"
-            android:onClick="navigation"
-            android:paddingBottom="7dp"
-            android:paddingLeft="7dp"
-            android:paddingRight="7dp"
-            android:paddingTop="7dp"
-            android:scaleType="centerInside"
-            android:src="@mipmap/ic_pin_drop_white_36dp" />
+        <!--<ImageView-->
+            <!--android:id="@+id/data_navigation"-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_toLeftOf="@+id/data_search"-->
+            <!--android:background="@drawable/topbarimg"-->
+            <!--android:onClick="navigation"-->
+            <!--android:paddingBottom="7dp"-->
+            <!--android:paddingLeft="7dp"-->
+            <!--android:paddingRight="7dp"-->
+            <!--android:paddingTop="7dp"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@mipmap/ic_pin_drop_white_36dp" />-->
 
-        <ImageView
-            android:id="@+id/data_search"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/topbarimg"
-            android:iconifiedByDefault="true"
-            android:onClick="search"
-            android:paddingBottom="7dp"
-            android:paddingLeft="7dp"
-            android:paddingRight="7dp"
-            android:paddingTop="7dp"
-            android:scaleType="centerInside"
-            android:src="@mipmap/ic_search_white_36dp" />
-    </RelativeLayout>
+        <!--<ImageView-->
+            <!--android:id="@+id/data_search"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:background="@drawable/topbarimg"-->
+            <!--android:iconifiedByDefault="true"-->
+            <!--android:onClick="search"-->
+            <!--android:paddingBottom="7dp"-->
+            <!--android:paddingLeft="7dp"-->
+            <!--android:paddingRight="7dp"-->
+            <!--android:paddingTop="7dp"-->
+            <!--android:scaleType="centerInside"-->
+            <!--android:src="@mipmap/ic_search_white_36dp" />-->
+    <!--</RelativeLayout>-->
 
-    <RelativeLayout
-        android:id="@+id/rl_search"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/secondprimary"
-        android:visibility="gone">
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/rl_search"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="48dp"-->
+        <!--android:background="@color/secondprimary"-->
+        <!--android:visibility="gone">-->
 
-        <SearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:iconifiedByDefault="false"
-            android:queryHint="@string/contains"></SearchView>
-    </RelativeLayout>
-
+        <!--<SearchView-->
+            <!--android:id="@+id/search_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:iconifiedByDefault="true"-->
+            <!--android:queryHint="@string/contains"></SearchView>-->
+    <!--</RelativeLayout>-->
+<include layout="@layout/toolbar"/>
     <com.fanweilin.coordinatemap.widget.CheckableRelativeLayout
         android:id="@+id/select_all"
         android:layout_width="match_parent"
@@ -131,18 +131,21 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/btnsave"
             android:gravity="center"
             android:text="@string/cancle"
+            android:textColor="@color/white"
             android:textSize="14sp" />
-
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_show"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_weight="1"
+            android:background="@drawable/btnsave"
             android:gravity="center"
             android:text="@string/show"
+            android:textColor="@color/white"
             android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

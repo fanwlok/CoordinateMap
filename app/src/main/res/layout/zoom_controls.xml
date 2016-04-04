@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/windowBackground">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/transparent">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:id="@+id/btn_zoom_in"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/imagebutton"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_add_grey600_48dp" />
 
-    <ImageButton
-        android:id="@+id/btn_zoom_in"
-        android:layout_width="40dp"
-        android:layout_height="45dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/imagebutton"
-        android:padding="5dp"
-        android:scaleType="centerInside"
-        android:src="@mipmap/ic_add_grey600_48dp" />
+        <View
+            android:id="@+id/temp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/btn_zoom_in"
+            android:background="@color/listdiver" />
 
-    <View
-        android:id="@+id/temp"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/btn_zoom_in"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@color/listdiver" />
-
-    <ImageButton
-        android:id="@+id/btn_zoom_out"
-        android:layout_width="40dp"
-        android:layout_height="45dp"
-        android:layout_below="@+id/temp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/imagebutton"
-        android:padding="5dp"
-        android:scaleType="centerInside"
-        android:src="@mipmap/ic_remove_grey600_48dp" />
-</RelativeLayout>
+        <ImageButton
+            android:id="@+id/btn_zoom_out"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_below="@+id/temp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/imagebutton"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@mipmap/ic_remove_grey600_48dp" />
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

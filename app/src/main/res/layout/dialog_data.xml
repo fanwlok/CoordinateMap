@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/decimal"
-            android:checked="true"/>
+            />
 
         <RadioButton
             android:id="@+id/radio_dms"
@@ -68,8 +68,9 @@
             android:layout_centerVertical="true"
             android:inputType="numberDecimal"
             android:singleLine="true"
+            android:hint="39.9631757"
             android:textColorHint="@color/textcontent"
-            android:hint="39.9631757745"/>
+            />
     </RelativeLayout>
 
     <RelativeLayout
@@ -92,7 +93,7 @@
             android:layout_toRightOf="@+id/tv_longtitude"
             android:layout_width="match_parent"
             android:layout_centerVertical="true"
-            android:hint="116.4002442204"
+            android:hint="116.4002442"
             android:inputType="numberDecimal"
             android:singleLine="true"
             android:textColorHint="@color/textcontent"

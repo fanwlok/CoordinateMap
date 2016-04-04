@@ -1,23 +1,27 @@
 package com.fanweilin.coordinatemap.Activity;
 
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.baidu.mobstat.StatService;
 import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.R;
 
@@ -27,28 +31,54 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddFileActivity extends ListActivity implements View.OnClickListener {
+public class AddFileActivity extends AppCompatActivity {
     private final String mDir = Environment.getExternalStorageDirectory().getPath();
     private List<Map<String, Object>> mData;
     private String path;
-    private Button btn;
+    private ListView list;
+   private Myadpter adapter;
     private int CoordStyle = LatStyle.GPSSYTELE;
     private int DataStye = LatStyle.DEGREE;
-
+    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_file);
-        btn = (Button) findViewById(R.id.btn_help);
+        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.item_addfile_help:
+                        onClick();
+                        break;
+                }
+                return false;
+            }
+        });
         path = mDir;
         mData = getData();
-        Myadpter adapter = new Myadpter(this);
-        setListAdapter(adapter);
-        btn.setOnClickListener(this);
+        list= (ListView) findViewById(R.id.list);
+        adapter = new Myadpter(this);
+        list.setAdapter(adapter);
+        list.setOnItemClickListener(new onListItemClick());
 
     }
-
-
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_addfile, menu);
+        return true;
+    }
     public List<Map<String, Object>> getData() {
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         Map<String, Object> map = null;
@@ -78,38 +108,37 @@ public class AddFileActivity extends ListActivity implements View.OnClickListene
         return list;
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        path = (String) mData.get(position).get("path");
-        String title = (String) mData.get(position).get("title");
-        if (position == 0) {
-            File file = new File(path);
-            if (file.getParent() == null) {
-                finish();
-            } else if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
-                mData = getData();
-                Myadpter adapter = new Myadpter(this);
-                setListAdapter(adapter);
+   private class onListItemClick implements AdapterView.OnItemClickListener {
+       @Override
+       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+           path = (String) mData.get(position).get("path");
+           String title = (String) mData.get(position).get("title");
+           if (position == 0) {
+               File file = new File(path);
+               if (file.getParent() == null) {
+                   finish();
+               } else if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
+                   mData = getData();
+                   adapter.notifyDataSetChanged();
 
-            }
-        }
-        if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
-            mData = getData();
-            Myadpter adapter = new Myadpter(this);
-            setListAdapter(adapter);
-        } else if (title.endsWith(".txt")) {
-            setdatastyel(path,title);
-        }
-    }
 
-    @Override
-    public void onClick(View view) {
+               }
+           }
+           if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
+               mData = getData();
+               mData = getData();
+               adapter.notifyDataSetChanged();
+           } else if (title.endsWith(".txt")) {
+               setdatastyel(path, title);
+           }
+       }
+   }
+
+    public void onClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(AddFileActivity.this);
         builder.setTitle("帮助");
-        builder.setMessage("导入文本格式为:.txt\n文本数据格式为:名称,纬度,经度\n坐标系支持WGS84坐标系（GPS设备采集的原始GPS坐标）," +
-                "百度地图坐标系,其他坐标系包括（google地图、soso地图、aliyun地图、mapabc地图和amap地图所用坐标)\n本软件支持小数、" +
-                "度分秒两种格式（注：当导入度分秒格式时请转换成如下形式如30.452734,表示为30度45分27.34秒");
+        builder.setMessage("导入文本格式为txt格式.\n小数形式例:\n1,30.42454758,120.54652514\n2,30.42556235,120.88745624"
+        +"\n度分秒格式例:\n1,30.45253,120.36478\n2,30.44257,120.55786\n坐标系导入数据后在设置.");
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -150,7 +179,7 @@ public class AddFileActivity extends ListActivity implements View.OnClickListene
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            ViewHolder holder = null;
+            ViewHolder holder ;
             if (view == null) {
                 holder = new ViewHolder();
                 view = inflater.inflate(R.layout.list_file, null);
@@ -226,8 +255,15 @@ public class AddFileActivity extends ListActivity implements View.OnClickListene
         builder.show();
     }
 
-    public void back(View view) {
-        finish();
+    public void onResume() {
+        super.onResume();
+
+        StatService.onResume(this);
     }
 
+    public void onPause() {
+        super.onPause();
+
+        StatService.onPause(this);
+    }
 }

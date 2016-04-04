@@ -29,7 +29,9 @@ public class FilesDao extends AbstractDao<Files, Long> {
         public final static Property Date = new Property(3, String.class, "date", false, "DATE");
         public final static Property Cdstyle = new Property(4, Integer.class, "cdstyle", false, "CDSTYLE");
         public final static Property Datastyle = new Property(5, Integer.class, "datastyle", false, "DATASTYLE");
-    }
+    };
+
+    private DaoSession daoSession;
 
 
     public FilesDao(DaoConfig config) {
@@ -38,6 +40,7 @@ public class FilesDao extends AbstractDao<Files, Long> {
     
     public FilesDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
+        this.daoSession = daoSession;
     }
 
     /** Creates the underlying database table. */
@@ -88,6 +91,12 @@ public class FilesDao extends AbstractDao<Files, Long> {
         if (datastyle != null) {
             stmt.bindLong(6, datastyle);
         }
+    }
+
+    @Override
+    protected void attachEntity(Files entity) {
+        super.attachEntity(entity);
+        entity.__setDaoSession(daoSession);
     }
 
     /** @inheritdoc */

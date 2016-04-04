@@ -23,4 +23,18 @@
     <string name="du">度数</string>
     <string name="computer">计算</string>
     <string name="result">结果:</string>
+    <string name="wgs">WGS84</string>
+    <string name="baidu">baidu</string>
+    <string name="save">保存</string>
+    <string name="pointname">名称</string>
+    <string name="btnphoto">添加照片</string>
+    <string name="btnpicture">图库</string>
+    <string name="newfile">新建</string>
+    <string name="importfile">导 入</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="north">北</string>
+    <string name="south">南</string>
+    <string name="east">东</string>
+    <string name="west">西</string>
 </resources>
