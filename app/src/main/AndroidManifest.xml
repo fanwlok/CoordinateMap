@@ -161,7 +161,12 @@
 
         <activity android:name=".Activity.WayponitActivity" />
         <activity android:name=".Activity.FileActivity" />
-        <activity android:name=".Activity.CompassActivity"></activity>
+        <activity android:name=".Activity.CompassActivity" />
+
+        <service
+            android:name=".Activity.LocationService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

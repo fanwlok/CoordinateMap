@@ -10,9 +10,14 @@
     <item android:id="@+id/add_file"
         android:icon="@mipmap/ic_folder_open_white_48dp"
         android:title="@string/add_file"
+        android:orderInCategory="110"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/menu_main_compass"
         android:icon="@mipmap/ic_gps_not_fixed_white_48dp"
         android:title="指南针"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/menu_main_tool"
+        android:icon="@mipmap/ic_gps_not_fixed_white_48dp"
+        android:title="工具"
         app:showAsAction="ifRoom" />
 </menu>

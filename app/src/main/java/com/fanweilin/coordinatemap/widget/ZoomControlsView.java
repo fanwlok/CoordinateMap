@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 
@@ -39,7 +40,7 @@ public class ZoomControlsView extends RelativeLayout implements View.OnClickList
 
     private void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        CardView view = (CardView) inflater.inflate(R.layout.zoom_controls, null);
+        FrameLayout view = (FrameLayout) inflater.inflate(R.layout.zoom_controls, null);
         zoomIn = (ImageButton) view.findViewById(R.id.btn_zoom_in);
         zoomOut = (ImageButton) view.findViewById(R.id.btn_zoom_out);
         zoomIn.setOnClickListener(this);

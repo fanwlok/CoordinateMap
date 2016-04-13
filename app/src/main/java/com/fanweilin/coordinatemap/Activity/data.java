@@ -37,10 +37,12 @@ public class data extends Application {
     public static String currentFilename;
     public static int currentCoordinate;
     public static int currentLatFormat;
+    public static int time;
     private final String Set="set";
     private static SharedPreferences spf;
     private SharedPreferences.Editor edit;
     private static final String FILENAME="filename";
+    private static final String TIME="time";
     private static final String COORDINATE="coorditnate";
     private static final String LATFORMAT="LATFORMAT";
     @Override
@@ -49,7 +51,8 @@ public class data extends Application {
         spf=getSharedPreferences(Set, Context.MODE_APPEND);
         currentFilename = spf.getString(FILENAME, "我的收藏");
         currentCoordinate=spf.getInt(COORDINATE, WGS);
-        currentLatFormat=spf.getInt(LATFORMAT,DEGREE);
+        currentLatFormat=spf.getInt(LATFORMAT, DEGREE);
+        time=spf.getInt(TIME,0);
         edit=spf.edit();
         setdata();
     }
@@ -57,6 +60,12 @@ public class data extends Application {
         SharedPreferences.Editor edit=spf.edit();
         currentFilename=filename;
         edit.putString(FILENAME,currentFilename);
+        edit.commit();
+    };
+    public static void settime(){
+        SharedPreferences.Editor edit=spf.edit();
+        time++;
+        edit.putInt(TIME,time);
         edit.commit();
     };
     public static void setCurrentCoordinate(int coordinate){
