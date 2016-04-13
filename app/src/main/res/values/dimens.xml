@@ -3,7 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="maginparent">16dp</dimen>
-    <dimen name="imgbtn">30dp</dimen>
+    <dimen name="imgbtn">35dp</dimen>
     <dimen name="location_popwindow_tv">40dp</dimen>
     <dimen name="waypointEtmagin">50dp</dimen>
     <dimen name="space_size">10dp</dimen>
@@ -15,5 +15,6 @@
     <dimen name="compass_view_degree_string_size">11sp</dimen>
     <dimen name="compass_view_direction_string_size">23sp</dimen>
     <dimen name="compass_view_arrow_size">6dip</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>

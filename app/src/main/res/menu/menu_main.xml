@@ -16,8 +16,4 @@
         android:icon="@mipmap/ic_gps_not_fixed_white_48dp"
         android:title="指南针"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_main_tool"
-        android:icon="@mipmap/ic_gps_not_fixed_white_48dp"
-        android:title="工具"
-        app:showAsAction="ifRoom" />
 </menu>

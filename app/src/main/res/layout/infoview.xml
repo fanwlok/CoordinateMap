@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingLeft="5dp"
+    android:background="@drawable/v4_bg_ballon"
+    android:orientation="horizontal">
+    <TextView
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:id="@+id/tv_info_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp" />
+
+    <ImageButton
+        android:id="@+id/imgbtn_info_clean"
+        android:layout_width="30dp"
+        android:scaleType="centerInside"
+        android:background="@color/transparent"
+        android:src="@mipmap/ic_close_grey600_18dp"
+        android:layout_height="30dp"
+        android:tint="@color/colorPrimary"/>
+</LinearLayout>

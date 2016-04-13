@@ -37,4 +37,5 @@
     <string name="south">南</string>
     <string name="east">东</string>
     <string name="west">西</string>
+    <string name="title_activity_distance">DistanceActivity</string>
 </resources>

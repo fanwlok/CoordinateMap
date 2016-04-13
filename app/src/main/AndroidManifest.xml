@@ -166,7 +166,12 @@
         <service
             android:name=".Activity.LocationService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity
+            android:name=".Activity.DistanceActivity"
+            android:label="@string/title_activity_distance"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -10,19 +10,21 @@
             android:id="@+id/nav_down"
             android:icon="@mipmap/ic_file_download_black_36dp"
             android:title="下载离线地图" />
+
+        <item
+            android:id="@+id/nav_quit"
+            android:icon="@mipmap/ic_assignment_return_black_36dp"
+            android:title="退出" />
+
+    </group>
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_about"
             android:icon="@mipmap/ic_person_black_36dp"
             android:title="关于" />
         <item
-            android:id="@+id/nav_quit"
-            android:icon="@mipmap/ic_assignment_return_black_36dp"
-            android:title="退出" />
-        <item
             android:id="@+id/nav_update"
             android:icon="@mipmap/ic_system_update_black_36dp"
             android:title="版本更新" />
     </group>
-
-
 </menu>

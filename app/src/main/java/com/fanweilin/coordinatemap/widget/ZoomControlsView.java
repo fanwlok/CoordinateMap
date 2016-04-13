@@ -40,7 +40,7 @@ public class ZoomControlsView extends RelativeLayout implements View.OnClickList
 
     private void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        FrameLayout view = (FrameLayout) inflater.inflate(R.layout.zoom_controls, null);
+        RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.zoom_controls, null);
         zoomIn = (ImageButton) view.findViewById(R.id.btn_zoom_in);
         zoomOut = (ImageButton) view.findViewById(R.id.btn_zoom_out);
         zoomIn.setOnClickListener(this);

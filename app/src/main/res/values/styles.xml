@@ -1,8 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="AppTheme.Base">
-    </style>
+    <style name="AppTheme" parent="AppTheme.Base"></style>
 
     <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
@@ -14,6 +13,7 @@
         <item name="colorAccent">@color/colorAccent</item>
 
     </style>
+
     <style name="Bubble.TextAppearance.Dark" parent="android:TextAppearance.Medium">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">#ff7f7f7f</item>
@@ -28,26 +28,27 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <style name="AppTheme.Dialog.Alert" parent="Theme.AppCompat.Light.Dialog.Alert">
-    </style>
+
+    <style name="AppTheme.Dialog.Alert" parent="Theme.AppCompat.Light.Dialog.Alert"></style>
+
     <style name="anim_menu_bottombar">
         <item name="android:windowEnterAnimation">@anim/menu_bottombar_in</item>
         <item name="android:windowExitAnimation">@anim/menu_bottombar_out</item>
     </style>
+
     <style name="anim_popupwindow_center">
         <item name="android:windowEnterAnimation">@anim/popupwindow_center_show</item>
         <item name="android:windowExitAnimation">@anim/popupwindow_destroy</item>
     </style>
+
     <style name="ActionMenuTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
         <item name="android:textSize">@dimen/action_text_size</item>
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-    </style>
+    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar"></style>
 
-    <style name="actionBarPopupTheme" parent="ThemeOverlay.AppCompat.Light">
-    </style>
+    <style name="actionBarPopupTheme" parent="ThemeOverlay.AppCompat.Light"></style>
 
     <style name="PhotoPickerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
@@ -57,5 +58,9 @@
         <!--<item name="actionBarTheme">@style/actionBarTheme</item>-->
         <!--<item name="actionBarPopupTheme">@style/actionBarPopupTheme</item>-->
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
