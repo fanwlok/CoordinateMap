@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,6 +30,7 @@ import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.bumptech.glide.Glide;
+import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.Class.PointDataParcel;
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.coordinatemap.widget.NoScrollGridView;
@@ -35,6 +39,8 @@ import com.fanweilin.greendao.Files;
 import com.fanweilin.greendao.FilesDao;
 import com.fanweilin.greendao.PictureData;
 import com.fanweilin.greendao.PointData;
+import com.fanweilin.greendao.ShowData;
+import com.fanweilin.greendao.ShowDataDao;
 import com.foamtrace.photopicker.PhotoPickerActivity;
 import com.foamtrace.photopicker.PhotoPreviewActivity;
 import com.foamtrace.photopicker.SelectModel;
@@ -64,8 +70,8 @@ public class WayponitActivity extends AppCompatActivity implements View.OnClickL
     private int columnWidth;
     private GridAdapter gridAdapter;
     public static final String POINTDATA = "pointdata";
-    private EditText pointname;
-    private EditText describe;
+    private AutoCompleteTextView pointname;
+    private AutoCompleteTextView describe;
     private EditText wsgEdit;
     private EditText baiduEdit;
     private EditText altitude;
@@ -133,6 +139,24 @@ public class WayponitActivity extends AppCompatActivity implements View.OnClickL
                             String name = pointname.getText().toString();
                             mpointdata.setName(name);
                             data.createPointData(data.findOrderByName(data.currentFilename), mpointdata);
+                            PointDataParcel pp=new PointDataParcel();
+                            pp=setPointdataParcel(mpointdata,data.findOrderByName(data.currentFilename));
+                            Intent intent = new Intent();
+                            intent.putExtra(MainActivity.GETPOINTDATAPARCE, pp);
+                            intent.setClass(WayponitActivity.this, MainActivity.class);
+                            intent.putExtra("data", "one");
+                            ShowData showData=new ShowData();
+                            showData.setTitle(mpointdata.getName());
+                            showData.setLatitude(mpointdata.getBaidulatitude());
+                            showData.setLongitude(mpointdata.getBaidulongitude());
+                            showData.setCdstyle(LatStyle.BAIDUMAPSTYELE);
+                            showData.setDatastyle(LatStyle.DEGREE);
+                            showData.setPointid(mpointdata.getId());
+                            showData.setFileid(data.findOrderByName(data.currentFilename).getId());
+                            getShowDataDao().insert(showData);
+                            intent.putExtra(MainActivity.DATAMANAGERACTIVITY, "com.fanweilin.coordinatemap.Activity.DataManagerActivity");
+                            startActivity(intent);
+
 
                         } else if (DATAMANAGERACTIVITY.equals(pointData.getActivity())) {
                             mpointdata.setName(pointname.getText().toString());
@@ -177,11 +201,31 @@ public class WayponitActivity extends AppCompatActivity implements View.OnClickL
             }
         });
     }
+    private ShowDataDao getShowDataDao() {
+        DaoSession mDaoSession;
+        mDaoSession = data.getmDaoSession();
+        return mDaoSession.getShowDataDao();
+    }
+    private  PointDataParcel setPointdataParcel(PointData pointData,Files files){
+        PointDataParcel pp = new PointDataParcel();
+        pp.setActivity(WayponitActivity.DATAMANAGERACTIVITY);
+        pp.setAddress(pointData.getAddress());
+        pp.setPointname(pointData.getName());
+        pp.setAltitude(pointData.getAltitude());
+        pp.setBaiduLongitude(pointData.getBaidulongitude());
+        pp.setBaiduLatitude(pointData.getBaidulatitude());
+        pp.setWgsLatitude(pointData.getWgslatitude());
+        pp.setWgsLongitude(pointData.getWgslongitude());
+        pp.setDescribe(pointData.getDescribe());
+        pp.setPointdataid(pointData.getId());
+        pp.setFileid(files.getId());
+        return pp;
+    }
     private void init() {
         gridView = (NoScrollGridView) findViewById(R.id.grv_photo);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        describe = (EditText) findViewById(R.id.edt_describe);
-        pointname = (EditText) findViewById(R.id.edt_pointname);
+        describe = (AutoCompleteTextView) findViewById(R.id.edt_describe);
+        pointname = (AutoCompleteTextView) findViewById(R.id.edt_pointname);
         btncameral = (Button) findViewById(R.id.btn_cameral);
         baiduEdit = (EditText) findViewById(R.id.edt_baidu);
         wsgEdit = (EditText) findViewById(R.id.edt_wgs);

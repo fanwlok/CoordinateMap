@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -23,6 +25,7 @@ import com.baidu.mobstat.StatService;
 import com.fanweilin.coordinatemap.Class.FileStyle;
 import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.R;
+import com.fanweilin.coordinatemap.computing.ConvertLatlng;
 import com.fanweilin.greendao.DaoSession;
 import com.fanweilin.greendao.Files;
 import com.fanweilin.greendao.FilesDao;
@@ -275,6 +278,15 @@ public class FileActivity extends AppCompatActivity {
                     pointData.setBaidulatitude(String.valueOf(df.format(baiduLng.latitude)));
                     pointData.setBaidulongitude(String.valueOf(df.format(baiduLng.longitude)));
                     pointData.setAddress("");
+                    if(CoordStyle==LatStyle.GPSSYTELE){
+                        if (DataStyle==LatStyle.DEGREE){
+                            pointData.setWgslatitude(split[1]);
+                            pointData.setWgslongitude(split[2]);
+                        }else {
+                            pointData.setWgslatitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(split[1]))));
+                            pointData.setWgslongitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(split[2]))));
+                        }
+                    }
                     data.createPointData(files, pointData);
                 }
             }

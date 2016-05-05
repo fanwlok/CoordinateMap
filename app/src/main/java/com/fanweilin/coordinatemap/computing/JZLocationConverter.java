@@ -44,7 +44,7 @@ public class JZLocationConverter {
 
     private static double jzA  = 6378245.0;
     private static double jzEE = 0.00669342162296594323;
-
+    final static double x_pi = 3.14159265358979324 * 3000.0 / 180.0;
     public static double transformLat(double x, double y) {
         double ret = LAT_OFFSET_0(x, y);
         ret += LAT_OFFSET_1(x, y);
@@ -107,8 +107,8 @@ public class JZLocationConverter {
     public static LatLng bd09Decrypt(double bdLat, double bdLon) {
         LatLng gcjPt = new LatLng();
         double x = bdLon - 0.0065, y = bdLat - 0.006;
-        double z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * Math.PI);
-        double theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * Math.PI);
+        double z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi);
+        double theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi);
         gcjPt.longitude = z * Math.cos(theta);
         gcjPt.latitude = z * Math.sin(theta);
         return gcjPt;
@@ -117,8 +117,8 @@ public class JZLocationConverter {
     public static LatLng bd09Encrypt(double ggLat, double ggLon) {
         LatLng bdPt = new LatLng();
         double x = ggLon, y = ggLat;
-        double z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * Math.PI);
-        double theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * Math.PI);
+        double z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * x_pi);
+        double theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * x_pi);
         bdPt.longitude = z * Math.cos(theta) + 0.0065;
         bdPt.latitude = z * Math.sin(theta) + 0.006;
         return bdPt;
@@ -181,6 +181,7 @@ public class JZLocationConverter {
      *
      * ####此接口有1－2米左右的误差，需要精确定位情景慎用
      */
+
     public static LatLng bd09ToWgs84(LatLng location) {
         LatLng gcj02 = bd09ToGcj02(location);
         return gcj02Decrypt(gcj02.latitude, gcj02.longitude);

@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/filemamager_menu_new"
         android:title="@string/newfile"
-        android:icon="@mipmap/ic_insert_drive_file_white_48dp"
+        android:icon="@mipmap/ic_insert_drive_file_white_36dp"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/filemanager_import"
         android:title="@string/importfile"
-        android:icon="@mipmap/ic_add_white_48dp"
+        android:icon="@mipmap/ic_add_white_36dp"
         app:showAsAction="ifRoom" />
 </menu>

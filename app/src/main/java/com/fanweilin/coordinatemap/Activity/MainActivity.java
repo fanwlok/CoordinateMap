@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,7 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.autoupdatesdk.BDAutoUpdateSDK;
 import com.baidu.autoupdatesdk.UICheckUpdateCallback;
@@ -50,6 +52,7 @@ import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.DotOptions;
 import com.baidu.mapapi.map.InfoWindow;
 import com.baidu.mapapi.map.MapPoi;
+import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
@@ -65,6 +68,12 @@ import com.baidu.mapapi.model.LatLngBounds;
 import com.baidu.mapapi.navi.BaiduMapAppNotSupportNaviException;
 import com.baidu.mapapi.navi.BaiduMapNavigation;
 import com.baidu.mapapi.navi.NaviParaOption;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.baidu.mapapi.utils.CoordinateConverter;
 import com.baidu.mapapi.utils.DistanceUtil;
 import com.baidu.mapapi.utils.OpenClientUtil;
@@ -102,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public LocationClient mLocationClient = null;
     public BaiduMap mBaiduMap;
     public MapView mMapView;
-    private Button btn_gone;
     public double latitude;
     public double lontitude;
     public static String GETPOINTDATAPARCE = "getpointdataparcel";
@@ -128,11 +136,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String address = "";
     private String altitude = "";
     private RelativeLayout appxBannerContainer;
+    private RelativeLayout mapPoint;
     private ProgressDialog dialog;
     private static final String MARKBUNDLE = "markbundle";
     AdView adView;
-    private LocationService locationService;
-
+    private Marker previous;
+    private boolean TAG_SAVEPOINT = false;
+    private Button btn_mapPoint;
+    private String pointAdress;
+    Double pointlat;
+    Double pointlng;
+    TextView tv_mappoint_adress;
     //distance
     private List<LatLng> pts;
     private List<Overlay> dotOptionses;
@@ -143,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View view;
     private TextView tvDistance;
     private boolean distance = false;
+    PopupWindow popupWindowDismiss;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -219,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
+
 
     private void download() {
         Intent intent = new Intent();
@@ -305,12 +321,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.imgbtn_distance:
                 if (distance) {
                     imgDistance.setImageResource(R.mipmap.ic_ruler);
-                    for(int i=0;i<dotOptionses.size();i++){
-                        Overlay dotovlay=dotOptionses.get(i);
+                    for (int i = 0; i < dotOptionses.size(); i++) {
+                        Overlay dotovlay = dotOptionses.get(i);
                         dotovlay.remove();
                     }
-                    for (int i=0;i<polylineOptionses.size();i++){
-                        Overlay polyOvlay=polylineOptionses.get(i);
+                    for (int i = 0; i < polylineOptionses.size(); i++) {
+                        Overlay polyOvlay = polylineOptionses.get(i);
                         polyOvlay.remove();
                     }
                     mBaiduMap.hideInfoWindow();
@@ -318,12 +334,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     listDistance.clear();
                     dotOptionses.clear();
                     polylineOptionses.clear();
-                    totalDistance=0.0;
+                    totalDistance = 0.0;
                     distance = false;
                 } else {
                     imgDistance.setImageResource(R.mipmap.ic_close_black_36dp);
                     distance = true;
                 }
+                break;
+            case R.id.btn_main_pointsave:
+                TAG_SAVEPOINT = false;
+                previous.remove();
+                mBaiduMap.hideInfoWindow();
+                DecimalFormat df = new DecimalFormat("#.0000000");
+                PointDataParcel pointData = new PointDataParcel();
+                pointData.setAddress(pointAdress);
+                pointData.setBaiduLatitude(String.valueOf(df.format(pointlat)));
+                pointData.setBaiduLongitude(String.valueOf(df.format(pointlng)));
+                pointData.setPointname(null);
+                pointData.setActivity(WayponitActivity.MAIACTIVTY);
+                Intent intent = new Intent();
+                intent.putExtra(WayponitActivity.POINTDATA, pointData);
+                intent.setClass(MainActivity.this, WayponitActivity.class);
+                startActivity(intent);
+                appxBannerContainer.setVisibility(View.VISIBLE);
+                mapPoint.setVisibility(View.GONE);
+                mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
+                break;
         }
     }
 
@@ -389,12 +425,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 LatLng point = new LatLng(lat, lon);
                 LatLng bdpoint = ComanLngConvertBdLngt(point, CoordStyle, DataStyle);
                 PointDataParcel pp = new PointDataParcel();
-                pp = setPointdataParcel(files, pointData);
-                mDataItem.setName(name);
-                mDataItem.setLatLng(point);
-                mDataItem.setPointDataParcel(pp);
-                items.add(new MyItem(bdpoint, mDataItem));
-                builder.include(bdpoint);
+                if (pointData != null) {
+                    pp = setPointdataParcel(files, pointData);
+                    mDataItem.setName(name);
+                    mDataItem.setLatLng(point);
+                    mDataItem.setPointDataParcel(pp);
+                    items.add(new MyItem(bdpoint, mDataItem));
+                    builder.include(bdpoint);
+                    Log.d("name",name);
+                }
             }
             mLatLngBounds = builder.build();
             mClusterManager.addItems(items);
@@ -404,7 +443,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean setlocation(Intent intent) {
-        mBaiduMap.clear();
         String name;
         String test = DataManagerActivity.class.getName();
         name = intent.getStringExtra(DATAMANAGERACTIVITY);
@@ -432,12 +470,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         imgMyloncation = (ImageButton) findViewById(R.id.imgbtn_mylocation);
         imgDistance = (ImageButton) findViewById(R.id.imgbtn_distance);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        btn_gone = (Button) findViewById(R.id.btn_main_gone);
+        mapPoint = (RelativeLayout) findViewById(R.id.rl_main_mappoint);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
+        btn_mapPoint = (Button) findViewById(R.id.btn_main_pointsave);
+        appxBannerContainer = (RelativeLayout) findViewById(R.id.appx_banner_container);
+        tv_mappoint_adress= (TextView) findViewById(R.id.tv_main_mappointAdress);
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.showZoomControls(false);
-        mMapView.setScaleControlPosition(new Point(10,-10));
+        mMapView.setScaleControlPosition(new Point(0, 0));
         zoomControlsView = (ZoomControlsView) findViewById(R.id.activity_main_zoomcontrols);
         mBaiduMap = mMapView.getMap();
         zoomControlsView.setBaiduMap(mMapView);
@@ -451,6 +492,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mClusterManager.setOnClusterClickListener(onClusterClickListener);
         mClusterManager.setOnClusterItemClickListener(onClusterItemClickListener);
         mBaiduMap.setOnMarkerClickListener(mClusterManager);
+        mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
+       // mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
         bitmaplocation1 = BitmapDescriptorFactory
                 .fromResource(R.mipmap.red_blank_48px_553042_easyicon);
         bitmaplocation2 = BitmapDescriptorFactory
@@ -458,6 +501,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmaplocation = new ArrayList<BitmapDescriptor>();
         bitmaplocation.add(bitmaplocation1);
         bitmaplocation.add(bitmaplocation2);
+
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -466,14 +510,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         startCount();
-        //createBananer();
-        isshowBananer();
+       // createAD();
+       // isshowBananer();
         RegisterEventBus();
         imgLayerChange.setOnClickListener(this);
         imgClearall.setOnClickListener(this);
         imgMyloncation.setOnClickListener(this);
         fabLocation.setOnClickListener(this);
         imgDistance.setOnClickListener(this);
+        btn_mapPoint.setOnClickListener(this);
         //distance init
         mBaiduMap.setOnMapClickListener(listener);
         view = LayoutInflater.from(this).inflate(R.layout.infoview, null);
@@ -520,6 +565,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     polylineOptionses.clear();
                     listDistance.clear();
                     mBaiduMap.hideInfoWindow();
+                    imgDistance.setImageResource(R.mipmap.ic_ruler);
+                    distance = false;
                 }
                 pts.remove(last);
             }
@@ -532,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * @param point 点击的地理坐标
          */
         public void onMapClick(LatLng point) {
-            if(distance) {
+            if (distance) {
                 pts.add(point);
                 DecimalFormat df = new DecimalFormat("#.00");
                 if (pts.size() >= 2) {
@@ -566,14 +613,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+        @Override
+        public boolean onMapPoiClick(MapPoi mapPoi) {
+            if (distance) {
+                pts.add( mapPoi.getPosition());
+                DecimalFormat df = new DecimalFormat("#.00");
+                if (pts.size() >= 2) {
+                    int n = pts.size();
+                    List<LatLng> linepoints = new ArrayList<LatLng>();
+                    linepoints.add(pts.get(n - 1));
+                    linepoints.add(pts.get(n - 2));
+                    double distance = DistanceUtil.getDistance(pts.get(n - 1), pts.get(n - 2));
+                    totalDistance += distance;
+                    listDistance.add(totalDistance);
+                    OverlayOptions lineOption = new PolylineOptions().color(0xFF0000FF).points(pts).width(5);
+                    polylineOptionses.add(mBaiduMap.addOverlay(lineOption));
+                }
+                String distance;
+                if (totalDistance >= 1000) {
+                    distance = String.valueOf(df.format(totalDistance / 1000)) + "km";
+                } else {
+                    distance = String.valueOf(df.format(totalDistance)) + "m";
+                }
+                if (pts.size() > 1) {
+                    final OverlayOptions dotOption = new DotOptions().center( mapPoi.getPosition()).color(0xFF0000FF).radius(10);
+                    dotOptionses.add(mBaiduMap.addOverlay(dotOption));
+                    tvDistance.setText(distance);
+                    InfoWindow mInfoWindow = new InfoWindow(view,  mapPoi.getPosition(), -15);
+                    mBaiduMap.showInfoWindow(mInfoWindow);
+                } else {
+                    listDistance.add(0.0);
+                    OverlayOptions dotOption = new DotOptions().center( mapPoi.getPosition()).color(0xFF0000FF).radius(10);
+                    dotOptionses.add(mBaiduMap.addOverlay(dotOption));
+                }
+            }
+            return true;
+        }
+
 
         /**
          * 地图内 Poi 单击事件回调函数
          * @param poi 点击的 poi 信息
          */
-        public boolean onMapPoiClick(MapPoi poi) {
-            return false;
-        }
     };
 
     public void isshowBananer() {
@@ -609,7 +690,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private LatLng bdLng = null;
-
 
     private void showLocation(BDLocation location, LatLng bdlat) {
         mBaiduMap.setMyLocationEnabled(true);
@@ -759,9 +839,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_navagation = (Button) view.findViewById(R.id.btn_main_navigation);
         btn_share = (Button) view.findViewById(R.id.btn_main_share);
         name.setText(item.getDataItem().getName());
-        DecimalFormat df = new DecimalFormat("#.0000000");
-        lat.setText("LAT:" + String.valueOf(df.format(item.getDataItem().getLatLng().latitude))
-                + "LNG:" + String.valueOf(df.format(item.getDataItem().getLatLng().longitude)));
+        PointDataParcel pp = item.getDataItem().getPointDataParcel();
+        PointData pointData = data.findPointDataDaoById(pp.getPointdataid());
+        if (pointData.getAddress().equals(null)) {
+            lat.setText("LAT:" + pointData.getLatitude()
+                    + "LNG:" + pointData.getLongitude());
+        } else {
+            lat.setText(pointData.getAddress());
+        }
         ll.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
@@ -817,12 +902,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View showpopupwindow() {
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(R.layout.locationpopupwindow, null);
-        final PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindowDismiss = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         DisplayLocationInfo(view, bdLocationForpw, bdLng);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.showAsDropDown(toolbar);
-        popupWindow.setAnimationStyle(R.style.anim_menu_bottombar);
+        popupWindowDismiss.setBackgroundDrawable(new ColorDrawable(0x00000000));
+        popupWindowDismiss.setOutsideTouchable(true);
+        popupWindowDismiss.showAsDropDown(toolbar);
+        popupWindowDismiss.setAnimationStyle(R.style.anim_menu_bottombar);
         return view;
 
     }
@@ -830,113 +915,141 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int SELECT = 0;
 
     public void DisplayLocationInfo(View view, BDLocation locationInfo, final LatLng bdLng) {
-        TextView tvAddress = (TextView) view.findViewById(R.id.et_address);
-        TextView tvNotice = (TextView) view.findViewById(R.id.et_notice_text);
-        final TextView tvLat = (TextView) view.findViewById(R.id.et_lat_text);
-        final TextView tvLong = (TextView) view.findViewById(R.id.et_lon_text);
-        TextView tvAccuracy = (TextView) view.findViewById(R.id.et_accuracy_text);
-        TextView tvSpeed = (TextView) view.findViewById(R.id.et_speed_text);
-        TextView tvAltitude = (TextView) view.findViewById(R.id.et_altitude_text);
-        TextView tvDerection = (TextView) view.findViewById(R.id.et_direction_text);
-        final TextView tvwgs = (TextView) view.findViewById(R.id.tv_wgs);
-        final TextView tvbaidu = (TextView) view.findViewById(R.id.tv_baidu);
-        final TextView tvlatitude = (TextView) view.findViewById(R.id.tv_latitude);
-        final TextView tvlongitude = (TextView) view.findViewById(R.id.tv_longtitude);
-        if (locationInfo.hasAddr()) {
-            address = locationInfo.getAddress().address;
-        }
-
-        String notice;
-        if (locationInfo.getLocType() != BDLocation.TypeGpsLocation) {
-            notice = "GPS未开启";
+        if (locationInfo == null) {
+            Toast.makeText(MainActivity.this, "网络异常", Toast.LENGTH_SHORT);
         } else {
-            notice = "GPS已开启";
-        }
-        tvAddress.setText(address);
-        tvNotice.setText(notice);
-        DecimalFormat dfthree = new DecimalFormat("#.000");
-        if (locationInfo.hasAltitude()) {
-            altitude = String.valueOf(dfthree.format(locationInfo.getAltitude()));
-        }
-        if (locationInfo.hasAltitude()) {
-            tvAltitude.setText(altitude + "米");//海拔
-        }
-        if (locationInfo.hasSpeed()) {
-            tvSpeed.setText(String.valueOf(dfthree.format(locationInfo.getSpeed())) + "km/h");
-        }
-        if (locationInfo.hasRadius()) {
-            tvAccuracy.setText(String.valueOf(dfthree.format(locationInfo.getRadius())) + "米");
-        }
-        final DecimalFormat df = new DecimalFormat("#.0000000");
-        final JZLocationConverter.LatLng location = JZLocationConverter.gcj02ToWgs84(new JZLocationConverter.LatLng(locationInfo.getLatitude(), locationInfo.getLongitude()));
-        tvDerection.setText(String.valueOf(locationInfo.getDirection()));
-        final String wgsLatitude = String.valueOf((df.format(location.getLatitude())));
-        final String wgsLongitude = String.valueOf(df.format(location.getLongitude()));
-        final String baiduLatidude = String.valueOf((df.format(bdLng.latitude)));
-        final String baiduLongitude = String.valueOf(df.format(bdLng.longitude));
-        if (SELECT == 0) {
-            tvlatitude.setText("WGS纬度");
-            tvlongitude.setText("WGS经度");
-            tvwgs.setTextColor(getResources().getColor(R.color.white));
-            tvbaidu.setTextColor(getResources().getColor(R.color.colorPrimary));
-            tvLat.setText(wgsLatitude);
-            tvLong.setText(wgsLongitude);
-        } else {
-            tvlatitude.setText("baidu纬度");
-            tvlongitude.setText("baidu经度");
-            tvbaidu.setTextColor(getResources().getColor(R.color.white));
-            tvwgs.setTextColor(getResources().getColor(R.color.colorPrimary));
-            tvLat.setText(baiduLatidude);
-            tvLong.setText(baiduLongitude);
-        }
-
-        Button btnSave = (Button) view.findViewById(R.id.btn_save);
-
-        btnSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PointDataParcel pointData = new PointDataParcel();
-                pointData.setAddress(address);
-                pointData.setWgsLatitude(wgsLatitude);
-                pointData.setWgsLongitude(wgsLongitude);
-                pointData.setBaiduLatitude(baiduLatidude);
-                pointData.setBaiduLongitude(baiduLongitude);
-                pointData.setAltitude(altitude);
-                pointData.setPointname(null);
-                pointData.setActivity(WayponitActivity.MAIACTIVTY);
-                Intent intent = new Intent();
-                intent.putExtra(WayponitActivity.POINTDATA, pointData);
-                intent.setClass(MainActivity.this, WayponitActivity.class);
-                startActivity(intent);
-
+            TextView tvAddress = (TextView) view.findViewById(R.id.et_address);
+            TextView tvNotice = (TextView) view.findViewById(R.id.et_notice_text);
+            final TextView tvLat = (TextView) view.findViewById(R.id.et_lat_text);
+            final TextView tvLong = (TextView) view.findViewById(R.id.et_lon_text);
+            TextView tvAccuracy = (TextView) view.findViewById(R.id.et_accuracy_text);
+            TextView tvSpeed = (TextView) view.findViewById(R.id.et_speed_text);
+            TextView tvAltitude = (TextView) view.findViewById(R.id.et_altitude_text);
+            TextView tvDerection = (TextView) view.findViewById(R.id.et_direction_text);
+            final TextView tvwgs = (TextView) view.findViewById(R.id.tv_wgs);
+            final TextView tvbaidu = (TextView) view.findViewById(R.id.tv_baidu);
+            final TextView tvlatitude = (TextView) view.findViewById(R.id.tv_latitude);
+            final TextView tvlongitude = (TextView) view.findViewById(R.id.tv_longtitude);
+            if (locationInfo.hasAddr()) {
+                address = locationInfo.getAddress().address;
             }
-        });
 
+            String notice;
+            if (locationInfo.getLocType() != BDLocation.TypeGpsLocation) {
+                notice = "GPS未开启";
+            } else {
+                notice = "GPS已开启";
+            }
+            tvAddress.setText(address);
+            tvNotice.setText(notice);
+            DecimalFormat dfthree = new DecimalFormat("#.000");
+            if (locationInfo.hasAltitude()) {
+                altitude = String.valueOf(dfthree.format(locationInfo.getAltitude()));
+            }
+            if (locationInfo.hasAltitude()) {
+                tvAltitude.setText(altitude + "米");//海拔
+            } else {
+                tvAltitude.setText("无");//海拔
+            }
+            if (locationInfo.hasSpeed()) {
+                tvSpeed.setText(String.valueOf(dfthree.format(locationInfo.getSpeed())) + "km/h");
+                tvDerection.setText(String.valueOf(locationInfo.getDirection()));
+            } else {
+                tvSpeed.setText("无");
+                tvDerection.setText("无");
+            }
+            tvAccuracy.setText(String.valueOf(dfthree.format(locationInfo.getRadius())) + "米");
+            final DecimalFormat df = new DecimalFormat("#.0000000");
+            final JZLocationConverter.LatLng location = JZLocationConverter.gcj02ToWgs84(new JZLocationConverter.LatLng(locationInfo.getLatitude(), locationInfo.getLongitude()));
 
-        tvwgs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SELECT = 0;
+            final String wgsLatitude = String.valueOf((df.format(location.getLatitude())));
+            final String wgsLongitude = String.valueOf(df.format(location.getLongitude()));
+            final String baiduLatidude = String.valueOf((df.format(bdLng.latitude)));
+            final String baiduLongitude = String.valueOf(df.format(bdLng.longitude));
+            if (SELECT == 0) {
                 tvlatitude.setText("WGS纬度");
                 tvlongitude.setText("WGS经度");
                 tvwgs.setTextColor(getResources().getColor(R.color.white));
                 tvbaidu.setTextColor(getResources().getColor(R.color.colorPrimary));
-                tvLat.setText(String.valueOf((df.format(location.getLatitude()))));
-                tvLong.setText(String.valueOf(df.format(location.getLongitude())));
-            }
-        });
-        tvbaidu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SELECT = 1;
+                tvLat.setText(wgsLatitude);
+                tvLong.setText(wgsLongitude);
+            } else {
                 tvlatitude.setText("baidu纬度");
                 tvlongitude.setText("baidu经度");
                 tvbaidu.setTextColor(getResources().getColor(R.color.white));
                 tvwgs.setTextColor(getResources().getColor(R.color.colorPrimary));
-                tvLat.setText(String.valueOf((df.format(bdLng.latitude))));
-                tvLong.setText(String.valueOf(df.format(bdLng.longitude)));
+                tvLat.setText(baiduLatidude);
+                tvLong.setText(baiduLongitude);
             }
-        });
+
+            Button btnSave = (Button) view.findViewById(R.id.btn_save);
+            Button btnSaveByMove = (Button) view.findViewById(R.id.btn_save_move);
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PointDataParcel pointData = new PointDataParcel();
+                    pointData.setAddress(address);
+                    pointData.setWgsLatitude(wgsLatitude);
+                    pointData.setWgsLongitude(wgsLongitude);
+                    pointData.setBaiduLatitude(baiduLatidude);
+                    pointData.setBaiduLongitude(baiduLongitude);
+                    pointData.setAltitude(altitude);
+                    pointData.setPointname(null);
+                    pointData.setActivity(WayponitActivity.MAIACTIVTY);
+                    Intent intent = new Intent();
+                    intent.putExtra(WayponitActivity.POINTDATA, pointData);
+                    intent.setClass(MainActivity.this, WayponitActivity.class);
+                    startActivity(intent);
+
+                }
+            });
+            btnSaveByMove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (previous != null) {
+                        previous.remove();
+                    }
+                    TAG_SAVEPOINT = true;
+                    popupWindowDismiss.dismiss();
+                    OverlayOptions presentOption = new MarkerOptions().icon(bitmap).position(bdLng);
+                    previous = (Marker) mBaiduMap.addOverlay(presentOption);
+                    TextView textView = new TextView(MainActivity.this);
+                    textView.setTextColor(getResources().getColor(R.color.white));
+                    textView.setText(String.valueOf(df.format(bdLng.latitude)) + "," + String.valueOf(df.format(bdLng.longitude)));
+                    textView.setBackgroundResource(R.drawable.v4_bg_ballon);
+                    InfoWindow infoWindow = new InfoWindow(textView, bdLng, -50);
+                    mBaiduMap.showInfoWindow(infoWindow);
+                    mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
+                    appxBannerContainer.setVisibility(View.GONE);
+                    mapPoint.setVisibility(View.VISIBLE);
+                }
+            });
+
+            tvwgs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SELECT = 0;
+                    tvlatitude.setText("WGS纬度");
+                    tvlongitude.setText("WGS经度");
+                    tvwgs.setTextColor(getResources().getColor(R.color.white));
+                    tvbaidu.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvLat.setText(String.valueOf((df.format(location.getLatitude()))));
+                    tvLong.setText(String.valueOf(df.format(location.getLongitude())));
+                }
+            });
+            tvbaidu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SELECT = 1;
+                    tvlatitude.setText("baidu纬度");
+                    tvlongitude.setText("baidu经度");
+                    tvbaidu.setTextColor(getResources().getColor(R.color.white));
+                    tvwgs.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    tvLat.setText(String.valueOf((df.format(bdLng.latitude))));
+                    tvLong.setText(String.valueOf(df.format(bdLng.longitude)));
+                }
+            });
+        }
     }
 
     public void showpopupwindows(final Marker marker, Bundle bundle) {
@@ -959,7 +1072,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         name.setText(pp.getPointname());
         if (pp.getAddress().isEmpty()) {
             PointData pointData = data.findPointDataDaoById(pp.getPointdataid());
-
             String text = "LAT:" + pointData.getLatitude() + " " + "LNG:" + pointData.getLongitude();
             address.setText(text);
         } else {
@@ -1075,6 +1187,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     pointData.setLongitude(edtLongtitude.getText().toString());
                     pointData.setBaidulatitude(String.valueOf(df.format(bd.latitude)));
                     pointData.setBaidulongitude(String.valueOf(df.format(bd.longitude)));
+                    if (coordstyle == LatStyle.GPSSYTELE) {
+                        if (datastyle == LatStyle.DEGREE) {
+                            pointData.setWgslatitude(edtLatitude.getText().toString());
+                            pointData.setWgslongitude(edtLongtitude.getText().toString());
+                        } else {
+                            pointData.setWgslatitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(edtLatitude.getText().toString()))));
+                            pointData.setWgslongitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(edtLongtitude.getText().toString()))));
+                        }
+                    }
                     pointData.setName("");
                     data.createPointData(data.findOrderByName("我的收藏"), pointData);
                     ShowData showData = new ShowData();
@@ -1102,44 +1223,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buildersearch.create().show();
     }
 
-//    private String address;
+    BaiduMap.OnMapStatusChangeListener onMapStatusChangeListener = new BaiduMap.OnMapStatusChangeListener() {
+        /**
+         * 手势操作地图，设置地图状态等操作导致地图状态开始改变。
+         * @param status 地图状态改变开始时的地图状态
+         */
+        public void onMapStatusChangeStart(MapStatus status) {
+        }
 
-//    private void getaddress(LatLng bdlat) {
-//        address = "";
-//        Log.d("address", "sfsa");
-//        GeoCoder geoCoder = GeoCoder.newInstance();
-//        //
-//        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
-//            // 反地理编码查询结果回调函数
-//            @Override
-//            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-//                if (result == null
-//                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
-//                    // 没有检测到结果
-//                    Toast.makeText(MainActivity.this, "抱歉，未能找到结果",
-//                            Toast.LENGTH_LONG).show();
-//                }
-//                Toast.makeText(getApplicationContext(),
-//                        "位置：" + result.getAddress(), Toast.LENGTH_LONG)
-//                        .show();
-//                address = result.getAddress();
-//            }
-//
-//            // 地理编码查询结果回调函数
-//            @Override
-//            public void onGetGeoCodeResult(GeoCodeResult result) {
-//                if (result == null
-//                        || result.error != SearchResult.ERRORNO.NO_ERROR) {
-//                    // 没有检测到结果
-//                }
-//            }
-//        };
-//        // 设置地理编码检索监听者
-//        geoCoder.setOnGetGeoCodeResultListener(listener);
-//        //
-//        geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(bdlat));
-//        Log.d("address", address);
-//    }
+        /**
+         * 地图状态变化中
+         * @param status 当前地图状态
+         */
+        public void onMapStatusChange(MapStatus status) {
+            if (TAG_SAVEPOINT) {
+                previous.setPosition(status.target);
+                DecimalFormat df = new DecimalFormat("#.0000000");
+                TextView textView = new TextView(MainActivity.this);
+                textView.setText(String.valueOf(df.format(status.target.latitude)) + "," + String.valueOf(df.format(status.target.longitude)));
+                textView.setBackgroundResource(R.drawable.v4_bg_ballon);
+                textView.setTextColor(getResources().getColor(R.color.white));
+                InfoWindow infoWindow = new InfoWindow(textView, status.target, -50);
+                mBaiduMap.showInfoWindow(infoWindow);
+            }
+        }
+
+        /**
+         * 地图状态改变结束
+         * @param status 地图状态改变结束后的地图状态
+         */
+        public void onMapStatusChangeFinish(MapStatus status) {
+            if (TAG_SAVEPOINT) {
+                previous.setPosition(status.target);
+                DecimalFormat df = new DecimalFormat("#.0000000");
+                TextView textView = new TextView(MainActivity.this);
+                textView.setText(String.valueOf(df.format(status.target.latitude)) + "," + String.valueOf(df.format(status.target.longitude)));
+                textView.setBackgroundResource(R.drawable.v4_bg_ballon);
+                textView.setTextColor(getResources().getColor(R.color.white));
+                InfoWindow infoWindow = new InfoWindow(textView, status.target, -50);
+                mBaiduMap.showInfoWindow(infoWindow);
+                pointlat=status.target.latitude;
+                pointlng=status.target.longitude;
+                getaddress(new LatLng(pointlat,pointlng));
+            }
+        }
+    };
+
+    private void getaddress(LatLng bdlat) {
+
+        Log.d("address", "sfsa");
+        GeoCoder geoCoder = GeoCoder.newInstance();
+        geoCoder.setOnGetGeoCodeResultListener(geolistener);
+        geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(bdlat));
+    }
+    OnGetGeoCoderResultListener geolistener = new OnGetGeoCoderResultListener() {
+        // 反地理编码查询结果回调函数
+        @Override
+        public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+            if (result == null
+                    || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                // 没有检测到结果
+                Toast.makeText(MainActivity.this, "抱歉，未能找到结果",
+                        Toast.LENGTH_LONG).show();
+            }
+            pointAdress = result.getAddress();
+            tv_mappoint_adress.setText(pointAdress);
+        }
+
+        // 地理编码查询结果回调函数
+        @Override
+        public void onGetGeoCodeResult(GeoCodeResult result) {
+            if (result == null
+                    || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                // 没有检测到结果
+            }
+        }
+    };
 
     // 调起百度地图导航
     private void startnavi(LatLng latLng) {
@@ -1212,7 +1371,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-        appxBannerContainer = (RelativeLayout) findViewById(R.id.appx_banner_container);
+
         appxBannerContainer.addView(adView);
     }
 
@@ -1254,7 +1413,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         StatService.setSendLogStrategy(this, SendStrategyEnum.SET_TIME_INTERVAL, 1, false);
         // 调试百度统计SDK的Log开关，可以在Eclipse中看到sdk打印的日志，发布时去除调用，或者设置为false
         StatService.setDebugOn(true);
-
         String sdkVersion = StatService.getSdkVersion();
     }
 

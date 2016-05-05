@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<item
-    android:id="@+id/menu_search"
-    android:title="search"
-    android:icon="@mipmap/ic_search_white_48dp"
-    android:orderInCategory="120"
-    app:actionViewClass="android.support.v7.widget.SearchView"
-    app:showAsAction="ifRoom|collapseActionView"/>
+
     <item
         android:title="编辑"
+        android:orderInCategory="120"
         android:id="@+id/item_edit"
-        android:icon="@mipmap/ic_edit_white_48dp"
+        android:icon="@mipmap/ic_edit_white_36dp"
         app:showAsAction="ifRoom"
         />
     <item
         android:title="新增"
+        android:orderInCategory="120"
         android:id="@+id/item_add"
-        android:icon="@mipmap/ic_add_white_48dp"
+        android:icon="@mipmap/ic_add_white_36dp"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/menu_search"
+        android:title="search"
+        android:icon="@mipmap/ic_search_white_36dp"
+        android:orderInCategory="120"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView"/>
+    <item
+    android:title="导出"
+    android:orderInCategory="150"
+    android:id="@+id/item_output"
+    android:icon="@mipmap/ic_file_download_white_36dp"
+    app:showAsAction="ifRoom"
+    />
+    <item
+        android:title="设置"
+        android:orderInCategory="160"
+        android:id="@+id/item_datemanager_set"
+        android:icon="@mipmap/ic_file_download_white_36dp"
         app:showAsAction="ifRoom"
         />
 </menu>

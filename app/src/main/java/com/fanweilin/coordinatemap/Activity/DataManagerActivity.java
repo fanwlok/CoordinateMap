@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -31,9 +35,11 @@ import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mobstat.StatService;
+import com.fanweilin.coordinatemap.Class.FilesSetting;
 import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.Class.PointDataParcel;
 import com.fanweilin.coordinatemap.R;
@@ -41,12 +47,24 @@ import com.fanweilin.coordinatemap.computing.ConvertLatlng;
 import com.fanweilin.coordinatemap.widget.CheckableRelativeLayout;
 import com.fanweilin.greendao.DaoSession;
 import com.fanweilin.greendao.Files;
+import com.fanweilin.greendao.PictureData;
 import com.fanweilin.greendao.PointData;
 import com.fanweilin.greendao.ShowData;
 import com.fanweilin.greendao.ShowDataDao;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,14 +97,21 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
     public static final String FILENAME = "filename";
     public static final String SUBTITLE = "subtitle";
     public static final String Id = "id";
-
+//checkbox
+    private CheckBox name;
+    private CheckBox wgs;
+    private CheckBox altitude;
+    private CheckBox bd;
+    private CheckBox describe;
+    private CheckBox address;
+    private CheckBox photo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.avtivity_data_manager);
         init();
         getData();
-        toolbar.setTitle(files.getTitle());
+       toolbar.setTitle(files.getTitle());
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -108,6 +133,12 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                         break;
                     case R.id.item_add:
                         ShowDialog();
+                        break;
+                    case R.id.item_output:
+                        importfile();
+                        break;
+                    case R.id.item_datemanager_set:;
+                        DialogSetting();
                 }
                 return false;
             }
@@ -168,7 +199,6 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onNothingSelected(AdapterView parent) {
-// TODO Auto-generated method stub
             }
         });
         buildersearch.setTitle("新增点");
@@ -186,6 +216,15 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                     pointData.setBaidulatitude(String.valueOf(df.format(bd.latitude)));
                     pointData.setBaidulongitude(String.valueOf(df.format(bd.longitude)));
                     pointData.setAddress("");
+                    if(coordstyle==LatStyle.GPSSYTELE) {
+                        if (datastyle == LatStyle.DEGREE) {
+                            pointData.setWgslatitude(edtLatitude.getText().toString());
+                            pointData.setWgslongitude(edtLongtitude.getText().toString());
+                        } else {
+                            pointData.setWgslatitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(edtLatitude.getText().toString()))));
+                            pointData.setWgslongitude(String.valueOf(df.format(ConvertLatlng.convertToDecimalByString(edtLongtitude.getText().toString()))));
+                        }
+                    }
                     data.createPointData(files, pointData);
                     files.resetPointItems();
                     getData();
@@ -204,7 +243,7 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
 
     public void init() {
         files = new Files();
-        mData = new ArrayList<>();
+         mData = new ArrayList<>();
         convertLatlng = new ConvertLatlng();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         btnCancle = (AppCompatButton) findViewById(R.id.btn_cancel);
@@ -239,7 +278,158 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         }
         mBackData = mData;
     }
+    public void DialogSetting() {
+        View dialogSetview=LayoutInflater.from(DataManagerActivity.this).inflate(R.layout.dialog_file_output_setting,null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(DataManagerActivity.this);
+        builder.setTitle("设置").setView(dialogSetview);
+        name= (CheckBox) dialogSetview.findViewById(R.id.cb_point_name);
+        wgs= (CheckBox) dialogSetview.findViewById(R.id.cb_point_wgs);
+        altitude= (CheckBox) dialogSetview.findViewById(R.id.cb_point_altitude);
+        bd= (CheckBox) dialogSetview.findViewById(R.id.cb_point_bd);
+        describe= (CheckBox) dialogSetview.findViewById(R.id.cb_point_describe);
+        address= (CheckBox) dialogSetview.findViewById(R.id.cb_point_adress);
+        photo= (CheckBox) dialogSetview.findViewById(R.id.cb_point_photo);
+        name.setChecked(FilesSetting.NAME_IS_DOWN);
+        wgs.setChecked(FilesSetting.WGS_IS_DOWN);
+        altitude.setChecked(FilesSetting.ALTITUDE_IS_DOWN);
+        bd.setChecked(FilesSetting.BAIDU_IS_DOWN);
+        describe.setChecked(FilesSetting.DESCRIBE_IS_DOWN);
+        address.setChecked(FilesSetting.ADDRESS_IS_DOWN);
+        photo.setChecked(FilesSetting.PHOTO_IS_DOWN);
+        builder.setPositiveButton("保存", new DialogInterface.OnClickListener() {
 
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FilesSetting.NAME_IS_DOWN = name.isChecked();
+                data.spfSetName(FilesSetting.NAME_IS_DOWN);
+                FilesSetting.WGS_IS_DOWN = wgs.isChecked();
+                data.spfSetWgs(FilesSetting.WGS_IS_DOWN);
+                FilesSetting.ALTITUDE_IS_DOWN = altitude.isChecked();
+                data.spfSetAltitude(FilesSetting.ALTITUDE_IS_DOWN);
+                FilesSetting.BAIDU_IS_DOWN = bd.isChecked();
+                data.spfSetBd(FilesSetting.BAIDU_IS_DOWN);
+                FilesSetting.DESCRIBE_IS_DOWN = describe.isChecked();
+                data.spfSetDescribe(FilesSetting.DESCRIBE_IS_DOWN);
+                FilesSetting.ADDRESS_IS_DOWN = address.isChecked();
+                data.spfSetAddress(FilesSetting.ADDRESS_IS_DOWN);
+                FilesSetting.PHOTO_IS_DOWN = photo.isChecked();
+                data.spfSetPhoto(FilesSetting.PHOTO_IS_DOWN);
+
+            }
+        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        }).show();
+    }
+    public void importfile(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(DataManagerActivity.this);
+        final AppCompatEditText editText = new AppCompatEditText(this);
+        editText.setText(files.getTitle());
+         builder.setTitle("请输入文件名").setView(editText).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+
+                 try {
+                     File dirs = new File(Environment.getExternalStorageDirectory(), "经纬度定位");
+                     if (!dirs.exists()) {
+                         dirs.mkdirs();
+                     }
+                     File filedirs = new File(dirs.getPath(), editText.getText().toString());
+                     if (!filedirs.exists()) {
+                         filedirs.mkdirs();
+                     }
+                     File file = new File(filedirs.getPath(), editText.getText().toString() + ".csv");
+                     if (!file.exists()) {
+                         file.createNewFile();
+                     }
+                     OutputStreamWriter outStream = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
+                     BufferedWriter bufferedWriter = new BufferedWriter(outStream);
+                     for (int i = 0; i < pointDatas.size(); i++) {
+                         StringBuilder context = new StringBuilder();
+                         if (FilesSetting.NAME_IS_DOWN) {
+                             context.append(pointDatas.get(i).getName());
+                         }
+                         if (FilesSetting.WGS_IS_DOWN) {
+                             context.append("," + pointDatas.get(i).getWgslatitude() + "," + pointDatas.get(i).getWgslongitude());
+                         }
+
+                         if (FilesSetting.BAIDU_IS_DOWN) {
+                             context.append("," + pointDatas.get(i).getBaidulatitude() + "," + pointDatas.get(i).getBaidulongitude());
+                         }
+                         if (FilesSetting.ALTITUDE_IS_DOWN) {
+                             context.append("," + pointDatas.get(i).getAltitude());
+                         }
+                         if (FilesSetting.DESCRIBE_IS_DOWN) {
+                             context.append("," + pointDatas.get(i).getDescribe());
+                         }
+                         if (FilesSetting.ADDRESS_IS_DOWN) {
+                             context.append("," + pointDatas.get(i).getAddress());
+                         }
+                         if (FilesSetting.PHOTO_IS_DOWN) {
+                             List<PictureData> pictureItems=new ArrayList<PictureData>();
+                             pictureItems = pointDatas.get(i).getPictureItems();
+                             for (int item = 0;item < pictureItems.size(); item++) {
+                                 File fromFile = new File(pictureItems.get(item).getPath());
+                                 File toFileDir = new File(filedirs, pointDatas.get(i).getName());
+                                 if (!toFileDir.exists()) {
+                                     toFileDir.mkdirs();
+                                 }
+                                 File toFile = new File(toFileDir, fromFile.getName());
+
+                                 if (!toFile.exists()) {
+                                     toFile.createNewFile();
+                                 }
+                                 copyFile(fromFile, toFile);
+                             }
+                         }
+                         bufferedWriter.write(context.toString());
+                         bufferedWriter.newLine();
+                         bufferedWriter.flush();
+
+                     }
+                     bufferedWriter.close();
+                     outStream.close();
+                     Toast.makeText(DataManagerActivity.this, "存储位置" + filedirs.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                 } catch (FileNotFoundException e) {
+                     return;
+                 } catch (IOException e) {
+                     return;
+                 }
+
+             }
+
+         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which) {
+             }
+         }).show();
+
+    }
+    public void copyFile(File oldPath, File newPath) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            if (oldPath.exists()) { //文件存在时
+                InputStream inStream = new FileInputStream(oldPath); //读入原文件
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1024];
+                int length;
+                while ( (byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread; //字节数 文件大小
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("复制单个文件操作出错");
+            e.printStackTrace();
+
+        }
+
+    }
     @Override
     public void onClick(View view) {
         SparseBooleanArray checkedArray = new SparseBooleanArray();
@@ -247,8 +437,10 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         SQLiteDatabase db = data.getDb();
         switch (view.getId()) {
             case R.id.btn_show:
+               try {
+                   db.beginTransaction();
+
                 for (int i = 0; i < checkedArray.size(); i++) {
-                    db.beginTransaction();
                     if (checkedArray.valueAt(i)) {
                         int k = checkedArray.keyAt(i);
                         int id = (int) mData.get(k).get(Id);
@@ -265,8 +457,9 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                         getShowDataDao().insert(showData);
                     }
                 }
-                db.setTransactionSuccessful();
-                db.endTransaction();
+                db.setTransactionSuccessful();}finally {
+                   db.endTransaction();
+               }
                 Intent intent = new Intent();
                 intent.putExtra("data", "more");
                 intent.setClass(DataManagerActivity.this, MainActivity.class);
@@ -534,20 +727,6 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             if (!show) {
-//                double Lat = Double.parseDouble((String) mData.get(i).get("latitude"));
-//                double Lng = Double.parseDouble((String) mData.get(i).get("longitude"));
-//                Intent intent = new Intent();
-//                intent.putExtra("Lat", Lat);
-//                intent.putExtra("Lng", Lng);
-//                intent.putExtra("name", mData.get(i).get("name").toString());
-//                intent.putExtra("activityname", "com.fanweilin.coordinatemap.Activity.DataManagerActivity");
-//                intent.putExtra("data", "one");
-//                intent.putExtra("CoordStyle", CoordStyle);
-//                intent.putExtra("DataStyle", DataStyle);
-//                Log.d("test1_data", String.valueOf(DataStyle));
-//                ComponentName componentName = new ComponentName(DataManagerActivity.this, MainActivity.class);
-//                intent.setComponent(componentName);
-//                startActivity(intent);
                 PointData pointData=pointDatas.get(i);
                 onListItemClick(pointData);
 

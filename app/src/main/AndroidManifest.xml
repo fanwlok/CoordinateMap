@@ -124,18 +124,14 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".Activity.DataManagerActivity" />
         </activity>
         <activity android:name=".Activity.Bdoffilin_activity" />
         <activity android:name=".Activity.ConvertActivity" />
         <activity android:name="com.baidu.appx.ui.BDInnerBrowser" />
-
+        <activity android:name="com.baidu.autoupdatesdk.ConfirmDialoigActivity"
+            android:screenOrientation="sensor"
+            android:exported="false"
+             />
         <receiver android:name="com.baidu.appx.app_download.CompleteReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
@@ -168,10 +164,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity
-            android:name=".Activity.DistanceActivity"
-            android:label="@string/title_activity_distance"
-            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

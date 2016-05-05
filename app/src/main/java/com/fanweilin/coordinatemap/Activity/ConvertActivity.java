@@ -1,14 +1,17 @@
 package com.fanweilin.coordinatemap.Activity;
 
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.coordinatemap.computing.ConvertLatlng;
+import com.fanweilin.coordinatemap.computing.JZLocationConverter;
 
 public class ConvertActivity extends AppCompatActivity implements View.OnClickListener {
     private Button btnDic;
@@ -51,10 +54,15 @@ public class ConvertActivity extends AppCompatActivity implements View.OnClickLi
         ConvertLatlng convertLatlng = new ConvertLatlng();
         switch (v.getId()) {
             case R.id.btn_dci:
-                if (!etDic.getText().toString().equals("")) {
-                    double dic = Double.parseDouble(etDic.getText().toString());
-                    tvDic.setText(convertLatlng.convertToSexagesimal(dic));
-                }
+//                if (!etDic.getText().toString().equals("")) {
+//                    double dic = Double.parseDouble(etDic.getText().toString());
+//                    tvDic.setText(convertLatlng.convertToSexagesimal(dic));
+//                }
+                String context=etDic.getText().toString();
+                String bdla[]=context.split(",");
+                JZLocationConverter.LatLng bdlat=new JZLocationConverter.LatLng(Double.parseDouble(bdla[0]),Double.parseDouble(bdla[1]));
+                JZLocationConverter.LatLng WGS=JZLocationConverter.bd09ToWgs84(bdlat);
+                tvDms.setText(String.valueOf(WGS.getLatitude())+ String.valueOf(WGS.getLongitude()));
                 break;
             case R.id.btn_dms:
                 double du;
@@ -76,6 +84,7 @@ public class ConvertActivity extends AppCompatActivity implements View.OnClickLi
                     miao = 0;
                 }
                 tvDms.setText(String.valueOf(convertLatlng.convertToDecimal(du, fen, miao)));
+
                 break;
         }
 

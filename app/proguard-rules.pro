@@ -28,6 +28,9 @@
 
 # # -------------------------------------------
 
+-keepclassmembers class ** {
+    public void onEvent*(**);
+}
 
 -keep class de.greenrobot.dao.** {*;}
 

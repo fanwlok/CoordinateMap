@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.baidu.mapapi.clusterutil.projection.Point;
+import com.fanweilin.coordinatemap.Class.FilesSetting;
 import com.fanweilin.greendao.DaoMaster;
 import com.fanweilin.greendao.DaoSession;
 import com.fanweilin.greendao.Files;
@@ -40,7 +41,7 @@ public class data extends Application {
     public static int time;
     private final String Set="set";
     private static SharedPreferences spf;
-    private SharedPreferences.Editor edit;
+    private static SharedPreferences spfFileSet;
     private static final String FILENAME="filename";
     private static final String TIME="time";
     private static final String COORDINATE="coorditnate";
@@ -48,13 +49,17 @@ public class data extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        initSpf();
+        initspfFileSetting();
+        setdata();
+    }
+    //SPF设置
+    public void initSpf(){
         spf=getSharedPreferences(Set, Context.MODE_APPEND);
         currentFilename = spf.getString(FILENAME, "我的收藏");
         currentCoordinate=spf.getInt(COORDINATE, WGS);
         currentLatFormat=spf.getInt(LATFORMAT, DEGREE);
-        time=spf.getInt(TIME,0);
-        edit=spf.edit();
-        setdata();
+        time=spf.getInt(TIME, 0);
     }
     public static void setCurretFilename(String filename){
         SharedPreferences.Editor edit=spf.edit();
@@ -65,7 +70,7 @@ public class data extends Application {
     public static void settime(){
         SharedPreferences.Editor edit=spf.edit();
         time++;
-        edit.putInt(TIME,time);
+        edit.putInt(TIME, time);
         edit.commit();
     };
     public static void setCurrentCoordinate(int coordinate){
@@ -80,6 +85,53 @@ public class data extends Application {
         edit.putInt(LATFORMAT, currentLatFormat);
         edit.commit();
     }
+    //spfFile设置
+    public void initspfFileSetting(){
+        spfFileSet=getSharedPreferences("putout_set", Context.MODE_APPEND);
+        FilesSetting.NAME_IS_DOWN=spfFileSet.getBoolean(FilesSetting.NAME, true);
+        FilesSetting.WGS_IS_DOWN=spfFileSet.getBoolean(FilesSetting.WGS, true);
+        FilesSetting.ALTITUDE_IS_DOWN=spfFileSet.getBoolean(FilesSetting.ALTITUDE, true);
+        FilesSetting.BAIDU_IS_DOWN=spfFileSet.getBoolean(FilesSetting.BAIDU,false);
+        FilesSetting.DESCRIBE_IS_DOWN=spfFileSet.getBoolean(FilesSetting.DESCRIBE,false);
+        FilesSetting.ADDRESS_IS_DOWN=spfFileSet.getBoolean(FilesSetting.ADDRESS,false);
+        FilesSetting.PHOTO_IS_DOWN=spfFileSet.getBoolean(FilesSetting.PHOTO,false);
+    }
+    public static void spfSetName(Boolean name){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.NAME,name);
+        edit.commit();
+    }
+    public static void spfSetWgs(Boolean wgs){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.WGS,wgs);
+        edit.commit();
+    }
+    public static void spfSetAltitude(Boolean altitude){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.ALTITUDE,altitude);
+        edit.commit();
+    }
+    public static void spfSetBd(Boolean bd){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.BAIDU,bd);
+        edit.commit();
+    }
+    public static void spfSetDescribe(Boolean describe){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.DESCRIBE,describe);
+        edit.commit();
+    }
+    public static void spfSetAddress(Boolean address){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.ADDRESS,address);
+        edit.commit();
+    }
+    public static void spfSetPhoto(Boolean photo){
+        SharedPreferences.Editor edit=spfFileSet.edit();
+        edit.putBoolean(FilesSetting.PHOTO,photo);
+        edit.commit();
+    }
+    //
     private void setdata() {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "files_db", null);
         db = helper.getWritableDatabase();
@@ -114,7 +166,7 @@ public class data extends Application {
         super.onTerminate();
     }
 
-
+  //数据库
     public static Files createFiles(String filename) {
         Files files = new Files();
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
