@@ -38,3 +38,10 @@
     public static java.lang.String TABLENAME;
 }
 -keep class **$Properties
+# # -------------------------------------------
+
+# #  ######## bmob混淆  ##########
+
+# # -------------------------------------------
+
+-keep class c.b.** { *; }

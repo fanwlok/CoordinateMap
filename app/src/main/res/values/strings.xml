@@ -61,5 +61,6 @@
     <string name="bdp_update_as_install_tip">推荐您使用百度手机助手进行升级。您尚未安装百度手机助手，请先安装。</string>
     <string name="bdp_update_as_action_install">安装</string>
     <string name="bdp_update_as_action_cancel">取消</string>
+    <string name="title_activity_alipay">AlipayActivity</string>
 
 </resources>

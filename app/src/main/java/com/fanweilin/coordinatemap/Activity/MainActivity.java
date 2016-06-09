@@ -24,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -212,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 about();
                                 break;
                             case R.id.nav_quit:
-                                finish();
+                                alipay();
                                 break;
                             case R.id.nav_update:
                                 dialog.show();
@@ -225,7 +224,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
     }
-
+    public void alipay(){
+        Intent intent=new Intent();
+        intent.setClass(MainActivity.this,AlipayActivity.class);
+        startActivity(intent);
+    }
     private class MyUICheckUpdateCallback implements UICheckUpdateCallback {
 
         @Override
@@ -350,6 +353,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pointData.setAddress(pointAdress);
                 pointData.setBaiduLatitude(String.valueOf(df.format(pointlat)));
                 pointData.setBaiduLongitude(String.valueOf(df.format(pointlng)));
+                JZLocationConverter.LatLng wgsLng=JZLocationConverter.bd09ToWgs84(new JZLocationConverter.LatLng(pointlat,pointlng));
+                pointData.setWgsLatitude(String.valueOf(df.format(wgsLng.getLatitude())));
+                pointData.setWgsLongitude(String.valueOf(df.format(wgsLng.getLongitude())));
                 pointData.setPointname(null);
                 pointData.setActivity(WayponitActivity.MAIACTIVTY);
                 Intent intent = new Intent();

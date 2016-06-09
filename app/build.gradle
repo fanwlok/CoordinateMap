@@ -54,4 +54,5 @@ dependencies {
     compile files('libs/patchupdate.jar')
     compile 'com.foamtrace:photopicker:1.0'
     compile files('libs/Baidu_MobAds_SDK.jar')
+    compile files('libs/BmobPay_v2.7_160427.jar')
 }

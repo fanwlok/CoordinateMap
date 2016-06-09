@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_GPS" />
     <uses-permission android:name="android.permission.ACCESS_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- 这个权限用于访问GPS定位 -->
@@ -61,7 +62,16 @@
         <activity
             android:name="com.foamtrace.photopicker.PhotoPreviewActivity"
             android:theme="@style/PhotoPickerTheme" />
-
+        <activity
+            android:name="c.b.a.A"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name="c.b.a.B"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent" />
         <meta-data
             android:name="BDAPPID"
             android:value="7700123" />
@@ -128,10 +138,11 @@
         <activity android:name=".Activity.Bdoffilin_activity" />
         <activity android:name=".Activity.ConvertActivity" />
         <activity android:name="com.baidu.appx.ui.BDInnerBrowser" />
-        <activity android:name="com.baidu.autoupdatesdk.ConfirmDialoigActivity"
-            android:screenOrientation="sensor"
+        <activity
+            android:name="com.baidu.autoupdatesdk.ConfirmDialoigActivity"
             android:exported="false"
-             />
+            android:screenOrientation="sensor" />
+
         <receiver android:name="com.baidu.appx.app_download.CompleteReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
@@ -164,6 +175,7 @@
             android:enabled="true"
             android:exported="true" />
 
+        <activity android:name=".Activity.AlipayActivity"></activity>
     </application>
 
 </manifest>
