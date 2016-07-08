@@ -51,6 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:inputType="numberDecimal"
             android:singleLine="true" />
 
         <Button
@@ -71,10 +72,11 @@
             android:text="@string/result"
             android:textSize="20sp" />
 
-        <TextView
+        <EditText
             android:id="@+id/tv_dic"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:editable="false"
             android:gravity="center_vertical"
             android:textSize="20sp" />
     </LinearLayout>
@@ -146,10 +148,11 @@
             android:text="结果:"
             android:textSize="20sp" />
 
-        <TextView
+        <EditText
             android:id="@+id/tv_dms"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:editable="false"
             android:gravity="center_vertical"
             android:textSize="20sp" />
     </LinearLayout>

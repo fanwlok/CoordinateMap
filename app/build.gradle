@@ -55,4 +55,10 @@ dependencies {
     compile 'com.foamtrace:photopicker:1.0'
     compile files('libs/Baidu_MobAds_SDK.jar')
     compile files('libs/BmobPay_v2.7_160427.jar')
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
+    compile 'io.reactivex:rxandroid:1.2.0'
+    compile 'io.reactivex:rxjava:1.1.5'
+    compile 'org.osmdroid:osmdroid-android:5.2@aar'
 }

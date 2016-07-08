@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="com.fanweilin.coordinatemap.Activity.ToolBoxActivity">
+<include layout="@layout/toolbar"/>
+    <com.fanweilin.coordinatemap.widget.MyGridView
+        android:id="@+id/line_grideview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:numColumns="3"
+        app:showTopLine="false"
+        app:dividerColor="@color/imgbtn_in"
+        app:showButtonLine="true"
+        app:inScrollView="true" >
+</com.fanweilin.coordinatemap.widget.MyGridView>
+</LinearLayout>

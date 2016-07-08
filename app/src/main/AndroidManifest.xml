@@ -28,6 +28,11 @@
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:name=".Activity.data"
         android:allowBackup="true"
@@ -72,6 +77,7 @@
             android:name="c.b.a.B"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Translucent" />
+
         <meta-data
             android:name="BDAPPID"
             android:value="7700123" />
@@ -127,7 +133,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".Activity.AddFileActivity" />
         <activity
             android:name=".Activity.DataManagerActivity"
             android:launchMode="singleTop">
@@ -135,9 +140,6 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.Bdoffilin_activity" />
-        <activity android:name=".Activity.ConvertActivity" />
-        <activity android:name="com.baidu.appx.ui.BDInnerBrowser" />
         <activity
             android:name="com.baidu.autoupdatesdk.ConfirmDialoigActivity"
             android:exported="false"
@@ -166,16 +168,27 @@
             </intent-filter>
         </receiver>
 
+        <activity android:name=".Activity.AddFileActivity" />
+        <activity android:name=".Activity.Bdoffilin_activity" />
+        <activity android:name=".toolActivity.ConvertActivity" />
+        <activity android:name="com.baidu.appx.ui.BDInnerBrowser" />
         <activity android:name=".Activity.WayponitActivity" />
         <activity android:name=".Activity.FileActivity" />
-        <activity android:name=".Activity.CompassActivity" />
+        <activity android:name=".toolActivity.CompassActivity" />
+        <activity android:name=".Activity.LoginActivity" />
+        <activity android:name=".Activity.AlipayActivity" />
+        <activity android:name=".Activity.ForgotPassActivity" />
+        <activity android:name=".Activity.RegisterActivity" />
 
         <service
             android:name=".Activity.LocationService"
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Activity.AlipayActivity"></activity>
+        <activity android:name=".Activity.OsmdroidActivity" />
+        <activity android:name=".Activity.ToolBoxActivity" />
+        <activity android:name=".toolActivity.CoordinateActivity" />
+        <activity android:name=".toolActivity.DistanceActivity"></activity>
     </application>
 
 </manifest>

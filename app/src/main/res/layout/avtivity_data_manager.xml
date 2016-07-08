@@ -6,6 +6,9 @@
     android:orientation="vertical">
 
 <include layout="@layout/toolbar"/>
+    <ProgressBar android:id="@+id/progress_data_delete" style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" android:visibility="gone" />
     <com.fanweilin.coordinatemap.widget.CheckableRelativeLayout
         android:id="@+id/select_all"
         android:layout_width="match_parent"
@@ -49,7 +52,8 @@
         android:layout_height="48dp"
         android:background="@color/subbar"
         android:orientation="horizontal"
-        android:visibility="gone">
+       android:visibility="gone">
+
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_cancel"
@@ -61,6 +65,18 @@
             android:text="@string/cancle"
             android:textColor="@color/white"
             android:textSize="14sp" />
+
+        <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_delete"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+
+        android:background="@drawable/btnsave"
+        android:gravity="center"
+        android:text="@string/delete"
+        android:textColor="@color/white"
+        android:textSize="14sp" />
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_show"
             android:layout_width="0dp"

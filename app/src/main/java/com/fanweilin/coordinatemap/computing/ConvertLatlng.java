@@ -7,6 +7,9 @@ package com.fanweilin.coordinatemap.computing;
 import java.math.BigDecimal;
 
 public class ConvertLatlng {
+    public static int sdu;
+    public static int sfen;
+    public static double smiao;
 
     //经纬度度分秒转换为小数
     public static double convertToDecimal(double du, double fen, double miao) {
@@ -29,20 +32,21 @@ public class ConvertLatlng {
 
     }
     //将小数转换为度分秒
-    public String convertToSexagesimal(double num) {
+    public static String convertToSexagesimal(double num) {
 
-        int du = (int) Math.floor(Math.abs(num));    //获取整数部分
-        double temp = getdPoint(Math.abs(num)) * 60;
-        int fen = (int) Math.floor(temp); //获取整数部分
-        double miao = getdPoint(temp) * 60;
-        if (num < 0)
-            return "-" + du + "°" + fen + "′" + miao + "″";
+        sdu = (int) Math.floor(Math.abs(num));    //获取整数部分
+        double temp = getdPoint(Math.abs(num)) * 60; sfen = (int) Math.floor(temp); //获取整数部分
+        smiao = getdPoint(temp) * 60;
+        if (num < 0){
+            sdu=sdu*(-1);
+        }
 
-        return du + "°" + fen + "′" + miao + "″";
+
+        return sdu + "°" + sfen + "′" + smiao + "″";
 
     }
     //获取小数部分
-    public double getdPoint(double num) {
+    public static double getdPoint(double num) {
         double d = num;
         int fInt = (int) d;
         BigDecimal b1 = new BigDecimal(Double.toString(d));

@@ -224,12 +224,12 @@ public class data extends Application {
     public static void deletePointdata(List<PointData> pointDatas){
         db.beginTransaction();
         for (int i=0;i<pointDatas.size();i++){
-            deltepointdata(pointDatas.get(i));
+            deletepointdata(pointDatas.get(i));
         }
         db.setTransactionSuccessful();
         db.endTransaction();
     }
-    public static void deltepointdata(PointData pointData){
+    public static void deletepointdata(PointData pointData){
         pointData.resetPictureItems();
         deletePictureDateByList(pointData.getPictureItems());
         mPointDataDao.delete(pointData);

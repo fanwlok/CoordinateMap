@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -85,9 +86,12 @@ import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.Class.PointDataParcel;
 import com.fanweilin.coordinatemap.EventBus.ServiceEvents;
 import com.fanweilin.coordinatemap.R;
+import com.fanweilin.coordinatemap.computing.Computer;
 import com.fanweilin.coordinatemap.computing.ConvertLatlng;
 import com.fanweilin.coordinatemap.computing.DataItem;
 import com.fanweilin.coordinatemap.computing.JZLocationConverter;
+import com.fanweilin.coordinatemap.toolActivity.CompassActivity;
+import com.fanweilin.coordinatemap.toolActivity.ConvertActivity;
 import com.fanweilin.coordinatemap.widget.ZoomControlsView;
 import com.fanweilin.greendao.DaoSession;
 import com.fanweilin.greendao.Files;
@@ -103,7 +107,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, BaiduMap.OnMapLoadedCallback {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, BaiduMap.OnMapLoadedCallback, BaiduMap.OnMapLongClickListener {
     public Toolbar toolbar;
     public DrawerLayout drawerLayout;
     public ActionBarDrawerToggle mDrawerToggle;
@@ -112,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public MapView mMapView;
     public double latitude;
     public double lontitude;
+    public static String DISTANCEACTIVITY = "distanceactivity";
+    public static String DISTANCELAT = "distanceAtoB";
     public static String GETPOINTDATAPARCE = "getpointdataparcel";
     public static String DATAMANAGERACTIVITY = "datamanageractivity";
     public ZoomControlsView zoomControlsView;
@@ -143,10 +149,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean TAG_SAVEPOINT = false;
     private Button btn_mapPoint;
     private String pointAdress;
+    private Button btncancel;
     Double pointlat;
     Double pointlng;
     TextView tv_mappoint_adress;
-    //distance
+    //临时标注点线段
+    private Overlay line;
+    //距离测量
     private List<LatLng> pts;
     private List<Overlay> dotOptionses;
     private List<Overlay> polylineOptionses;
@@ -162,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        showLineDistance(getIntent());
         setlocation(getIntent());
         showdata(getIntent());
     }
@@ -211,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 about();
                                 break;
                             case R.id.nav_quit:
-                                alipay();
+                                register();
                                 break;
                             case R.id.nav_update:
                                 dialog.show();
@@ -224,11 +234,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
     }
-    public void alipay(){
-        Intent intent=new Intent();
-        intent.setClass(MainActivity.this,AlipayActivity.class);
+
+    public void register() {
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, OsmdroidActivity.class);
         startActivity(intent);
     }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+        if(line!=null){
+            line.remove();
+        }
+
+        OverlayOptions presentOption = new MarkerOptions().icon(bitmap).position(latLng);
+        mBaiduMap.addOverlay(presentOption);
+        TextView textView = new TextView(MainActivity.this);
+        textView.setTextColor(getResources().getColor(R.color.white));
+        List<LatLng> points = new ArrayList<LatLng>();
+        points.add(new LatLng(latitude, lontitude));
+        points.add(latLng);
+        OverlayOptions lineOption = new PolylineOptions().points(points).color(Color.RED).width(5);
+        line=mBaiduMap.addOverlay(lineOption);
+        String distance = Computer.distanceFomat(DistanceUtil.getDistance(new LatLng(latitude, lontitude), latLng));
+        textView.setText(distance);
+        textView.setBackgroundResource(R.drawable.v4_bg_ballon);
+        InfoWindow infoWindow = new InfoWindow(textView, latLng, -50);
+        mBaiduMap.showInfoWindow(infoWindow);
+    }
+
     private class MyUICheckUpdateCallback implements UICheckUpdateCallback {
 
         @Override
@@ -353,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 pointData.setAddress(pointAdress);
                 pointData.setBaiduLatitude(String.valueOf(df.format(pointlat)));
                 pointData.setBaiduLongitude(String.valueOf(df.format(pointlng)));
-                JZLocationConverter.LatLng wgsLng=JZLocationConverter.bd09ToWgs84(new JZLocationConverter.LatLng(pointlat,pointlng));
+                JZLocationConverter.LatLng wgsLng = JZLocationConverter.bd09ToWgs84(new JZLocationConverter.LatLng(pointlat, pointlng));
                 pointData.setWgsLatitude(String.valueOf(df.format(wgsLng.getLatitude())));
                 pointData.setWgsLongitude(String.valueOf(df.format(wgsLng.getLongitude())));
                 pointData.setPointname(null);
@@ -362,6 +396,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra(WayponitActivity.POINTDATA, pointData);
                 intent.setClass(MainActivity.this, WayponitActivity.class);
                 startActivity(intent);
+                appxBannerContainer.setVisibility(View.VISIBLE);
+                mapPoint.setVisibility(View.GONE);
+                mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
+                break;
+            case R.id.btn_main_cancel:
+                TAG_SAVEPOINT = false;
+                previous.remove();
+                mBaiduMap.hideInfoWindow();
                 appxBannerContainer.setVisibility(View.VISIBLE);
                 mapPoint.setVisibility(View.GONE);
                 mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
@@ -438,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mDataItem.setPointDataParcel(pp);
                     items.add(new MyItem(bdpoint, mDataItem));
                     builder.include(bdpoint);
-                    Log.d("name",name);
+                    Log.d("name", name);
                 }
             }
             mLatLngBounds = builder.build();
@@ -446,6 +488,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngBounds(mLatLngBounds));
         }
         cursor.close();
+    }
+
+    private void showLineDistance(Intent intent) {
+        String name;
+        LatLngBounds mLatLngBounds;
+        name = intent.getStringExtra(DISTANCEACTIVITY);
+        if (name != null) {
+            double[] data = intent.getDoubleArrayExtra(DISTANCELAT);
+            LatLng bgwgs = new LatLng(data[0], data[1]);
+            LatLng endwgs = new LatLng(data[2], data[3]);
+            LatLng bgbd = ComanLngConvertBdLngt(bgwgs, LatStyle.GPSSYTELE, LatStyle.DEGREE);
+            LatLng endbd = ComanLngConvertBdLngt(endwgs, LatStyle.GPSSYTELE, LatStyle.DEGREE);
+            List<LatLng> pts = new ArrayList<LatLng>();
+            pts.add(bgbd);
+            pts.add(endbd);
+            OverlayOptions polylineOptionsOption = new PolylineOptions()
+                    .points(pts).width(5).color(0xFF0000FF);
+            mBaiduMap.addOverlay(polylineOptionsOption);
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(bgbd);
+            builder.include(endbd);
+            mLatLngBounds = builder.build();
+            mBaiduMap.animateMapStatus(MapStatusUpdateFactory.newLatLngBounds(mLatLngBounds));
+        }
     }
 
     private boolean setlocation(Intent intent) {
@@ -479,8 +545,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapPoint = (RelativeLayout) findViewById(R.id.rl_main_mappoint);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerlayout);
         btn_mapPoint = (Button) findViewById(R.id.btn_main_pointsave);
+        btncancel= (Button) findViewById(R.id.btn_main_cancel);
+        btncancel.setOnClickListener(this);
         appxBannerContainer = (RelativeLayout) findViewById(R.id.appx_banner_container);
-        tv_mappoint_adress= (TextView) findViewById(R.id.tv_main_mappointAdress);
+        tv_mappoint_adress = (TextView) findViewById(R.id.tv_main_mappointAdress);
         mLocationClient = new LocationClient(getApplicationContext());     //声明LocationClient类
         mMapView = (MapView) findViewById(R.id.bmapView);
         mMapView.showZoomControls(false);
@@ -499,7 +567,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mClusterManager.setOnClusterItemClickListener(onClusterItemClickListener);
         mBaiduMap.setOnMarkerClickListener(mClusterManager);
         mBaiduMap.setOnMapStatusChangeListener(mClusterManager);
-       // mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
+        // mBaiduMap.setOnMapStatusChangeListener(onMapStatusChangeListener);
         bitmaplocation1 = BitmapDescriptorFactory
                 .fromResource(R.mipmap.red_blank_48px_553042_easyicon);
         bitmaplocation2 = BitmapDescriptorFactory
@@ -507,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bitmaplocation = new ArrayList<BitmapDescriptor>();
         bitmaplocation.add(bitmaplocation1);
         bitmaplocation.add(bitmaplocation2);
-
+        mBaiduMap.setOnMapLongClickListener(this);
         mBaiduMap.setOnMarkerClickListener(new BaiduMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -516,8 +584,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         startCount();
-       // createAD();
-       // isshowBananer();
+        // createAD();
+        // isshowBananer();
         RegisterEventBus();
         imgLayerChange.setOnClickListener(this);
         imgClearall.setOnClickListener(this);
@@ -622,7 +690,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onMapPoiClick(MapPoi mapPoi) {
             if (distance) {
-                pts.add( mapPoi.getPosition());
+                pts.add(mapPoi.getPosition());
                 DecimalFormat df = new DecimalFormat("#.00");
                 if (pts.size() >= 2) {
                     int n = pts.size();
@@ -642,14 +710,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     distance = String.valueOf(df.format(totalDistance)) + "m";
                 }
                 if (pts.size() > 1) {
-                    final OverlayOptions dotOption = new DotOptions().center( mapPoi.getPosition()).color(0xFF0000FF).radius(10);
+                    final OverlayOptions dotOption = new DotOptions().center(mapPoi.getPosition()).color(0xFF0000FF).radius(10);
                     dotOptionses.add(mBaiduMap.addOverlay(dotOption));
                     tvDistance.setText(distance);
-                    InfoWindow mInfoWindow = new InfoWindow(view,  mapPoi.getPosition(), -15);
+                    InfoWindow mInfoWindow = new InfoWindow(view, mapPoi.getPosition(), -15);
                     mBaiduMap.showInfoWindow(mInfoWindow);
                 } else {
                     listDistance.add(0.0);
-                    OverlayOptions dotOption = new DotOptions().center( mapPoi.getPosition()).color(0xFF0000FF).radius(10);
+                    OverlayOptions dotOption = new DotOptions().center(mapPoi.getPosition()).color(0xFF0000FF).radius(10);
                     dotOptionses.add(mBaiduMap.addOverlay(dotOption));
                 }
             }
@@ -714,6 +782,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mBaiduMap.animateMapStatus(mMapStatusUpdate);
     }
 
+    public void logOrRigester(View view) {
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+    }
+
     private Toolbar.OnMenuItemClickListener onMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -727,9 +801,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     startActivity(intent);
                     break;
                 case R.id.menu_main_compass:
-                    Intent compassIntent = new Intent();
-                    compassIntent.setClass(MainActivity.this, CompassActivity.class);
-                    startActivity(compassIntent);
+                    Intent toolBoxIntent = new Intent();
+                    toolBoxIntent.setClass(MainActivity.this, ToolBoxActivity.class);
+                    startActivity(toolBoxIntent);
                     break;
             }
             return true;
@@ -847,6 +921,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         name.setText(item.getDataItem().getName());
         PointDataParcel pp = item.getDataItem().getPointDataParcel();
         PointData pointData = data.findPointDataDaoById(pp.getPointdataid());
+        String distance = Computer.distanceFomat(DistanceUtil.getDistance(new LatLng(latitude, lontitude), new LatLng(Double.parseDouble(pointData.getBaidulatitude()),
+                Double.parseDouble(pointData.getBaidulongitude()))));
         if (pointData.getAddress().equals(null)) {
             lat.setText("LAT:" + pointData.getLatitude()
                     + "LNG:" + pointData.getLongitude());
@@ -1235,13 +1311,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * @param status 地图状态改变开始时的地图状态
          */
         public void onMapStatusChangeStart(MapStatus status) {
-        }
-
-        /**
-         * 地图状态变化中
-         * @param status 当前地图状态
-         */
-        public void onMapStatusChange(MapStatus status) {
             if (TAG_SAVEPOINT) {
                 previous.setPosition(status.target);
                 DecimalFormat df = new DecimalFormat("#.0000000");
@@ -1251,6 +1320,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 textView.setTextColor(getResources().getColor(R.color.white));
                 InfoWindow infoWindow = new InfoWindow(textView, status.target, -50);
                 mBaiduMap.showInfoWindow(infoWindow);
+            }
+        }
+
+        /**
+         * 地图状态变化中
+         * @param status 当前地图状态
+         */
+        public void onMapStatusChange(MapStatus status) {
+            if (TAG_SAVEPOINT) {
+                String distance = Computer.distanceFomat(DistanceUtil.getDistance(new LatLng(latitude, lontitude), status.target));
+                previous.setPosition(status.target);
+               DecimalFormat df = new DecimalFormat("#.0000000");
+                TextView textView = new TextView(MainActivity.this);
+                textView.setText(String.valueOf(df.format(status.target.latitude)) + "," + String.valueOf(df.format(status.target.longitude)));
+                textView.setBackgroundResource(R.drawable.v4_bg_ballon);
+                textView.setTextColor(getResources().getColor(R.color.white));
+               InfoWindow infoWindow = new InfoWindow(textView, status.target, -50);
+                pointlat = status.target.latitude;
+                pointlng = status.target.longitude;
+             getaddress(new LatLng(pointlat, pointlng));
+             mBaiduMap.showInfoWindow(infoWindow);
+                tv_mappoint_adress.setText(distance + pointAdress);
             }
         }
 
@@ -1260,28 +1351,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          */
         public void onMapStatusChangeFinish(MapStatus status) {
             if (TAG_SAVEPOINT) {
+                String distance = Computer.distanceFomat(DistanceUtil.getDistance(new LatLng(latitude, lontitude), status.target));
                 previous.setPosition(status.target);
-                DecimalFormat df = new DecimalFormat("#.0000000");
+                DecimalFormat df = new DecimalFormat("0.0000000");
                 TextView textView = new TextView(MainActivity.this);
                 textView.setText(String.valueOf(df.format(status.target.latitude)) + "," + String.valueOf(df.format(status.target.longitude)));
                 textView.setBackgroundResource(R.drawable.v4_bg_ballon);
                 textView.setTextColor(getResources().getColor(R.color.white));
                 InfoWindow infoWindow = new InfoWindow(textView, status.target, -50);
                 mBaiduMap.showInfoWindow(infoWindow);
-                pointlat=status.target.latitude;
-                pointlng=status.target.longitude;
-                getaddress(new LatLng(pointlat,pointlng));
+                pointlat = status.target.latitude;
+                pointlng = status.target.longitude;
+                getaddress(new LatLng(pointlat, pointlng));
+                tv_mappoint_adress.setText(distance + pointAdress);
             }
         }
     };
 
     private void getaddress(LatLng bdlat) {
 
-        Log.d("address", "sfsa");
         GeoCoder geoCoder = GeoCoder.newInstance();
         geoCoder.setOnGetGeoCodeResultListener(geolistener);
         geoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(bdlat));
     }
+
     OnGetGeoCoderResultListener geolistener = new OnGetGeoCoderResultListener() {
         // 反地理编码查询结果回调函数
         @Override
@@ -1293,7 +1386,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.LENGTH_LONG).show();
             }
             pointAdress = result.getAddress();
-            tv_mappoint_adress.setText(pointAdress);
         }
 
         // 地理编码查询结果回调函数

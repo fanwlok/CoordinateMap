@@ -8,12 +8,12 @@
         android:orderInCategory="120"
         app:showAsAction="ifRoom"/>
     <item android:id="@+id/add_file"
-        android:icon="@mipmap/ic_folder_open_white_36dp"
+        android:icon="@mipmap/ic_folder_white_36dp"
         android:title="@string/add_file"
         android:orderInCategory="110"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/menu_main_compass"
-        android:icon="@mipmap/ic_gps_not_fixed_white_36dp"
-        android:title="指南针"
+        android:icon="@mipmap/ic_wallet_travel_white_36dp"
+        android:title="工具箱"
         app:showAsAction="ifRoom" />
 </menu>
