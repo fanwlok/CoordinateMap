@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:title="编辑"
-        android:orderInCategory="120"
-        android:id="@+id/item_edit"
-        android:icon="@mipmap/ic_edit_white_36dp"
-        app:showAsAction="ifRoom"
-        />
-    <item
         android:title="新增"
         android:orderInCategory="120"
         android:id="@+id/item_add"

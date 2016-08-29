@@ -9,11 +9,9 @@ import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,13 +20,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -42,6 +40,7 @@ import com.fanweilin.coordinatemap.Class.FilesSetting;
 import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.Class.PointDataParcel;
 import com.fanweilin.coordinatemap.R;
+
 import com.fanweilin.coordinatemap.computing.ConvertLatlng;
 import com.fanweilin.coordinatemap.widget.CheckableRelativeLayout;
 import com.fanweilin.greendao.DaoSession;
@@ -67,24 +66,22 @@ import java.util.Map;
 
 public class DataManagerActivity extends AppCompatActivity implements View.OnClickListener, android.support.v7.widget.SearchView.OnQueryTextListener {
     private ListView mListView;
-    private TextView mTextView;
-    private String title;
     private DataAdpter mDataAdpter;
-    private ConvertLatlng convertLatlng;
     private boolean show = false;
     private List<Map<String, Object>> mData;
     private List<Map<String, Object>> mBackData;
     private LinearLayout layoutShow;
     private CheckableRelativeLayout selectALL;
     private boolean isSelectALL;
-    private android.support.v7.widget.AppCompatButton btnShow;
-    private android.support.v7.widget.AppCompatButton btnCancle;
+    //onclick
+    private Button btnShow;
+    private Button btnCancle;
+    private Button btnDelete;
+    private Button btnEdit;
+    private Button btnAll;
+    private RelativeLayout rlEdit;
     private RelativeLayout rlTopbar;
-    private RelativeLayout rlSearch;
     private android.support.v7.widget.SearchView searchView;
-    private boolean searchShow = false;
-    private int CoordStyle;
-    private int DataStyle;
     private Files files;
     private Toolbar toolbar;
     private List<PointData> pointDatas;
@@ -93,7 +90,7 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
     public static final String FILENAME = "filename";
     public static final String SUBTITLE = "subtitle";
     public static final String Id = "id";
-    private android.support.v7.widget.AppCompatButton btndelete;
+
     //checkbox
     private CheckBox name;
     private CheckBox wgs;
@@ -102,7 +99,6 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
     private CheckBox describe;
     private CheckBox address;
     private CheckBox photo;
-    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,15 +117,6 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.item_edit:
-                        if (!show) {
-                            show = true;
-                            selectALL.setVisibility(View.VISIBLE);
-                            layoutShow.setVisibility(View.VISIBLE);
-                            mDataAdpter.notifyDataSetChanged();
-
-                        }
-                        break;
                     case R.id.item_add:
                         ShowDialog();
                         break;
@@ -137,7 +124,6 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                         importfile();
                         break;
                     case R.id.item_datemanager_set:
-                        ;
                         DialogSetting();
                 }
                 return false;
@@ -205,7 +191,7 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         buildersearch.setPositiveButton("添加", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                if (edtLatitude.getText().toString().isEmpty() != true && edtLongtitude.getText().toString().isEmpty() != true) {
+                if (!TextUtils.isEmpty(edtLatitude.getText().toString()) && !TextUtils.isEmpty(edtLongtitude.getText().toString())) {
                     LatLng point = new LatLng(Double.parseDouble(edtLatitude.getText().toString()), Double.parseDouble(edtLongtitude.getText().toString()));
                     LatLng bd = MainActivity.ComanLngConvertBdLngt(point, coordstyle, datastyle);
                     PointData pointData = new PointData();
@@ -244,21 +230,27 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
     public void init() {
         files = new Files();
         mData = new ArrayList<>();
-        convertLatlng = new ConvertLatlng();
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        btnCancle = (AppCompatButton) findViewById(R.id.btn_cancel);
-        btnShow = (AppCompatButton) findViewById(R.id.btn_show);
+        btnCancle = (Button) findViewById(R.id.btn_cancel);
+        btnShow = (Button) findViewById(R.id.btn_show);
+        btnDelete = (Button) findViewById(R.id.btn_delete);
+        btnEdit = (Button) findViewById(R.id.btn_edit);
+        btnAll = (Button) findViewById(R.id.btn_all);
         mListView = (ListView) findViewById(R.id.data_manager_list);
         layoutShow = (LinearLayout) findViewById(R.id.layoutshow);
         rlTopbar = (RelativeLayout) findViewById(R.id.data_manager_topbar);
-
+        rlEdit = (RelativeLayout) findViewById(R.id.rl_server);
         btnCancle.setOnClickListener(this);
         btnShow.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
+        btnEdit.setOnClickListener(this);
+        btnAll.setOnClickListener(this);
         mListView.setTextFilterEnabled(true);
         selectALL = (CheckableRelativeLayout) findViewById(R.id.select_all);
         isSelectALL = false;
-        btndelete = (AppCompatButton) findViewById(R.id.btn_delete);
-        btndelete.setOnClickListener(this);
+
+
     }
 
 
@@ -446,6 +438,16 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         checkedArray = mListView.getCheckedItemPositions();
         final SQLiteDatabase db = data.getDb();
         switch (view.getId()) {
+            case R.id.btn_edit:
+                if (!show) {
+                    show = true;
+                    rlEdit.setVisibility(View.GONE);
+                    layoutShow.setVisibility(View.VISIBLE);
+                    mDataAdpter.notifyDataSetChanged();
+                    uncheckedAll();
+
+                }
+                break;
             case R.id.btn_show:
                 try {
                     db.beginTransaction();
@@ -453,15 +455,13 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                         if (checkedArray.valueAt(i)) {
                             int k = checkedArray.keyAt(i);
                             int id = (int) mData.get(k).get(Id);
-//                        ShowData showData = new ShowData(null, pointDatas.get(id).getName(), pointDatas.get(id).getBaidulatitude(),
-//                                pointDatas.get(id).getBaidulongitude(), LatStyle.BAIDUMAPSTYELE, LatStyle.DEGREE);
                             ShowData showData = new ShowData();
                             showData.setTitle(pointDatas.get(id).getName());
                             showData.setLatitude(pointDatas.get(id).getBaidulatitude());
                             showData.setLongitude(pointDatas.get(id).getBaidulongitude());
                             showData.setCdstyle(LatStyle.BAIDUMAPSTYELE);
                             showData.setDatastyle(LatStyle.DEGREE);
-                            showData.setPointid(pointDatas.get(i).getId());
+                            showData.setPointid(pointDatas.get(id).getId());
                             showData.setFileid(files.getId());
                             getShowDataDao().insert(showData);
                         }
@@ -480,18 +480,20 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                 selectALL.setVisibility(View.GONE);
                 layoutShow.setVisibility(View.GONE);
                 mDataAdpter.notifyDataSetChanged();
+                uncheckedAll();
                 break;
             case R.id.btn_delete:
                 AlertDialog.Builder builder = new AlertDialog.Builder(DataManagerActivity.this);
                 builder.setTitle("数据删除");
                 builder.setMessage("确定删除吗？");
                 final SparseBooleanArray finalCheckedArray = checkedArray;
+                final int len = mListView.getCount();
                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             db.beginTransaction();
-                            for (int i = 0; i < finalCheckedArray.size(); i++) {
+                            for (int i = 0; i < len; i++) {
                                 if (finalCheckedArray.valueAt(i)) {
                                     int k = finalCheckedArray.keyAt(i);
                                     int id = (int) mData.get(k).get(Id);
@@ -504,6 +506,7 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                         }
                         getData();
                         mDataAdpter.notifyDataSetChanged();
+                        uncheckedAll();
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -512,9 +515,23 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                     }
                 });
                 builder.show();
+                break;
+            case R.id.btn_all:
+                if (isSelectALL) {
+                    for (int i = 0; i < mData.size(); i++) {
+                        mListView.setItemChecked(i, false);
+                        isSelectALL = false;
+                    }
 
+                } else {
+                    for (int i = 0; i < mData.size(); i++) {
+                        mListView.setItemChecked(i, true);
+                        isSelectALL = true;
+                    }
+                }
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -595,13 +612,11 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                 holder = (ViewHolder) view.getTag();
             }
             holder.name.setText(mData.get(i).get(FILENAME).toString());
-//            holder.latitude.setText(mData.get(i).get("latitude") + ",");
-//            holder.longitude.setText((String) mData.get(i).get("longitude"));
-            if (pointDatas.get(i).getAddress().isEmpty()) {
-                holder.subtitle.setText(pointDatas.get(i).getLatitude() + "," + pointDatas.get(i).getLongitude());
+            if (TextUtils.isEmpty(pointDatas.get(i).getAddress())) {
+                holder.subtitle.setText(pointDatas.get((Integer) mData.get(i).get(Id)).getLatitude() + "," + pointDatas.get((Integer) mData.get(i).get(Id)).getLongitude());
 
             } else {
-                holder.subtitle.setText(pointDatas.get(i).getAddress().toString());
+                holder.subtitle.setText(pointDatas.get((Integer) mData.get(i).get(Id)).getAddress().toString());
             }
 
             if (show) {
@@ -774,7 +789,7 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             if (!show) {
-                PointData pointData = pointDatas.get(i);
+                PointData pointData = pointDatas.get((Integer) mData.get(i).get(Id));
                 onListItemClick(pointData);
 
             }
@@ -788,17 +803,23 @@ public class DataManagerActivity extends AppCompatActivity implements View.OnCli
                 mListView.setItemChecked(i, false);
                 isSelectALL = false;
             }
-            selectALL.setChecked(false);
 
         } else {
             for (int i = 0; i < mData.size(); i++) {
                 mListView.setItemChecked(i, true);
                 isSelectALL = true;
             }
-            selectALL.setChecked(true);
         }
     }
 
+    public void uncheckedAll() {
+        for (int i = 0; i < mData.size(); i++) {
+            mListView.setItemChecked(i, false);
+            isSelectALL = false;
+        }
+        selectALL.setChecked(false);
+
+    }
 
     private ShowDataDao getShowDataDao() {
         DaoSession mDaoSession;

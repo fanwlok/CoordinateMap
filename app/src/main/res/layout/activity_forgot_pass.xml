@@ -76,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/grey_0"
                     android:layout_marginTop="30dp"
-                    android:background="@drawable/login_btn"
+                    android:background="@drawable/btn_corner"
                     android:text="@string/action_recover" />
 
                 <TextView

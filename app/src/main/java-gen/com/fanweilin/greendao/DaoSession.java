@@ -1,13 +1,12 @@
 package com.fanweilin.greendao;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import java.util.Map;
 
-import de.greenrobot.dao.AbstractDao;
-import de.greenrobot.dao.AbstractDaoSession;
-import de.greenrobot.dao.identityscope.IdentityScopeType;
-import de.greenrobot.dao.internal.DaoConfig;
+import org.greenrobot.greendao.AbstractDao;
+import org.greenrobot.greendao.AbstractDaoSession;
+import org.greenrobot.greendao.database.Database;
+import org.greenrobot.greendao.identityscope.IdentityScopeType;
+import org.greenrobot.greendao.internal.DaoConfig;
 
 import com.fanweilin.greendao.ShowData;
 import com.fanweilin.greendao.PictureData;
@@ -24,7 +23,7 @@ import com.fanweilin.greendao.FilesDao;
 /**
  * {@inheritDoc}
  * 
- * @see de.greenrobot.dao.AbstractDaoSession
+ * @see org.greenrobot.greendao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
 
@@ -38,7 +37,7 @@ public class DaoSession extends AbstractDaoSession {
     private final PointDataDao pointDataDao;
     private final FilesDao filesDao;
 
-    public DaoSession(SQLiteDatabase db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
+    public DaoSession(Database db, IdentityScopeType type, Map<Class<? extends AbstractDao<?, ?>>, DaoConfig>
             daoConfigMap) {
         super(db);
 

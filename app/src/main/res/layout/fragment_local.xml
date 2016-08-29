@@ -1,0 +1,79 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_local"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fanweilin.coordinatemap.fragment.LocalFragment">
+
+    <ListView
+        android:id="@+id/lv_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="multipleChoice"
+        />
+    <RelativeLayout
+        android:id="@+id/rl_local"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/subbar" />
+        <Button
+            android:id="@+id/btn_local_edit"
+            android:text="编辑"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/maginparent"
+            android:background="@drawable/noaccount_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+<LinearLayout
+    android:id="@+id/ll_local"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/subbar" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/btn_local_cancel"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="@string/cancel"
+        android:background="@drawable/noaccount_background"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_local_delete"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="@string/delete"
+        android:background="@drawable/noaccount_background"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_local_put"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="@string/copy"
+        android:background="@drawable/noaccount_background"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btn_local_all"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="全部"
+        android:background="@drawable/noaccount_background"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+</LinearLayout>
+</LinearLayout>

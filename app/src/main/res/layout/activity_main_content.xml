@@ -17,6 +17,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true" />
+        <TextView
+            android:id="@+id/tv_main_center_lng"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/iv_main_center"
+            android:textColor="@color/white"
+            android:text="移动地图"
+            android:visibility="gone"
+            android:background="@drawable/v4_bg_ballon"/>
+        <ImageView
+            android:id="@+id/iv_main_center"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/icon_plus"
+            android:scaleType="centerInside"
+            android:visibility="gone"
+            />
 
         <com.fanweilin.coordinatemap.widget.ZoomControlsView
             android:id="@+id/activity_main_zoomcontrols"
@@ -24,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="100dp"
+            android:layout_marginBottom="80dp"
             android:layout_marginRight="5dp"></com.fanweilin.coordinatemap.widget.ZoomControlsView>
 
         <ImageButton
@@ -90,7 +109,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="60dp"
             android:src="@mipmap/ic_place_white_36dp"
             app:borderWidth="0dp" />
 

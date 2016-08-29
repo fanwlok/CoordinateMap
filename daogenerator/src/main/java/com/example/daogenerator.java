@@ -1,19 +1,17 @@
 package com.example;
 
 
-import java.awt.Point;
-
-import de.greenrobot.daogenerator.DaoGenerator;
-import de.greenrobot.daogenerator.Entity;
-import de.greenrobot.daogenerator.Property;
-import de.greenrobot.daogenerator.Schema;
-import de.greenrobot.daogenerator.ToMany;
+import org.greenrobot.greendao.generator.DaoGenerator;
+import org.greenrobot.greendao.generator.Entity;
+import org.greenrobot.greendao.generator.Property;
+import org.greenrobot.greendao.generator.Schema;
+import org.greenrobot.greendao.generator.ToMany;
 
 public class daogenerator {
     public static void main(String[] args) throws Exception {
         // 正如你所见的，你创建了一个用于添加实体（Entity）的模式（Schema）对象。
         // 两个参数分别代表：数据库版本号与自动生成代码的包路径。
-        Schema schema = new Schema(2, "com.fanweilin.greendao");
+        Schema schema = new Schema(4, "com.fanweilin.greendao");
 //      当然，如果你愿意，你也可以分别指定生成的 Bean 与 DAO 类所在的目录，只要如下所示：
 //      Schema schema = new Schema(1, "me.itangqi.bean");
 //      schema.setDefaultJavaPackageDao("me.itangqi.dao");
@@ -45,6 +43,7 @@ public class daogenerator {
 //        note.addIntProperty("datastyle");
 //    }
     private static void addData(Schema schema) {
+        //ShowData
         Entity note = schema.addEntity("ShowData");
         note.addIdProperty();
         note.addStringProperty("title").notNull();
@@ -57,12 +56,13 @@ public class daogenerator {
     }
 
     private static void init(Schema schema) {
+        //PictureData
         Entity pictureItems = schema.addEntity("PictureData");
         pictureItems.implementsSerializable();
         pictureItems.addIdProperty();
         pictureItems.addStringProperty("path");
         Property pointId = pictureItems.addLongProperty("pointId").getProperty();
-
+       //PointData
         Entity pointItems = schema.addEntity("PointData");
         pointItems.implementsInterface();
         pointItems.addIdProperty();
@@ -76,13 +76,16 @@ public class daogenerator {
         pointItems.addStringProperty("altitude");
         pointItems.addStringProperty("latitude");
         pointItems.addStringProperty("longitude");
+        pointItems.addStringProperty("filename");
+        pointItems.addIntProperty("status");
+        pointItems.addLongProperty("guid");
 
 
-        Property fileID = pointItems.addLongProperty("fileId").getProperty();
+        Property fileID = pointItems.addLongProperty("fileid").getProperty();
         pictureItems.addToOne(pointItems, pointId);
         ToMany toMany = pointItems.addToMany(pictureItems, pointId);
         toMany.setName("pictureItems");
-
+        //Files
         Entity files = schema.addEntity("Files");
         files.addIdProperty();
         files.addStringProperty("title").notNull();
@@ -90,6 +93,9 @@ public class daogenerator {
         files.addStringProperty("date");
         files.addIntProperty("cdstyle");
         files.addIntProperty("datastyle");
+        files.addIntProperty("status");
+        files.addDateProperty("anchor");
+
         pointItems.addToOne(files, fileID);
         ToMany fileTomany = files.addToMany(pointItems, fileID);
         fileTomany.setName("pointItems");

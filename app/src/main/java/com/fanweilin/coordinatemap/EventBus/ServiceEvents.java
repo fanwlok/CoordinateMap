@@ -1,5 +1,7 @@
 package com.fanweilin.coordinatemap.EventBus;
 
+import android.location.Location;
+
 import com.baidu.location.BDLocation;
 
 /**
@@ -10,6 +12,12 @@ public class ServiceEvents {
         public BDLocation location;
         public LocationUpdate(BDLocation loc) {
             this.location = loc;
+        }
+    }
+    public static class WgsLocation{
+        public  Location location;
+        public  WgsLocation(Location location){
+            this.location=location;
         }
     }
 }

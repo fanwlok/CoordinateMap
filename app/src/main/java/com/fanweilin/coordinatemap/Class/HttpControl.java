@@ -4,9 +4,12 @@ import android.content.Context;
 
 import com.fanweilin.coordinatemap.computing.Constants;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -33,9 +36,18 @@ public class HttpControl {
 
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .readTimeout(7676, TimeUnit.MILLISECONDS)
-                .connectTimeout(7676, TimeUnit.MILLISECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .cookieJar(new CookieManger(context))
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        return chain.proceed(chain.request() // originalRequest
+                                .newBuilder()
+                                .addHeader("accept", "application/json")
+                                .build());
+                    }
+                })
                 .build();
 
 

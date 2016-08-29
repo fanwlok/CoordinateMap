@@ -161,6 +161,7 @@ public class WayponitActivity extends AppCompatActivity implements View.OnClickL
                         } else if (DATAMANAGERACTIVITY.equals(pointData.getActivity())) {
                             mpointdata.setName(pointname.getText().toString());
                             mpointdata.setDescribe(describe.getText().toString());
+                            data.updataPointdata(mpointdata);
                             data.deletePictureDateByList(mpointdata.getPictureItems());
                             mpointdata.resetPictureItems();
                         }

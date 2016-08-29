@@ -20,9 +20,10 @@
         app:border_width="2dp" />
 
     <TextView
+        android:id="@+id/tv_mainactivity_log"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="25dp"
         android:layout_below="@id/profile_image"
         android:gravity="center"
         android:layout_centerHorizontal="true"

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ProgressBar
+        android:id="@+id/progress_data_delete"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+    <com.fanweilin.coordinatemap.widget.CheckableRelativeLayout
+        android:id="@+id/select_all"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/subbar"
+        android:onClick="checkall"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/maginparent"
+            android:text="@string/all"
+            android:textColor="@color/textcolor"
+            android:textSize="18sp" />
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/iv_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/maginparent"
+            android:clickable="false"
+            android:focusable="false" />
+    </com.fanweilin.coordinatemap.widget.CheckableRelativeLayout>
+
+    <ListView
+        android:id="@+id/data_manager_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="multipleChoice"
+        android:divider="@color/listdiver"
+        android:dividerHeight="1dp"></ListView>
+
+    <RelativeLayout
+        android:id="@+id/rl_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/subbar" />
+
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/maginparent"
+            android:background="@drawable/noaccount_background"
+            android:text="编辑" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutshow"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/subbar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/cancle"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_delete"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/delete"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+
+            <!--<Button-->
+                <!--android:id="@+id/btn_down"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_weight="1"-->
+                <!--android:background="@drawable/noaccount_background"-->
+                <!--android:gravity="center"-->
+                <!--android:text="@string/down"-->
+                <!--android:textColor="@color/textcolor"-->
+                <!--android:textSize="14sp" />-->
+
+            <Button
+                android:id="@+id/btn_all"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/all"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

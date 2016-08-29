@@ -4,17 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -39,9 +36,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FileActivity extends AppCompatActivity {
     private static final int REQUEST = 1;
@@ -57,7 +52,7 @@ public class FileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_file_manager);
+        setContentView(R.layout.activity_file_manager2);
         init();
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
@@ -239,7 +234,13 @@ public class FileActivity extends AppCompatActivity {
                 int coordstyle = mBundle.getInt("CoordStyle");
                 int datastyle = mBundle.getInt("DataStyle");
                 if (!isNamere(cursor, title)) {
-                    Files files = new Files(null, title, path, comment, coordstyle, datastyle);
+                   // Files files = new Files(null, title, path, comment, coordstyle, datastyle,0,0);
+                    Files files=new Files();
+                    files.setTitle(title);
+                    files.setPath(path);
+                    files.setDate(comment);
+                    files.setCdstyle(coordstyle);
+                    files.setDatastyle(datastyle);
                     getFileDao().insert(files);
                     cursor.requery();
                     getData(title, coordstyle, datastyle, path, files);

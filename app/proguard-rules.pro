@@ -15,33 +15,85 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+# # -------------------------------------------
+
+# #  ######### baidu混淆  ##########
+
+# # -------------------------------------------
+
 -keep class com.baidu.** {*;}
 -keep class vi.com.** {*;}
 -dontwarn com.baidu.**
 -keep class com.baidu.kirin.** {*;}
 -keep class com.baidu.mobstat.** {*;}
 -keep class com.baidu.**{public protected *;}
+# # -------------------------------------------
+
+# #  ######### v7混淆  ##########
+# # -------------------------------------------
+
 -keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}
 # # -------------------------------------------
 
-# #  ######## greenDao混淆  ##########
+# #  ######## event混淆  ##########
 
 # # -------------------------------------------
 
 -keepclassmembers class ** {
     public void onEvent*(**);
 }
+# # -------------------------------------------
 
--keep class de.greenrobot.dao.** {*;}
+# #  ######## greenDao混淆  ##########
 
--keepclassmembers class * extends de.greenrobot.dao.AbstractDao {
+# # -------------------------------------------
+
+-keep class org.greenrobot.greendao.** {*;}
+
+-keepclassmembers class * extends org.greenrobot.greendao.AbstractDao {
     public static java.lang.String TABLENAME;
 }
 -keep class **$Properties
+-dontwarn org.greenrobot.greendao.database.**
 # # -------------------------------------------
 
-# #  ######## bmob混淆  ##########
 
 # # -------------------------------------------
 
--keep class c.b.** { *; }
+
+# #  ######## retrofit2混淆  ##########
+
+# # -------------------------------------------
+# Retrofit
+
+# Retrofit 2.X
+## https://square.github.io/retrofit/ ##
+
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+#-keep class com.unity3d.player.**{*;}
+-dontwarn com.unity3d.player.**
+-dontwarn okio.**
+
+
+## GSON 2.2.4 specific rules ##
+
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { *; }

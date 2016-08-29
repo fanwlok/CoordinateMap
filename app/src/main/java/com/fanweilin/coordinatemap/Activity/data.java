@@ -170,14 +170,13 @@ public class data extends Application {
     public static Files createFiles(String filename) {
         Files files = new Files();
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
-        String comment = "Added on " + df.format(new Date());
+        String comment = "创建于 " + df.format(new Date());
         files.setDate(comment);
         files.setTitle(filename);
         return mDaoSession.getFilesDao().load(mDaoSession.getFilesDao().insert(files));
     }
 
     public static Files updateFiles(Files files) {
-
         mFilesDao.update(files);
         return files;
     }
@@ -204,10 +203,12 @@ public class data extends Application {
     }
 
     public static  PointData createPointData(Files files, PointData pointData) {
+        pointData.setStatus(0);
         pointData.setFiles(files);
         return mPointDataDao.load(mPointDataDao.insert(pointData));
     }
     public static void updataPointdata(PointData pointData){
+        pointData.setStatus(-1);
         mPointDataDao.update(pointData);
     }
     public static void deletePonitdataById(long PointDataId){

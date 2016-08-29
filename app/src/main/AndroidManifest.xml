@@ -67,16 +67,16 @@
         <activity
             android:name="com.foamtrace.photopicker.PhotoPreviewActivity"
             android:theme="@style/PhotoPickerTheme" />
-        <activity
-            android:name="c.b.a.A"
-            android:configChanges="orientation|keyboardHidden|navigation"
-            android:exported="false"
-            android:screenOrientation="behind"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity
-            android:name="c.b.a.B"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent" />
+        <!-- <activity -->
+        <!-- android:name="c.b.a.A" -->
+        <!-- android:configChanges="orientation|keyboardHidden|navigation" -->
+        <!-- android:exported="false" -->
+        <!-- android:screenOrientation="behind" -->
+        <!-- android:windowSoftInputMode="adjustResize|stateHidden" /> -->
+        <!-- <activity -->
+        <!-- android:name="c.b.a.B" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@android:style/Theme.Translucent" /> -->
 
         <meta-data
             android:name="BDAPPID"
@@ -145,18 +145,19 @@
             android:exported="false"
             android:screenOrientation="sensor" />
 
-        <receiver android:name="com.baidu.appx.app_download.CompleteReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
-                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
+        <!-- <receiver android:name="com.baidu.appx.app_download.CompleteReceiver"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.DOWNLOAD_COMPLETE" /> -->
+        <!-- <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" /> -->
+        <!-- </intent-filter> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.PACKAGE_ADDED" /> -->
 
-                <data android:scheme="package" />
-                <!-- 注意！！ 这句必须要加，否则接收不到安装完成广播 -->
-            </intent-filter>
-        </receiver>
+
+        <!-- <data android:scheme="package" /> -->
+        <!-- &lt;!&ndash; 注意！！ 这句必须要加，否则接收不到安装完成广播 &ndash;&gt; -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
         <receiver
             android:name="com.baidu.autoupdatesdk.receiver.BDBroadcastReceiver"
             android:exported="false">
@@ -171,12 +172,11 @@
         <activity android:name=".Activity.AddFileActivity" />
         <activity android:name=".Activity.Bdoffilin_activity" />
         <activity android:name=".toolActivity.ConvertActivity" />
-        <activity android:name="com.baidu.appx.ui.BDInnerBrowser" />
+        <!-- //<activity android:name="com.baidu.appx.ui.BDInnerBrowser" /> -->
         <activity android:name=".Activity.WayponitActivity" />
         <activity android:name=".Activity.FileActivity" />
         <activity android:name=".toolActivity.CompassActivity" />
         <activity android:name=".Activity.LoginActivity" />
-        <activity android:name=".Activity.AlipayActivity" />
         <activity android:name=".Activity.ForgotPassActivity" />
         <activity android:name=".Activity.RegisterActivity" />
 
@@ -185,10 +185,12 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Activity.OsmdroidActivity" />
         <activity android:name=".Activity.ToolBoxActivity" />
         <activity android:name=".toolActivity.CoordinateActivity" />
-        <activity android:name=".toolActivity.DistanceActivity"></activity>
+        <activity android:name=".toolActivity.DistanceActivity" />
+        <activity android:name=".Activity.FileManagerActivity" />
+        <activity android:name=".Activity.DateServerMananerActivity" />
+        <activity android:name=".Activity.DataServerManagerActivity"></activity>
     </application>
 
 </manifest>

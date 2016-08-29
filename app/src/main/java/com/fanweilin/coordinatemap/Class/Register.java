@@ -6,10 +6,12 @@ package com.fanweilin.coordinatemap.Class;
 public class Register {
 
 
-    String message;
-    String username;
-    String password;
-
+    private String message;
+    private String username;
+    private String password;
+    private Integer id;
+    private int vip;
+    private int code ;//200 成功，400未登录
     public Integer getId() {
         return id;
     }
@@ -18,7 +20,7 @@ public class Register {
         this.id = id;
     }
 
-    Integer id;
+
     public String getMessage() {
         return message;
     }
@@ -43,4 +45,19 @@ public class Register {
         this.password = password;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public int getVip() {
+        return vip;
+    }
+
+    public void setVip(int vip) {
+        this.vip = vip;
+    }
 }
