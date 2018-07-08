@@ -10,6 +10,8 @@ public class PointData {
     private String wgslongitude;
     private String baidulatitude;
     private String baidulongitude;
+    private String gcjlatitude;
+    private String gcjlongitude;
     private String altitude;
     private String pointname;
     private String describe;
@@ -104,5 +106,21 @@ public class PointData {
 
     public void setGuid(Long guid) {
         this.guid = guid;
+    }
+
+    public String getGcjlatitude() {
+        return gcjlatitude;
+    }
+
+    public void setGcjlatitude(String gcjlatitude) {
+        this.gcjlatitude = gcjlatitude;
+    }
+
+    public String getGcjlongitude() {
+        return gcjlongitude;
+    }
+
+    public void setGcjlongitude(String gcjlongitude) {
+        this.gcjlongitude = gcjlongitude;
     }
 }

@@ -2,9 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:title="刷新"
+        android:id="@+id/item_refreshfile"
+        app:showAsAction="ifRoom"
+        />
+    <item
         android:title="帮助"
         android:id="@+id/item_addfile_help"
-        android:icon="@mipmap/ic_help_white_36dp"
         app:showAsAction="ifRoom"
         />
 </menu>

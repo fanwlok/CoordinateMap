@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="setting"
+        android:title="基本设置">
+    <ListPreference
+        android:key="@string/pre_gps_rate"
+        android:entries="@array/gps_rate"
+        android:entryValues="@array/gps_rate_value"
+        android:title="gps刷新频率" />
+    <ListPreference
+        android:title="坐标显示格式"
+        android:key="@string/pre_coordinatedisplayformat"
+        android:entries="@array/update_rate"
+        android:entryValues="@array/update_rate_value"
+         />
+        <CheckBoxPreference
+            android:key="@string/pre_isshow_name"
+            android:defaultValue="false"
+            android:title="是否显示名字"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="about"
+        android:title="关于软件"
+        >
+        <Preference
+            android:key="version"
+            android:title="版本信息"
+            android:summary="Version 3.1.0 from 2017年4月1日"
+            />
+        <Preference
+            android:key="@string/pre_iphone"
+            android:title="联系方式"
+            android:summary="QQ:897481601"
+            />
+        <Preference
+            android:key="update"
+            android:title="检查更新"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

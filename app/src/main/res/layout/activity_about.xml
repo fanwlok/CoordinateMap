@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fanweilin.coordinatemap.Activity.AboutActivity">
+    <include layout="@layout/toolbar"></include>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_marginTop="20dp"
+            android:id="@+id/cc_logo"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_centerHorizontal="true"
+            android:src="@mipmap/earth_global"
+            app:border_color="@color/primary_light"
+            app:border_width="2dp" />
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/txt_descricao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cc_logo"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/app_decription"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/grey_600" />
+        <TextView
+            android:id="@+id/txt_version"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_descricao"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="Version 3.1.0 from 2017年4月1日"
+           />
+        <ListView
+            android:id="@+id/list_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+         >
+        </ListView>
+        <TextView
+            android:id="@+id/txt_persion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:textColor="@color/blue_600"
+            android:text="联系QQ:897481601"
+            />
+    </RelativeLayout>
+
+</LinearLayout>

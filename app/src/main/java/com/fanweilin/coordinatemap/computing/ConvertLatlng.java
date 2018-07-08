@@ -5,6 +5,7 @@ package com.fanweilin.coordinatemap.computing;
  */
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 public class ConvertLatlng {
     public static int sdu;
@@ -35,14 +36,16 @@ public class ConvertLatlng {
     public static String convertToSexagesimal(double num) {
 
         sdu = (int) Math.floor(Math.abs(num));    //获取整数部分
-        double temp = getdPoint(Math.abs(num)) * 60; sfen = (int) Math.floor(temp); //获取整数部分
+        double temp = getdPoint(Math.abs(num)) * 60;
+        sfen = (int) Math.floor(temp); //获取整数部分
         smiao = getdPoint(temp) * 60;
+        DecimalFormat dfthree = new DecimalFormat("00.000");
         if (num < 0){
             sdu=sdu*(-1);
         }
 
 
-        return sdu + "°" + sfen + "′" + smiao + "″";
+        return sdu + "°" + sfen + "′" +String.valueOf(dfthree.format(smiao)) + "″";
 
     }
     //获取小数部分

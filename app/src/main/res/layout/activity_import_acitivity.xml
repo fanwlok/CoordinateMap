@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fanweilin.coordinatemap.Activity.ImportAcitivity">
+    <include layout="@layout/toolbar" />
+    <ScrollView
+        android:id="@+id/scrview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_import"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="@dimen/fab_margin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textcontent"
+        android:textSize="14sp"
+        android:text="导出类型"/>
+
+            <RadioGroup
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_below="@+id/tv_import"
+                android:id="@+id/radio_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:orientation="vertical">
+                <RadioButton
+                    android:id="@+id/radio_csv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="csv"
+                    />
+
+                <RadioButton
+                    android:id="@+id/radio_csv_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="带照片csv" />
+                <RadioButton
+                    android:visibility="gone"
+                    android:id="@+id/radio_kml"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="kml" />
+            </RadioGroup>
+            <TextView
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_below="@+id/radio_type"
+                android:id="@+id/tv_import_name"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textcontent"
+                android:textSize="14sp"
+                android:text="导出名称"/>
+            <EditText
+                android:layout_below="@+id/tv_import_name"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/fab_margin"
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_below="@+id/et_name"
+                android:id="@+id/tv_path"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textcontent"
+                android:textSize="14sp"
+                android:text="导出路径"/>
+            <TextView
+                android:layout_marginTop="@dimen/fab_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_below="@+id/tv_path"
+                android:id="@+id/tv_path_conten"
+                android:layout_width="wrap_content"
+                android:textColor="@color/textcontent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+    </ScrollView>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <Button
+        android:id="@+id/btn_import"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@color/colorPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:textColor="@color/white"
+        android:text="导出"/>
+    <Button
+        android:layout_toLeftOf="@+id/btn_import"
+        android:id="@+id/btn_cancel"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_centerVertical="true"
+        android:layout_width="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_height="35dp"
+        android:textColor="@color/white"
+        android:text="取消"/>
+</RelativeLayout>
+</LinearLayout>

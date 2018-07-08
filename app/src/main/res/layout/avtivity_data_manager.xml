@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="@dimen/maginparent"
-            android:background="@drawable/noaccount_background"
+            android:background="?android:selectableItemBackground"
             android:text="编辑" />
     </RelativeLayout>
 
@@ -80,16 +80,16 @@
             android:background="@color/subbar" />
 
         <LinearLayout
+            android:id="@+id/ll_data_manager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <Button
                 android:id="@+id/btn_cancel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/cancle"
                 android:textColor="@color/textcolor"
@@ -101,11 +101,12 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
 
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/delete"
                 android:textColor="@color/textcolor"
                 android:textSize="14sp" />
+
 
             <Button
                 android:id="@+id/btn_show"
@@ -113,7 +114,7 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/show"
                 android:textColor="@color/textcolor"
@@ -124,9 +125,21 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/all"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_more"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="?android:selectableItemBackground"
+                android:gravity="center"
+                android:text="更多"
                 android:textColor="@color/textcolor"
                 android:textSize="14sp" />
         </LinearLayout>

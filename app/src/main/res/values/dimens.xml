@@ -12,6 +12,7 @@
     <dimen name="waypoint_ll_listdimen">40dp</dimen>
     <dimen name="waypoint_textsize">18sp</dimen>
 
+    <dimen name="actionBarSize">32dip</dimen>
     <dimen name="compass_view_degree_string_size">11sp</dimen>
     <dimen name="compass_view_direction_string_size">23sp</dimen>
     <dimen name="compass_view_arrow_size">6dip</dimen>
@@ -24,4 +25,57 @@
 
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <!--腾讯通信-->
+    <!--h1-->
+    <dimen name="h1">9sp</dimen>
+    <!--h2-->
+    <dimen name="h2">10sp</dimen>
+    <!--h3-->
+    <dimen name="h3">11sp</dimen>
+    <!--h4-->
+    <dimen name="h4">12sp</dimen>
+    <!--h5-->
+    <dimen name="h5">13sp</dimen>
+    <!--h6-->
+    <dimen name="h6">14sp</dimen>
+    <!--h7-->
+    <dimen name="h7">15sp</dimen>
+    <!--h8-->
+    <dimen name="h8">16sp</dimen>
+    <!--h9-->
+    <dimen name="h9">17sp</dimen>
+    <!--h10-->
+    <dimen name="h10">18sp</dimen>
+    <!--h11-->
+    <dimen name="h11">19sp</dimen>
+    <dimen name="folder_padding">5dp</dimen>
+    <!--gpstest-->
+
+
+    <!-- Per the design guidelines, navigation drawers should be between 240dp and 320dp:
+     https://developer.android.com/design/patterns/navigation-drawer.html -->
+    <dimen name="navigation_drawer_width">260dp</dimen>
+
+    <!-- Status view -->
+    <dimen name="status_margin">5dp</dimen>
+    <dimen name="column_padding">3dp</dimen>
+
+    <!-- Sky view -->
+    <dimen name="sky_legend_text_size_large">14sp</dimen>
+    <dimen name="sky_legend_text_size_small">10sp</dimen>
+
+    <dimen name="sky_margin">5dp</dimen>
+    <dimen name="sky_legend_cn0_indicator">10dp</dimen>
+    <dimen name="sky_legend_cn0_indicator_legend_margin">5dp</dimen>
+    <dimen name="sky_legend_cn0_large_line">10dp</dimen>
+    <dimen name="sky_legend_cn0_medium_line">7dp</dimen>
+    <dimen name="sky_legend_cn0_small_line">4dp</dimen>
+    <dimen name="cn0_value_min_width">30dp</dimen>
+
+    <dimen name="sky_legend_shape_size">14dp</dimen>
+    <dimen name="sky_legend_shape_small_line">5dp</dimen>
+    <dimen name="min_column_width">40dp</dimen>
+<dimen name="status_text_size">12sp</dimen>
+    <dimen name="dp_8">8</dimen>
+    <dimen name="dp_4">4</dimen>
 </resources>

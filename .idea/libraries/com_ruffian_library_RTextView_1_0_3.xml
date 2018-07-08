@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="com.ruffian.library:RTextView-1.0.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/RTextView-1.0.3.aar/18199ff379de93299668f85cf944bba9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/RTextView-1.0.3.aar/18199ff379de93299668f85cf944bba9/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ruffian.library/RTextView/1.0.3/59d4d3370f8bb8baedf3fa07fb780f493a6194d1/RTextView-1.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

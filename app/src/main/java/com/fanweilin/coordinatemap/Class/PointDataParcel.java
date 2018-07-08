@@ -14,6 +14,8 @@ public class PointDataParcel implements Parcelable {
     private String wgsLongitude;
     private String baiduLatitude;
     private String baiduLongitude;
+    private String gcjLatitude;
+    private String gcjLongitude;
     private String altitude;
     private String pointname;
     private String describe;
@@ -68,6 +70,8 @@ public class PointDataParcel implements Parcelable {
         wgsLongitude = in.readString();
         baiduLatitude = in.readString();
         baiduLongitude = in.readString();
+        gcjLatitude = in.readString();
+        gcjLongitude = in.readString();
         altitude = in.readString();
         pointname = in.readString();
         describe = in.readString();
@@ -113,6 +117,8 @@ public class PointDataParcel implements Parcelable {
         dest.writeString(wgsLongitude);
         dest.writeString(baiduLatitude);
         dest.writeString(baiduLongitude);
+        dest.writeString(gcjLatitude);
+        dest.writeString(gcjLongitude);
         dest.writeString(altitude);
         dest.writeString(pointname);
         dest.writeString(describe);
@@ -160,5 +166,21 @@ public class PointDataParcel implements Parcelable {
 
     public void setAltitude(String altitude) {
         this.altitude = altitude;
+    }
+
+    public String getGcjLatitude() {
+        return gcjLatitude;
+    }
+
+    public void setGcjLatitude(String gcjLatitude) {
+        this.gcjLatitude = gcjLatitude;
+    }
+
+    public String getGcjLongitude() {
+        return gcjLongitude;
+    }
+
+    public void setGcjLongitude(String gcjLongitude) {
+        this.gcjLongitude = gcjLongitude;
     }
 }

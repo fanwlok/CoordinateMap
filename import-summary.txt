@@ -7,7 +7,6 @@ The following files were *not* copied into the new Gradle project; you
 should evaluate whether these are still needed in your project and if
 so manually move them:
 
-* BDIntegrationSDK_LibProject.iml
 * proguard-project.txt
 
 Replaced Jars with Dependencies:
@@ -31,9 +30,8 @@ Eclipse projects. Here's how the projects were restructured:
 * assets\ => bDIntegrationSDK_LibProject\src\main\assets
 * libs\armeabi\libbase64encoder_v1_4.so => bDIntegrationSDK_LibProject\src\main\jniLibs\armeabi\libbase64encoder_v1_4.so
 * libs\armeabi\libMD5_v1.so => bDIntegrationSDK_LibProject\src\main\jniLibs\armeabi\libMD5_v1.so
-* libs\Baidu_Mtj_3.7.3.93.jar => bDIntegrationSDK_LibProject\libs\Baidu_Mtj_3.7.3.93.jar
-* libs\BDAutoUpdateSDK_20150605_V1.2.0.jar => bDIntegrationSDK_LibProject\libs\BDAutoUpdateSDK_20150605_V1.2.0.jar
-* libs\need_lib.jar => bDIntegrationSDK_LibProject\libs\need_lib.jar
+* libs\BDAutoUpdateSDK_V1.2.0.2.jar => bDIntegrationSDK_LibProject\libs\BDAutoUpdateSDK_V1.2.0.2.jar
+* libs\galaxy_lite.jar => bDIntegrationSDK_LibProject\libs\galaxy_lite.jar
 * libs\patchupdate.jar => bDIntegrationSDK_LibProject\libs\patchupdate.jar
 * libs\x86\libbase64encoder_v1_4.so => bDIntegrationSDK_LibProject\src\main\jniLibs\x86\libbase64encoder_v1_4.so
 * libs\x86\libMD5_v1.so => bDIntegrationSDK_LibProject\src\main\jniLibs\x86\libMD5_v1.so

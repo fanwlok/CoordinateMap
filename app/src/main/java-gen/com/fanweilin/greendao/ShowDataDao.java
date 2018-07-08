@@ -20,17 +20,22 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
     /**
      * Properties of entity ShowData.<br/>
      * Can be used for QueryBuilder and for referencing column names.
-    */
+     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
         public final static Property Latitude = new Property(2, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(3, String.class, "longitude", false, "LONGITUDE");
-        public final static Property Cdstyle = new Property(4, Integer.class, "cdstyle", false, "CDSTYLE");
-        public final static Property Fileid = new Property(5, Long.class, "fileid", false, "FILEID");
-        public final static Property Pointid = new Property(6, Long.class, "pointid", false, "POINTID");
-        public final static Property Datastyle = new Property(7, Integer.class, "datastyle", false, "DATASTYLE");
-    };
+        public final static Property Wgslatitude = new Property(4, String.class, "wgslatitude", false, "WGSLATITUDE");
+        public final static Property Wgslongitude = new Property(5, String.class, "wgslongitude", false, "WGSLONGITUDE");
+        public final static Property Baidulatitude = new Property(6, String.class, "baidulatitude", false, "BAIDULATITUDE");
+        public final static Property Baidulongitude = new Property(7, String.class, "baidulongitude", false, "BAIDULONGITUDE");
+        public final static Property Cdstyle = new Property(8, Integer.class, "cdstyle", false, "CDSTYLE");
+        public final static Property Fileid = new Property(9, Long.class, "fileid", false, "FILEID");
+        public final static Property Pointid = new Property(10, Long.class, "pointid", false, "POINTID");
+        public final static Property Datastyle = new Property(11, Integer.class, "datastyle", false, "DATASTYLE");
+        public final static Property Style = new Property(12, Integer.class, "style", false, "STYLE");
+    }
 
 
     public ShowDataDao(DaoConfig config) {
@@ -45,14 +50,19 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"SHOW_DATA\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
-                "\"TITLE\" TEXT NOT NULL ," + // 1: title
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
+                "\"TITLE\" TEXT," + // 1: title
                 "\"LATITUDE\" TEXT," + // 2: latitude
                 "\"LONGITUDE\" TEXT," + // 3: longitude
-                "\"CDSTYLE\" INTEGER," + // 4: cdstyle
-                "\"FILEID\" INTEGER," + // 5: fileid
-                "\"POINTID\" INTEGER," + // 6: pointid
-                "\"DATASTYLE\" INTEGER);"); // 7: datastyle
+                "\"WGSLATITUDE\" TEXT," + // 4: wgslatitude
+                "\"WGSLONGITUDE\" TEXT," + // 5: wgslongitude
+                "\"BAIDULATITUDE\" TEXT," + // 6: baidulatitude
+                "\"BAIDULONGITUDE\" TEXT," + // 7: baidulongitude
+                "\"CDSTYLE\" INTEGER," + // 8: cdstyle
+                "\"FILEID\" INTEGER," + // 9: fileid
+                "\"POINTID\" INTEGER," + // 10: pointid
+                "\"DATASTYLE\" INTEGER," + // 11: datastyle
+                "\"STYLE\" INTEGER);"); // 12: style
     }
 
     /** Drops the underlying database table. */
@@ -69,7 +79,11 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getTitle());
+ 
+        String title = entity.getTitle();
+        if (title != null) {
+            stmt.bindString(2, title);
+        }
  
         String latitude = entity.getLatitude();
         if (latitude != null) {
@@ -81,24 +95,49 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
             stmt.bindString(4, longitude);
         }
  
+        String wgslatitude = entity.getWgslatitude();
+        if (wgslatitude != null) {
+            stmt.bindString(5, wgslatitude);
+        }
+ 
+        String wgslongitude = entity.getWgslongitude();
+        if (wgslongitude != null) {
+            stmt.bindString(6, wgslongitude);
+        }
+ 
+        String baidulatitude = entity.getBaidulatitude();
+        if (baidulatitude != null) {
+            stmt.bindString(7, baidulatitude);
+        }
+ 
+        String baidulongitude = entity.getBaidulongitude();
+        if (baidulongitude != null) {
+            stmt.bindString(8, baidulongitude);
+        }
+ 
         Integer cdstyle = entity.getCdstyle();
         if (cdstyle != null) {
-            stmt.bindLong(5, cdstyle);
+            stmt.bindLong(9, cdstyle);
         }
  
         Long fileid = entity.getFileid();
         if (fileid != null) {
-            stmt.bindLong(6, fileid);
+            stmt.bindLong(10, fileid);
         }
  
         Long pointid = entity.getPointid();
         if (pointid != null) {
-            stmt.bindLong(7, pointid);
+            stmt.bindLong(11, pointid);
         }
  
         Integer datastyle = entity.getDatastyle();
         if (datastyle != null) {
-            stmt.bindLong(8, datastyle);
+            stmt.bindLong(12, datastyle);
+        }
+ 
+        Integer style = entity.getStyle();
+        if (style != null) {
+            stmt.bindLong(13, style);
         }
     }
 
@@ -110,7 +149,11 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
-        stmt.bindString(2, entity.getTitle());
+ 
+        String title = entity.getTitle();
+        if (title != null) {
+            stmt.bindString(2, title);
+        }
  
         String latitude = entity.getLatitude();
         if (latitude != null) {
@@ -122,24 +165,49 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
             stmt.bindString(4, longitude);
         }
  
+        String wgslatitude = entity.getWgslatitude();
+        if (wgslatitude != null) {
+            stmt.bindString(5, wgslatitude);
+        }
+ 
+        String wgslongitude = entity.getWgslongitude();
+        if (wgslongitude != null) {
+            stmt.bindString(6, wgslongitude);
+        }
+ 
+        String baidulatitude = entity.getBaidulatitude();
+        if (baidulatitude != null) {
+            stmt.bindString(7, baidulatitude);
+        }
+ 
+        String baidulongitude = entity.getBaidulongitude();
+        if (baidulongitude != null) {
+            stmt.bindString(8, baidulongitude);
+        }
+ 
         Integer cdstyle = entity.getCdstyle();
         if (cdstyle != null) {
-            stmt.bindLong(5, cdstyle);
+            stmt.bindLong(9, cdstyle);
         }
  
         Long fileid = entity.getFileid();
         if (fileid != null) {
-            stmt.bindLong(6, fileid);
+            stmt.bindLong(10, fileid);
         }
  
         Long pointid = entity.getPointid();
         if (pointid != null) {
-            stmt.bindLong(7, pointid);
+            stmt.bindLong(11, pointid);
         }
  
         Integer datastyle = entity.getDatastyle();
         if (datastyle != null) {
-            stmt.bindLong(8, datastyle);
+            stmt.bindLong(12, datastyle);
+        }
+ 
+        Integer style = entity.getStyle();
+        if (style != null) {
+            stmt.bindLong(13, style);
         }
     }
 
@@ -152,13 +220,18 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
     public ShowData readEntity(Cursor cursor, int offset) {
         ShowData entity = new ShowData( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
-            cursor.getString(offset + 1), // title
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // title
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // latitude
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // longitude
-            cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // cdstyle
-            cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5), // fileid
-            cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6), // pointid
-            cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7) // datastyle
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // wgslatitude
+            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // wgslongitude
+            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // baidulatitude
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // baidulongitude
+            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8), // cdstyle
+            cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9), // fileid
+            cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10), // pointid
+            cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11), // datastyle
+            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12) // style
         );
         return entity;
     }
@@ -166,13 +239,18 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
     @Override
     public void readEntity(Cursor cursor, ShowData entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
-        entity.setTitle(cursor.getString(offset + 1));
+        entity.setTitle(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setLatitude(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setLongitude(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setCdstyle(cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4));
-        entity.setFileid(cursor.isNull(offset + 5) ? null : cursor.getLong(offset + 5));
-        entity.setPointid(cursor.isNull(offset + 6) ? null : cursor.getLong(offset + 6));
-        entity.setDatastyle(cursor.isNull(offset + 7) ? null : cursor.getInt(offset + 7));
+        entity.setWgslatitude(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
+        entity.setWgslongitude(cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5));
+        entity.setBaidulatitude(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
+        entity.setBaidulongitude(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setCdstyle(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
+        entity.setFileid(cursor.isNull(offset + 9) ? null : cursor.getLong(offset + 9));
+        entity.setPointid(cursor.isNull(offset + 10) ? null : cursor.getLong(offset + 10));
+        entity.setDatastyle(cursor.isNull(offset + 11) ? null : cursor.getInt(offset + 11));
+        entity.setStyle(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
      }
     
     @Override
@@ -188,6 +266,11 @@ public class ShowDataDao extends AbstractDao<ShowData, Long> {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean hasKey(ShowData entity) {
+        return entity.getId() != null;
     }
 
     @Override

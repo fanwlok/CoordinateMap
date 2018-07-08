@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <CheckBox
+        android:id="@+id/cb_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="时间" />
+
+    <CheckBox
+        android:id="@+id/cb_wgs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="经纬度"/>
+
+
+
+    <CheckBox
+        android:id="@+id/cb_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="地址" />
+
+    <CheckBox
+        android:id="@+id/cb_IMEI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IMEI"/>
+    <CheckBox
+        android:id="@+id/cb_describe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="说明"/>
+</LinearLayout>

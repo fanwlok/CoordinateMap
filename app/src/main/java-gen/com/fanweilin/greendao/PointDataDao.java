@@ -25,7 +25,7 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
     /**
      * Properties of entity PointData.<br/>
      * Can be used for QueryBuilder and for referencing column names.
-    */
+     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
@@ -38,14 +38,20 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
         public final static Property Altitude = new Property(8, String.class, "altitude", false, "ALTITUDE");
         public final static Property Latitude = new Property(9, String.class, "latitude", false, "LATITUDE");
         public final static Property Longitude = new Property(10, String.class, "longitude", false, "LONGITUDE");
-        public final static Property Filename = new Property(11, String.class, "filename", false, "FILENAME");
-        public final static Property Status = new Property(12, Integer.class, "status", false, "STATUS");
-        public final static Property Guid = new Property(13, Long.class, "guid", false, "GUID");
-        public final static Property Fileid = new Property(14, Long.class, "fileid", false, "FILEID");
-    };
+        public final static Property Date = new Property(11, java.util.Date.class, "date", false, "DATE");
+        public final static Property Filename = new Property(12, String.class, "filename", false, "FILENAME");
+        public final static Property Status = new Property(13, Integer.class, "status", false, "STATUS");
+        public final static Property Guid = new Property(14, String.class, "guid", false, "GUID");
+        public final static Property Markerid = new Property(15, Integer.class, "markerid", false, "MARKERID");
+        public final static Property Gcjlongitude = new Property(16, String.class, "gcjlongitude", false, "GCJLONGITUDE");
+        public final static Property Gcjlatitude = new Property(17, String.class, "gcjlatitude", false, "GCJLATITUDE");
+        public final static Property OlfileId = new Property(18, Long.class, "olfileId", false, "OLFILE_ID");
+        public final static Property FileId = new Property(19, Long.class, "fileId", false, "FILE_ID");
+    }
 
     private DaoSession daoSession;
 
+    private Query<PointData> olfiles_PointolItemsQuery;
     private Query<PointData> files_PointItemsQuery;
 
     public PointDataDao(DaoConfig config) {
@@ -61,7 +67,7 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"POINT_DATA\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"NAME\" TEXT," + // 1: name
                 "\"DESCRIBE\" TEXT," + // 2: describe
                 "\"ADDRESS\" TEXT," + // 3: address
@@ -72,10 +78,15 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
                 "\"ALTITUDE\" TEXT," + // 8: altitude
                 "\"LATITUDE\" TEXT," + // 9: latitude
                 "\"LONGITUDE\" TEXT," + // 10: longitude
-                "\"FILENAME\" TEXT," + // 11: filename
-                "\"STATUS\" INTEGER," + // 12: status
-                "\"GUID\" INTEGER," + // 13: guid
-                "\"FILEID\" INTEGER);"); // 14: fileid
+                "\"DATE\" INTEGER," + // 11: date
+                "\"FILENAME\" TEXT," + // 12: filename
+                "\"STATUS\" INTEGER," + // 13: status
+                "\"GUID\" TEXT," + // 14: guid
+                "\"MARKERID\" INTEGER," + // 15: markerid
+                "\"GCJLONGITUDE\" TEXT," + // 16: gcjlongitude
+                "\"GCJLATITUDE\" TEXT," + // 17: gcjlatitude
+                "\"OLFILE_ID\" INTEGER," + // 18: olfileId
+                "\"FILE_ID\" INTEGER);"); // 19: fileId
     }
 
     /** Drops the underlying database table. */
@@ -143,24 +154,49 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
             stmt.bindString(11, longitude);
         }
  
+        java.util.Date date = entity.getDate();
+        if (date != null) {
+            stmt.bindLong(12, date.getTime());
+        }
+ 
         String filename = entity.getFilename();
         if (filename != null) {
-            stmt.bindString(12, filename);
+            stmt.bindString(13, filename);
         }
  
         Integer status = entity.getStatus();
         if (status != null) {
-            stmt.bindLong(13, status);
+            stmt.bindLong(14, status);
         }
  
-        Long guid = entity.getGuid();
+        String guid = entity.getGuid();
         if (guid != null) {
-            stmt.bindLong(14, guid);
+            stmt.bindString(15, guid);
         }
  
-        Long fileid = entity.getFileid();
-        if (fileid != null) {
-            stmt.bindLong(15, fileid);
+        Integer markerid = entity.getMarkerid();
+        if (markerid != null) {
+            stmt.bindLong(16, markerid);
+        }
+ 
+        String gcjlongitude = entity.getGcjlongitude();
+        if (gcjlongitude != null) {
+            stmt.bindString(17, gcjlongitude);
+        }
+ 
+        String gcjlatitude = entity.getGcjlatitude();
+        if (gcjlatitude != null) {
+            stmt.bindString(18, gcjlatitude);
+        }
+ 
+        Long olfileId = entity.getOlfileId();
+        if (olfileId != null) {
+            stmt.bindLong(19, olfileId);
+        }
+ 
+        Long fileId = entity.getFileId();
+        if (fileId != null) {
+            stmt.bindLong(20, fileId);
         }
     }
 
@@ -223,24 +259,49 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
             stmt.bindString(11, longitude);
         }
  
+        java.util.Date date = entity.getDate();
+        if (date != null) {
+            stmt.bindLong(12, date.getTime());
+        }
+ 
         String filename = entity.getFilename();
         if (filename != null) {
-            stmt.bindString(12, filename);
+            stmt.bindString(13, filename);
         }
  
         Integer status = entity.getStatus();
         if (status != null) {
-            stmt.bindLong(13, status);
+            stmt.bindLong(14, status);
         }
  
-        Long guid = entity.getGuid();
+        String guid = entity.getGuid();
         if (guid != null) {
-            stmt.bindLong(14, guid);
+            stmt.bindString(15, guid);
         }
  
-        Long fileid = entity.getFileid();
-        if (fileid != null) {
-            stmt.bindLong(15, fileid);
+        Integer markerid = entity.getMarkerid();
+        if (markerid != null) {
+            stmt.bindLong(16, markerid);
+        }
+ 
+        String gcjlongitude = entity.getGcjlongitude();
+        if (gcjlongitude != null) {
+            stmt.bindString(17, gcjlongitude);
+        }
+ 
+        String gcjlatitude = entity.getGcjlatitude();
+        if (gcjlatitude != null) {
+            stmt.bindString(18, gcjlatitude);
+        }
+ 
+        Long olfileId = entity.getOlfileId();
+        if (olfileId != null) {
+            stmt.bindLong(19, olfileId);
+        }
+ 
+        Long fileId = entity.getFileId();
+        if (fileId != null) {
+            stmt.bindLong(20, fileId);
         }
     }
 
@@ -269,10 +330,15 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // altitude
             cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // latitude
             cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // longitude
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11), // filename
-            cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12), // status
-            cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13), // guid
-            cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14) // fileid
+            cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)), // date
+            cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // filename
+            cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13), // status
+            cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14), // guid
+            cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15), // markerid
+            cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // gcjlongitude
+            cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // gcjlatitude
+            cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18), // olfileId
+            cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19) // fileId
         );
         return entity;
     }
@@ -290,10 +356,15 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
         entity.setAltitude(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setLatitude(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
         entity.setLongitude(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
-        entity.setFilename(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-        entity.setStatus(cursor.isNull(offset + 12) ? null : cursor.getInt(offset + 12));
-        entity.setGuid(cursor.isNull(offset + 13) ? null : cursor.getLong(offset + 13));
-        entity.setFileid(cursor.isNull(offset + 14) ? null : cursor.getLong(offset + 14));
+        entity.setDate(cursor.isNull(offset + 11) ? null : new java.util.Date(cursor.getLong(offset + 11)));
+        entity.setFilename(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
+        entity.setStatus(cursor.isNull(offset + 13) ? null : cursor.getInt(offset + 13));
+        entity.setGuid(cursor.isNull(offset + 14) ? null : cursor.getString(offset + 14));
+        entity.setMarkerid(cursor.isNull(offset + 15) ? null : cursor.getInt(offset + 15));
+        entity.setGcjlongitude(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
+        entity.setGcjlatitude(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
+        entity.setOlfileId(cursor.isNull(offset + 18) ? null : cursor.getLong(offset + 18));
+        entity.setFileId(cursor.isNull(offset + 19) ? null : cursor.getLong(offset + 19));
      }
     
     @Override
@@ -312,21 +383,40 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
     }
 
     @Override
+    public boolean hasKey(PointData entity) {
+        return entity.getId() != null;
+    }
+
+    @Override
     protected final boolean isEntityUpdateable() {
         return true;
     }
     
+    /** Internal query to resolve the "pointolItems" to-many relationship of Olfiles. */
+    public List<PointData> _queryOlfiles_PointolItems(Long olfileId) {
+        synchronized (this) {
+            if (olfiles_PointolItemsQuery == null) {
+                QueryBuilder<PointData> queryBuilder = queryBuilder();
+                queryBuilder.where(Properties.OlfileId.eq(null));
+                olfiles_PointolItemsQuery = queryBuilder.build();
+            }
+        }
+        Query<PointData> query = olfiles_PointolItemsQuery.forCurrentThread();
+        query.setParameter(0, olfileId);
+        return query.list();
+    }
+
     /** Internal query to resolve the "pointItems" to-many relationship of Files. */
-    public List<PointData> _queryFiles_PointItems(Long fileid) {
+    public List<PointData> _queryFiles_PointItems(Long fileId) {
         synchronized (this) {
             if (files_PointItemsQuery == null) {
                 QueryBuilder<PointData> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.Fileid.eq(null));
+                queryBuilder.where(Properties.FileId.eq(null));
                 files_PointItemsQuery = queryBuilder.build();
             }
         }
         Query<PointData> query = files_PointItemsQuery.forCurrentThread();
-        query.setParameter(0, fileid);
+        query.setParameter(0, fileId);
         return query.list();
     }
 
@@ -337,9 +427,12 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getFilesDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getOlfilesDao().getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T1", daoSession.getFilesDao().getAllColumns());
             builder.append(" FROM POINT_DATA T");
-            builder.append(" LEFT JOIN FILES T0 ON T.\"FILEID\"=T0.\"_id\"");
+            builder.append(" LEFT JOIN OLFILES T0 ON T.\"OLFILE_ID\"=T0.\"_id\"");
+            builder.append(" LEFT JOIN FILES T1 ON T.\"FILE_ID\"=T1.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -349,6 +442,10 @@ public class PointDataDao extends AbstractDao<PointData, Long> {
     protected PointData loadCurrentDeep(Cursor cursor, boolean lock) {
         PointData entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
+
+        Olfiles olfiles = loadCurrentOther(daoSession.getOlfilesDao(), cursor, offset);
+        entity.setOlfiles(olfiles);
+        offset += daoSession.getOlfilesDao().getAllColumns().length;
 
         Files files = loadCurrentOther(daoSession.getFilesDao(), cursor, offset);
         entity.setFiles(files);

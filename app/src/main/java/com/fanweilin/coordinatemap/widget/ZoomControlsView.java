@@ -1,7 +1,6 @@
 package com.fanweilin.coordinatemap.widget;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,8 +40,8 @@ public class ZoomControlsView extends RelativeLayout implements View.OnClickList
     private void init() {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         RelativeLayout view = (RelativeLayout) inflater.inflate(R.layout.zoom_controls, null);
-        zoomIn = (ImageButton) view.findViewById(R.id.btn_zoom_in);
-        zoomOut = (ImageButton) view.findViewById(R.id.btn_zoom_out);
+        zoomIn = view.findViewById(R.id.btn_zoom_in);
+        zoomOut = view.findViewById(R.id.btn_zoom_out);
         zoomIn.setOnClickListener(this);
         zoomOut.setOnClickListener(this);
         addView(view);

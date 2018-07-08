@@ -1,13 +1,17 @@
 package com.fanweilin.coordinatemap.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,14 +19,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
 import com.fanweilin.coordinatemap.Class.LatStyle;
 import com.fanweilin.coordinatemap.R;
+import com.fanweilin.greendao.ShowData;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,20 +40,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AddFileActivity extends AppCompatActivity {
+public class AddFileActivity extends AppCompatActivity implements View.OnClickListener{
     private final String mDir = Environment.getExternalStorageDirectory().getPath();
     private List<Map<String, Object>> mData;
     private String path;
     private ListView list;
-   private Myadpter adapter;
+    private Myadpter adapter;
     private int CoordStyle = LatStyle.GPSSYTELE;
     private int DataStye = LatStyle.DEGREE;
     private Toolbar toolbar;
+    private Button btnShow;
+    private Button btnCancle;
+    private Button btnShare;
+    private Button btnEdit;
+    private Button btnAll;
+    private RelativeLayout rlEdit;
+    private LinearLayout layoutShow;
+    private boolean show = false;
+    private boolean isSelectALL;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_file);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
+        init();
+
+    }
+    private void init(){
+        toolbar= findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(true); //设置返回键可用
@@ -55,17 +79,46 @@ public class AddFileActivity extends AppCompatActivity {
                     case R.id.item_addfile_help:
                         onClick();
                         break;
+                    case R.id.item_refreshfile:
+                        refresh(data.BASE_PATH);
+                        Toast.makeText(AddFileActivity.this,"电脑端无法看到文件,请先刷新",Toast.LENGTH_SHORT).show();
+                        break;
                 }
                 return false;
             }
         });
-        path = mDir;
+        path = data.BASE_PATH;
         mData = getData();
-        list= (ListView) findViewById(R.id.list);
+        list= findViewById(R.id.list);
         adapter = new Myadpter(this);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new onListItemClick());
+        rlEdit = findViewById(R.id.rl_server);
+        layoutShow = findViewById(R.id.layoutshow);
+        btnCancle = findViewById(R.id.btn_cancel);
+        btnShow = findViewById(R.id.btn_show);
+        btnShare = findViewById(R.id.btn_delete);
+        btnEdit = findViewById(R.id.btn_edit);
+        btnAll = findViewById(R.id.btn_all);
+        btnCancle.setOnClickListener(this);
+        btnShow.setOnClickListener(this);
+        btnShare.setOnClickListener(this);
+        btnEdit.setOnClickListener(this);
+        btnAll.setOnClickListener(this);
+        isSelectALL = false;
+    }
+    public void refresh(String path){
+        File f = new File(path);
+        File file[] = f.listFiles();
+        for (int i=0; i < file.length; i++)
+        {
 
+            if (file[i].isDirectory()){
+                refresh(file[i].getAbsolutePath());
+            }else {
+                MediaScannerConnection.scanFile(this, new String[] {file[i].getAbsolutePath()}, null, null);
+            }
+        }
     }
     @Override
     public boolean onSupportNavigateUp() {
@@ -86,7 +139,7 @@ public class AddFileActivity extends AppCompatActivity {
         if (!path.equals("mDir")) {
             map = new HashMap<String, Object>();
             map.put("title", "返回上一级");
-            map.put("img", R.mipmap.ex_folder);
+            map.put("img", R.mipmap.icon_folder);
             map.put("path", f.getParent());
             list.add(map);
         }
@@ -96,10 +149,10 @@ public class AddFileActivity extends AppCompatActivity {
                 map.put("title", files[i].getName());
                 map.put("path", files[i].getAbsolutePath());
                 if (files[i].isDirectory()) {
-                    map.put("img", R.mipmap.ex_folder);
+                    map.put("img", R.mipmap.icon_folder);
 
                 } else {
-                    map.put("img", R.mipmap.ex_doc);
+                    map.put("img", R.mipmap.icon_unknown1);
                 }
                 list.add(map);
             }
@@ -107,37 +160,137 @@ public class AddFileActivity extends AppCompatActivity {
         return list;
     }
 
-   private class onListItemClick implements AdapterView.OnItemClickListener {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_edit:
+                if (!show) {
+                    show = true;
+                    rlEdit.setVisibility(View.GONE);
+                    layoutShow.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
+                    uncheckedAll();
+
+                }
+                break;
+            case R.id.btn_show:
+                SparseBooleanArray checkedArray = new SparseBooleanArray();
+                checkedArray = list.getCheckedItemPositions();
+                for (int i = 0; i < checkedArray.size(); i++) {
+                    if (checkedArray.valueAt(i)) {
+                        int k = checkedArray.keyAt(i);
+                        String path = (String) mData.get(k).get("path");
+                        String title = (String) mData.get(k).get("title");
+                        File f = new File(path);
+                        if (mData.get(k).get("img").equals(R.mipmap.icon_folder)) {setdatastyel(path, title);
+                        } else if (title.endsWith(".txt")) {
+                            setdatastyel(path, title);
+                        } else if (title.endsWith(".csv")) {
+                            setdatastyel(path, title);
+                        } else if (title.endsWith(".kml")) {
+                            setdatastyel(path, title);
+                        }else if(title.endsWith(".kmz")){
+                            setdatastyel(path, title);
+                        }
+                    }
+                }
+                break;
+            case R.id.btn_cancel:
+                show = false;
+                rlEdit.setVisibility(View.VISIBLE);
+                layoutShow.setVisibility(View.GONE);
+                adapter.notifyDataSetChanged();
+                uncheckedAll();
+                break;
+            case R.id.btn_delete:
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+              //  shareIntent.
+                SparseBooleanArray checkedArrays = new SparseBooleanArray();
+                checkedArrays = list.getCheckedItemPositions();
+                File f;
+                for (int i = 0; i < checkedArrays.size(); i++) {
+                    if (checkedArrays.valueAt(i)) {
+                        int k = checkedArrays.keyAt(i);
+                        String path = (String) mData.get(k).get("path");
+                        String title = (String) mData.get(k).get("title");
+                        f = new File(path);
+                      if (mData.get(k).get("img").equals(R.mipmap.icon_folder)) {
+                          Toast.makeText(this,"只能分享文件",Toast.LENGTH_LONG).show();
+                        } else{
+                          Uri u = Uri.fromFile(f);
+                          shareIntent.putExtra(Intent.EXTRA_STREAM,  u );
+                          shareIntent.setType("*/*");
+                          startActivity(Intent.createChooser(shareIntent, "分享到"));
+                        }
+                    }
+                }
+                break;
+            case R.id.btn_all:
+                if (isSelectALL) {
+                    for (int i = 0; i < mData.size(); i++) {
+                        list.setItemChecked(i, false);
+                        isSelectALL = false;
+                    }
+
+                } else {
+                    for (int i = 0; i < mData.size(); i++) {
+                        list.setItemChecked(i, true);
+                        isSelectALL = true;
+                    }
+                }
+                break;
+
+        }
+    }
+    public void uncheckedAll() {
+        for (int i = 0; i < mData.size(); i++) {
+            list.setItemChecked(i, false);
+            isSelectALL = false;
+        }
+
+    }
+    private class onListItemClick implements AdapterView.OnItemClickListener {
        @Override
        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-           path = (String) mData.get(position).get("path");
-           String title = (String) mData.get(position).get("title");
-           if (position == 0) {
-               File file = new File(path);
-               if (file.getParent() == null) {
-                   finish();
-               } else if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
-                   mData = getData();
-                   adapter.notifyDataSetChanged();
-
+           if (!show){
+               path = (String) mData.get(position).get("path");
+               String title = (String) mData.get(position).get("title");
+               if (position == 0) {
+                   for (int i = 0; i < mData.size(); i++) {
+                       list.setItemChecked(i, false);
+                   }
+                   File file = new File(path);
+                   if (file.getParent() == null) {
+                       finish();
+                   } else if (mData.get(position).get("img").equals(R.mipmap.icon_folder) ) {
+                       mData = getData();
+                       adapter.notifyDataSetChanged();
+                   }
 
                }
+               if (mData.get(position).get("img").equals(R.mipmap.icon_folder) ) {
+                   mData = getData();
+                   mData = getData();
+                   adapter.notifyDataSetChanged();
+               } else if (title.endsWith(".txt")) {
+                   setdatastyel(path, title);
+               }else if(title.endsWith(".csv")){
+                   setdatastyel(path, title);
+               }
+               else if(title.endsWith(".kml")){
+                   setdatastyel(path, title);
+               }
            }
-           if ((Integer) mData.get(position).get("img") == R.mipmap.ex_folder) {
-               mData = getData();
-               mData = getData();
-               adapter.notifyDataSetChanged();
-           } else if (title.endsWith(".txt")) {
-               setdatastyel(path, title);
            }
-       }
+
    }
 
     public void onClick() {
         AlertDialog.Builder builder = new AlertDialog.Builder(AddFileActivity.this);
-        builder.setTitle("帮助");
-        builder.setMessage("导入文本格式为txt格式.\n小数形式例:\n1,30.42454758,120.54652514\n2,30.42556235,120.88745624"
-        +"\n度分秒格式例:\n1,30.45253,120.36478\n2,30.44257,120.55786\n坐标系导入数据后在设置.");
+        builder.setTitle("导入说明");
+        builder.setMessage(R.string.import_help);
+
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -151,6 +304,7 @@ public class AddFileActivity extends AppCompatActivity {
         ImageView img;
         TextView titleview;
         TextView pathview;
+        CheckBox checkBox;
     }
 
     public class Myadpter extends BaseAdapter {
@@ -182,9 +336,10 @@ public class AddFileActivity extends AppCompatActivity {
             if (view == null) {
                 holder = new ViewHolder();
                 view = inflater.inflate(R.layout.list_file, null);
-                holder.img = (ImageView) view.findViewById(R.id.img);
-                holder.titleview = (TextView) view.findViewById(R.id.title);
-                holder.pathview = (TextView) view.findViewById(R.id.path);
+                holder.img = view.findViewById(R.id.img);
+                holder.titleview = view.findViewById(R.id.title);
+                holder.pathview = view.findViewById(R.id.path);
+                holder.checkBox = view.findViewById(R.id.checkbox);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -192,6 +347,11 @@ public class AddFileActivity extends AppCompatActivity {
             holder.img.setBackgroundResource((Integer) mData.get(i).get("img"));
             holder.titleview.setText((String) mData.get(i).get("title"));
             holder.pathview.setText((String) mData.get(i).get("path"));
+            if (show) {
+                holder.checkBox.setVisibility(View.VISIBLE);
+            } else {
+                holder.checkBox.setVisibility(View.GONE);
+            }
             return view;
         }
 
@@ -205,7 +365,9 @@ public class AddFileActivity extends AppCompatActivity {
         conDate.putInt("DataStyle", datastyle);
         Intent intent = new Intent();
         intent.putExtras(conDate);
-        setResult(RESULT_OK, intent);
+        intent.setClass(this,FileManagerActivity.class);
+        intent.putExtra("activityname","addfileactivity");
+        startActivity(intent);
         finish();
     }
 
@@ -216,8 +378,8 @@ public class AddFileActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(AddFileActivity.this);
         builder.setView(view);
         builder.setTitle("数据格式设置");
-        rgcoord = (RadioGroup) view.findViewById(R.id.rg_codstyle);
-        rgdata = (RadioGroup) view.findViewById(R.id.rg_datastyle);
+        rgcoord = view.findViewById(R.id.rg_codstyle);
+        rgdata = view.findViewById(R.id.rg_datastyle);
 
 
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {

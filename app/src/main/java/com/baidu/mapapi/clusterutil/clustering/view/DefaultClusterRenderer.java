@@ -37,6 +37,7 @@ import com.baidu.mapapi.map.BitmapDescriptor;
 import com.baidu.mapapi.map.BitmapDescriptorFactory;
 import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.Projection;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.model.LatLngBounds;
@@ -72,7 +73,6 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements
 
     private static final int[] BUCKETS = {10, 20, 50, 100, 200, 500, 1000};
     private ShapeDrawable mColoredCircleBackground;
-
     /**
      * Markers that are currently on the map.
      */
@@ -116,6 +116,8 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements
     private ClusterManager.OnClusterInfoWindowClickListener<T> mInfoWindowClickListener;
     private ClusterManager.OnClusterItemClickListener<T> mItemClickListener;
     private ClusterManager.OnClusterItemInfoWindowClickListener<T> mItemInfoWindowClickListener;
+    //2018
+    List<Point> mClustersOnScreen;
 
     public DefaultClusterRenderer(Context context, BaiduMap map, ClusterManager<T> clusterManager) {
         mMap = map;
@@ -371,6 +373,7 @@ public class DefaultClusterRenderer<T extends ClusterItem> implements
                     markerModifier.add(onScreen, new CreateMarkerTask(c, newMarkers, null));
                 }
             }
+
 
             // Wait for all markers to be added.
             markerModifier.waitUntilFree();

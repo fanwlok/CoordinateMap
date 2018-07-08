@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.baidu.mapapi.map.offline.MKOLUpdateElement;
 import com.fanweilin.coordinatemap.Activity.Bdoffilin_activity;
-import com.fanweilin.coordinatemap.Activity.MainActivity;
+import com.fanweilin.coordinatemap.Activity.MainMapsActivity;
 import com.fanweilin.coordinatemap.R;
 
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ public class DownFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.frament_down, container, false);
-        ListView localMapListView = (ListView) view.findViewById(R.id.localmaplist);
-        stateView= (TextView) view.findViewById(R.id.state);
+        ListView localMapListView = view.findViewById(R.id.localmaplist);
+        stateView= view.findViewById(R.id.state);
         lAdapter = new LocalMapAdapter(getActivity());
         localMapListView.setAdapter(lAdapter);
         return view;
@@ -77,11 +77,11 @@ public class DownFragment extends Fragment {
         }
 
         void initViewItem(View view, final MKOLUpdateElement e) {
-            Button display = (Button) view.findViewById(R.id.display);
-            Button remove = (Button) view.findViewById(R.id.remove);
-            TextView title = (TextView) view.findViewById(R.id.title);
-            TextView update = (TextView) view.findViewById(R.id.update);
-            TextView ratio = (TextView) view.findViewById(R.id.ratio);
+            Button display = view.findViewById(R.id.display);
+            Button remove = view.findViewById(R.id.remove);
+            TextView title = view.findViewById(R.id.title);
+            TextView update = view.findViewById(R.id.update);
+            TextView ratio = view.findViewById(R.id.ratio);
             ratio.setText(e.ratio + "%");
             title.setText(e.cityName);
             if (e.update) {
@@ -107,7 +107,7 @@ public class DownFragment extends Fragment {
                     Intent intent = new Intent();
                     intent.putExtra("x", e.geoPt.longitude);
                     intent.putExtra("y", e.geoPt.latitude);
-                    intent.setClass(getActivity(), MainActivity.class);
+                    intent.setClass(getActivity(), MainMapsActivity.class);
                     startActivity(intent);
                 }
             });

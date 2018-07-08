@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fanweilin.coordinatemap.Activity.GuassActivity">
+    <include layout="@layout/toolbar" />
+    <ListView
+        android:id="@+id/list_guass"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+    </ListView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/gray"
+        />
+    <TextView
+        android:layout_margin="5dp"
+        android:id="@+id/tv_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="关于参数配置,国家2000仅需配置中央子午线。自定义适用北京54，西安80及地方坐标系,由于采用单点转换，仅适用于局部，建议距离超过50km重新配置。
+ 参数配置需输入一个已知点的WGS84经纬度和对应平面坐标，中央子午线可以输入平面坐标系内任意经度。"/>
+</LinearLayout>

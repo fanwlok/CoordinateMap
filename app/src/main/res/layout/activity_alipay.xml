@@ -5,12 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.fanweilin.coordinatemap.Activity.AlipayActivity">
+    >
     <include layout="@layout/toolbar"></include>
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></RelativeLayout>
-    <RelativeLayout
+        android:visibility="gone"
         android:layout_below="@id/toolbar"
         android:id="@+id/rl_alipay_zhifu"
         android:background="@drawable/imgbutton_normal"
@@ -23,27 +21,28 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:textColor="@android:color/black"
-            android:text="商品名称：去除广告"/>
+            android:text="商品名称：经纬度定位"/>
         <TextView
             android:id="@+id/tv_alipay_jiage"
             android:layout_width="wrap_content"
             android:gravity="center_vertical"
             android:layout_below="@id/tv_alipay_name"
             android:textColor="@android:color/black"
-            android:text="支付金额：20.00"
+            android:text="支付金额：30.00"
             android:layout_height="wrap_content" />
     </RelativeLayout>
     <TextView
+        android:visibility="gone"
         android:id="@+id/tv_alipay_select"
         android:layout_marginLeft="@dimen/maginparent"
         android:layout_below="@id/rl_alipay_zhifu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="请选择支付方式"/>
+        android:text="请选择支付方式:"/>
     <LinearLayout
+        android:visibility="gone"
         android:layout_marginLeft="@dimen/maginparent"
         android:id="@+id/ll_alipay_zhifubao"
-        android:onClick="zhifubao"
         android:layout_below="@id/rl_alipay_zhifu"
         android:background="@drawable/imagebutton"
         android:layout_width="match_parent"
@@ -61,7 +60,7 @@
             android:text="支付宝支付"/>
     </LinearLayout>
     <LinearLayout
-        android:onClick="weixin"
+        android:visibility="gone"
         android:layout_marginLeft="@dimen/maginparent"
         android:layout_below="@id/ll_alipay_zhifubao"
         android:id="@+id/ll_alipay_weixin"
@@ -81,9 +80,63 @@
             android:text="微信支付"/>
     </LinearLayout>
     <TextView
-        android:layout_marginLeft="@dimen/maginparent"
-        android:layout_marginRight="@dimen/maginparent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="注：收款方为第三方支付商，收款后系统会自动给你去除广告并开放全部功能。如有问题请联系qq：897481601"/>
+        android:gravity="center"
+        android:textColor="@color/textcolor"
+        android:textSize="20sp"
+        android:text="\n关注微信公众号jwddw88\n或微信搜索经纬度定位"/>
+    <TextView
+        android:layout_marginLeft="@dimen/maginparent"
+        android:layout_marginRight="@dimen/maginparent"
+        android:layout_marginTop="@dimen/maginparent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="该软件为业余时间开发，由于精力有限，并未对软件进行深度测试，在使用中难免会出现部分bug,
+        如在使用过程中遇到bug,或有好的建议可以联系作者，一经采用，可以获得永久去除广告功能。\n个人QQ：897481601
+        \n新建QQ群723232871。"
+      />
+    <LinearLayout
+        android:layout_marginLeft="@dimen/maginparent"
+        android:layout_marginRight="@dimen/maginparent"
+        android:layout_marginTop="@dimen/maginparent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="本机id :"/>
+        <TextView
+            android:id="@+id/tv_appid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <TextView
+            android:onClick="copy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/blue"
+            android:text="点击复制"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_pay"
+        android:layout_marginLeft="@dimen/maginparent"
+        android:layout_marginRight="@dimen/maginparent"
+        android:layout_marginTop="@dimen/maginparent"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="加入QQ群"/>
+    <Button
+        android:visibility="gone"
+        android:id="@+id/btn_setvip"
+        android:layout_marginLeft="@dimen/maginparent"
+        android:layout_marginRight="@dimen/maginparent"
+        android:layout_marginTop="@dimen/maginparent"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="设置vip"/>
 </LinearLayout>

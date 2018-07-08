@@ -6,78 +6,83 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseBooleanArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fanweilin.coordinatemap.Activity.DataManagerActivity;
 import com.fanweilin.coordinatemap.Activity.FileManagerActivity;
+import com.fanweilin.coordinatemap.Activity.ImportAcitivity;
+import com.fanweilin.coordinatemap.Activity.MainMapsActivity;
 import com.fanweilin.coordinatemap.Activity.data;
-import com.fanweilin.coordinatemap.Class.CoordianteApi;
-import com.fanweilin.coordinatemap.Class.HttpControl;
-import com.fanweilin.coordinatemap.Class.Register;
+import com.fanweilin.coordinatemap.Class.Marker;
+import com.fanweilin.coordinatemap.Class.ShowPointStyle;
+import com.fanweilin.coordinatemap.Class.SpfOlMap;
+import com.fanweilin.coordinatemap.DataModel.CoordianteApi;
+import com.fanweilin.coordinatemap.DataModel.HttpControl;
 import com.fanweilin.coordinatemap.DataModel.IdsClass;
 import com.fanweilin.coordinatemap.DataModel.PointDataClient;
-import com.fanweilin.coordinatemap.DataModel.PointDataGet;
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.greendao.DaoSession;
 import com.fanweilin.greendao.Files;
 import com.fanweilin.greendao.FilesDao;
 import com.fanweilin.greendao.PointData;
 import com.fanweilin.greendao.PointDataDao;
+import com.fanweilin.greendao.ShowData;
+import com.fanweilin.greendao.ShowDataDao;
+import com.fanweilin.greendao.SqlPolygon;
+import com.fanweilin.greendao.SqlPolyline;
+import com.zyyoona7.lib.EasyPopup;
+import com.zyyoona7.lib.HorizontalGravity;
+import com.zyyoona7.lib.VerticalGravity;
 
 import org.greenrobot.greendao.query.Join;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
-public class LocalFragment extends Fragment implements View.OnClickListener {
+public class LocalFragment extends Fragment  {
     ListView listView;
     public Cursor cursor;
     private SQLiteDatabase db;
     private List<Map<String, Object>> mData = new ArrayList<Map<String, Object>>();
     private DaoSession mDaoSession;
     private Boolean show = false;
-    private Boolean isSelectALL = false;
     public LocalListAdpter adapter;
     public LinearLayout ll;
-    private RelativeLayout rl;
-    private Button btnEdit;
-    private Button btnCancel;
-    private Button btndelete;
-    private Button btnput;
-    private Button btnAll;
+    public LinearLayout fll;
+
     private ProgressDialog dialog;
-    private FileManagerActivity fileManagerActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,282 +97,34 @@ public class LocalFragment extends Fragment implements View.OnClickListener {
         adapter = new LocalListAdpter(getActivity());
         dialog = new ProgressDialog(getActivity());
         dialog.setIndeterminate(true);
-        fileManagerActivity= (FileManagerActivity) this.getActivity();
-        correctData();
+
     }
- public void correctData(){
-     Retrofit retrofit = HttpControl.getInstance(getContext()).getRetrofit();
-     CoordianteApi getids = retrofit.create(CoordianteApi.class);
-     getids.Rxgetdataid().subscribeOn(Schedulers.io()).observeOn(Schedulers.io()).subscribe(new Subscriber<List<IdsClass>>() {
-         @Override
-         public void onCompleted() {
 
-         }
-
-         @Override
-         public void onError(Throwable e) {
-             Log.e("ex","网络异常");
-         }
-
-         @Override
-         public void onNext(List<IdsClass> ids) {
-             QueryBuilder qb = getPointDataDao().queryBuilder().where(PointDataDao.Properties.Status.eq(9));
-             List<PointData> list = qb.list();
-             List<Long> guids=new ArrayList<Long>();
-             for (IdsClass idsClass:ids){
-                 guids.add(idsClass.getId());
-             }
-             try {
-                 db.beginTransaction();
-                 for(PointData pointData:list){
-                     Long id=pointData.getGuid();
-                     if(!guids.contains(id)){
-                         pointData.setStatus(-1);
-                         pointData.update();
-                     }
-                 }
-                 db.setTransactionSuccessful();
-             }finally {
-                 db.endTransaction();
-             }
-
-
-         }
-     });
- }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         init();
         View view = inflater.inflate(R.layout.fragment_local, container, false);
-        rl = (RelativeLayout) view.findViewById(R.id.rl_local);
-        ll = (LinearLayout) view.findViewById(R.id.ll_local);
-        listView = (ListView) view.findViewById(R.id.lv_fragment);
-        btnEdit = (Button) view.findViewById(R.id.btn_local_edit);
-        btnCancel = (Button) view.findViewById(R.id.btn_local_cancel);
-        btndelete = (Button) view.findViewById(R.id.btn_local_delete);
-        btnput = (Button) view.findViewById(R.id.btn_local_put);
-        btnAll = (Button) view.findViewById(R.id.btn_local_all);
-        btnEdit.setOnClickListener(this);
-        btnCancel.setOnClickListener(this);
-        btndelete.setOnClickListener(this);
-        btnAll.setOnClickListener(this);
-        btnput.setOnClickListener(this);
+        ll = view.findViewById(R.id.ll_local);
+        fll=view.findViewById(R.id.fragment_local);
+        listView = view.findViewById(R.id.lv_fragment);
         listView.setAdapter(adapter);
         listView.setOnItemLongClickListener(new MyItemLongclick());
         listView.setOnItemClickListener(new MyOnItemclick());
         return view;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_local_edit:
-                ishowcheckbox();
-                break;
-            case R.id.btn_local_cancel:
-                ishowcheckbox();
-                break;
-            case R.id.btn_local_delete:
-                delete();
-                break;
-            case R.id.btn_local_put:
-                if (fileManagerActivity.islog){
-                    put();
-                }else {
-                    Toast.makeText(getActivity(),"请先登陆",Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case R.id.btn_local_all:
-                checkall();
-                break;
-        }
-
-    }
-
-    public void put() {
-        dialog.show();
-        Retrofit retrofit = HttpControl.getInstance(getContext()).getRetrofit();
-        CoordianteApi putdata = retrofit.create(CoordianteApi.class);
-        int len = listView.getCount();
-        SparseBooleanArray checkedArray = new SparseBooleanArray();
-        checkedArray = listView.getCheckedItemPositions();
-        final List<PointDataClient> listdata = new ArrayList<PointDataClient>();
-        for (int i = 0; i < len; i++) {
-            if (checkedArray.valueAt(i)) {
-                int k = checkedArray.keyAt(i);
-                long id = (long) mData.get(k).get("id");
-                QueryBuilder qb = getPointDataDao().queryBuilder().where(PointDataDao.Properties.Status.lt(8));
-                Join file = qb.join(PointDataDao.Properties.Fileid, Files.class);
-                file.where(FilesDao.Properties.Id.eq(id));
-                List<PointData> list = qb.list();
-                for (PointData pointData : list) {
-                    PointDataClient pointDataClient = new PointDataClient();
-                    pointDataClient.setFilename(data.findOrderById(id).getTitle());
-                    pointDataClient.setAltitude(pointData.getAltitude());
-                    pointDataClient.setPointname(pointData.getName());
-                    pointDataClient.setAddress(pointData.getAddress());
-                    pointDataClient.setWgslatitude(pointData.getWgslatitude());
-                    pointDataClient.setWgslongitude(pointData.getWgslongitude());
-                    pointDataClient.setBaidulatitude(pointData.getBaidulatitude());
-                    pointDataClient.setBaidulongitude(pointData.getBaidulongitude());
-                    pointDataClient.setDescribe(pointData.getDescribe());
-                    pointDataClient.setPointid(pointData.getId());
-                    pointDataClient.setGuid(pointData.getGuid());
-                    listdata.add(pointDataClient);
-                }
-            }
-        }
-        if (listdata.size() == 0) {
-            Toast.makeText(getActivity(), "没有数据要更新", Toast.LENGTH_SHORT).show();
-            dialog.dismiss();
-        } else {
-            putdata.Rxputdata(listdata).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<IdsClass>>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-
-                }
-
-                @Override
-                public void onNext(List<IdsClass> idsClasses) {
-                    Toast.makeText(getActivity(), "备份完成", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    fileManagerActivity.cloudFragment.getListdata();
-                    try {
-                        db.beginTransaction();
-                        for (IdsClass idsClass : idsClasses) {
-                            PointData pointData = data.findPointDataDaoById(idsClass.getClientid());
-                            pointData.setStatus(9);
-                            pointData.setGuid(idsClass.getServerid());
-                            pointData.update();
-                        }
-                        db.setTransactionSuccessful();
-                    }finally {
-                        db.endTransaction();
-                    }
-
-                }
-            });
-
-        }
-        }
-
     public FilesDao getFilesDao() {
         return data.getmDaoSession().getFilesDao();
     }
 
-    public PointDataDao getPointDataDao() {
-        return data.getmDaoSession().getPointDataDao();
-    }
-
-    public void checkall() {
-        if (isSelectALL) {
-            for (int i = 0; i < mData.size(); i++) {
-                listView.setItemChecked(i, false);
-                isSelectALL = false;
-            }
-
-        } else {
-            for (int i = 0; i < mData.size(); i++) {
-                listView.setItemChecked(i, true);
-                isSelectALL = true;
-            }
-        }
-    }
-    public String[] dataItems = { "删除", "取消"};
-    public void delete() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("文件删除");
-        builder.setMessage("确定删除吗？");
-        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                deletedata();
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.show();
-    }
-    public class ListAdapter extends BaseAdapter {
-        private LayoutInflater inflater;
-
-        public ListAdapter(Context context) {
-            inflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public int getCount() {
-            return dataItems.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return dataItems[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view = inflater.inflate(R.layout.list_datamanger_dialog, null);
-            TextView textView = (TextView) view.findViewById(R.id.tv_datamanager_dialog);
-            textView.setText(dataItems[position]);
-            if (dataItems[position].equals("删除")){
-                textView.setTextColor(getResources().getColor(R.color.blue_500));
-            }
-            return view;
-        }
-    }
-   public void deletedata(){
-       int len = listView.getCount();
-       SparseBooleanArray checkedArray = new SparseBooleanArray();
-       checkedArray = listView.getCheckedItemPositions();
-       try {
-           db.beginTransaction();
-           for (int i = 0; i < len; i++) {
-               if (checkedArray.valueAt(i)) {
-                   int k = checkedArray.keyAt(i);
-                   long id = (long) mData.get(k).get("id");
-                   data.deleteFile(data.findOrderById(id));
-               }
-           }
-           db.setTransactionSuccessful();
-       } finally {
-           db.endTransaction();
-       }
-       fresh();
-   }
-    public void ishowcheckbox() {
-        if (show) {
-            rl.setVisibility(View.VISIBLE);
-            ll.setVisibility(View.GONE);
-            show = false;
-        } else {
-            rl.setVisibility(View.GONE);
-            ll.setVisibility(View.VISIBLE);
-            show = true;
-        }
-        fresh();
-    }
 
     public class ViewHolder {
+        ImageView imgMarker;
         TextView name;
         TextView subtitle;
-        CheckBox checkBox;
+        ImageButton btn;
     }
 
     public class LocalListAdpter extends BaseAdapter {
@@ -394,30 +151,242 @@ public class LocalFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-
+            long id = (long) mData.get(i).get("id");
+            final Files files=data.findOrderById(id);
             ViewHolder holder;
             if ((view == null)) {
                 holder = new ViewHolder();
-                view = inflater.inflate(R.layout.list_data, null);
-                holder.name = (TextView) view.findViewById(R.id.name);
-                holder.subtitle = (TextView) view.findViewById(R.id.tv_subtitle);
-                holder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);
+                view = inflater.inflate(R.layout.list_file_item, null);
+                holder.name = view.findViewById(R.id.name);
+                holder.subtitle = view.findViewById(R.id.tv_subtitle);
+                holder.btn=view.findViewById(R.id.img_btn_more);
+                holder.imgMarker=view.findViewById(R.id.img_marker);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
             }
             holder.name.setText(mData.get(i).get("filename").toString());
             holder.subtitle.setText(mData.get(i).get("data").toString());
+            holder.imgMarker.setImageResource(Marker.getResource((Integer) mData.get(i).get("color")));
+            holder.btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showPouup(files);
 
-            if (show) {
-                holder.checkBox.setVisibility(View.VISIBLE);
-            } else {
-                holder.checkBox.setVisibility(View.GONE);
-            }
+                }
+            });
             return view;
         }
     }
+public void  showPouup(final Files files){
+    ListView listView = new ListView(getActivity());
+    listView.setAdapter(new DialogListAdapter(getActivity()));
+    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    final AlertDialog dialog = builder.setView(listView).show();
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            switch (position){
+                case 0:
+                    dialog.dismiss();
+                    showAllfiles(files);
+                    break;
+                case 1:
+                    dialog.dismiss();
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("文件删除");
+                    builder.setMessage("确定删除吗？");
+                    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (files.getTitle().equals("我的收藏")) {
+                                Toast.makeText(getActivity(), "默认文件不能删除", Toast.LENGTH_SHORT).show();
+                            } else {
+                                data.deleteFile(files);
+                            }
+                            fresh();
+                        }
+                    });
+                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    builder.show();
+                    break;
+                case 2:
+                    importFile(files);
+                    dialog.dismiss();
+                        break;
+                case 3:
+                    dialog.dismiss();
+                    setfileMarker(files);
+                    break;
+            }
 
+        }
+    });
+}
+    private int selectMarker;
+public void setfileMarker(final Files files){
+    View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_img, null);
+    ImageButton imgBlue=view.findViewById(R.id.img_blue);
+    ImageButton imgRed=view.findViewById(R.id.img_red);
+    ImageButton imgGreen=view.findViewById(R.id.img_green);
+    ImageButton imgYellow=view.findViewById(R.id.img_yellow);
+    ImageButton imgZs=view.findViewById(R.id.img_zs);
+    final ImageView imageView=view.findViewById(R.id.img_select);
+    if(files.getMarkerid()==null){
+
+    }else {
+        imageView.setImageResource(Marker.getResource(files.getMarkerid()));
+
+    }
+
+    class imgClick implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.img_blue:
+                selectMarker=Marker.blue;
+                imageView.setImageResource(Marker.REBLUEID);
+                break;
+            case R.id.img_red:
+                selectMarker=Marker.red;
+                imageView.setImageResource(Marker.REREDID);
+                break;
+            case R.id.img_green:
+                selectMarker=Marker.green;
+                imageView.setImageResource(Marker.REGREENID);
+                break;
+            case R.id.img_yellow:
+                selectMarker=Marker.yellow;
+                imageView.setImageResource(Marker.REYEID);
+                break;
+            case R.id.img_zs:
+                selectMarker=Marker.zs;
+                imageView.setImageResource(Marker.REZS);
+                break;
+        }
+        }
+    }
+
+    imgBlue.setOnClickListener(new imgClick());
+    imgRed.setOnClickListener(new imgClick());
+    imgGreen.setOnClickListener(new imgClick());
+    imgYellow.setOnClickListener(new imgClick());
+    imgZs.setOnClickListener(new imgClick());
+
+
+    final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    builder.setView(view);
+    builder.setTitle("设置文件默认图标");
+    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            files.setMarkerid(selectMarker);
+            data.updateFiles(files);
+            getListdata();
+            adapter.notifyDataSetChanged();
+
+        }
+    });
+    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+        }
+    });
+    builder.show();
+}
+private void showAllfiles(Files files){
+    List<PointData> pointDatas=files.getPointItems();
+    List<SqlPolyline> polylines=files.getPolyItems();
+    List<SqlPolygon>polygons=files.getPolygonItems();
+    try {
+        db.beginTransaction();
+        for (int i = 0; i < pointDatas.size(); i++) {
+            /*    ShowData showData = new ShowData();
+                showData.setTitle(pointDatas.get(i).getName());
+                //showdata
+                showData.setBaidulatitude(pointDatas.get(i).getGcjlatitude());
+                showData.setBaidulongitude(pointDatas.get(i).getGcjlongitude());
+                showData.setWgslatitude(pointDatas.get(i).getWgslatitude());
+                showData.setWgslongitude(pointDatas.get(i).getWgslongitude());
+                showData.setPointid(pointDatas.get(i).getId());
+                showData.setFileid(files.getId());
+                showData.setStyle(ShowPointStyle.PONIT);
+                getShowDataDao().insert(showData);*/
+            data.createShowdata(pointDatas.get(i));
+            }
+
+        for(int i=0;i<polylines.size();i++){
+          /*  ShowData polyshowData = new ShowData();
+            polyshowData .setTitle(polylines.get(i).getName());
+            polyshowData.setPointid(polylines.get(i).getId());
+            polyshowData.setStyle(ShowPointStyle.LINE);
+            polyshowData.setFileid(files.getId());
+            getShowDataDao().insert(polyshowData);*/
+          data.createShowdata(polylines.get(i));
+        }
+
+        for(int i=0;i<polygons.size();i++){
+       /*     ShowData polyshowData = new ShowData();
+            polyshowData .setTitle(polygons.get(i).getName());
+            polyshowData.setPointid(polygons.get(i).getId());
+            polyshowData.setStyle(ShowPointStyle.POLGON);
+            polyshowData.setFileid(files.getId());
+            getShowDataDao().insert(polyshowData);*/
+        data.createShowdata(polygons.get(i));
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+    } finally {
+
+    }
+    Intent intent = new Intent();
+    intent.putExtra("data", "more");
+    intent.setClass(getActivity(), MainMapsActivity.class);
+    startActivity(intent);
+}
+    private ShowDataDao getShowDataDao() {
+        DaoSession mDaoSession;
+        mDaoSession = data.getmDaoSession();
+        return mDaoSession.getShowDataDao();
+    }
+    public String[] fileitems = {"显示", "删除", "导出","设置图标"};
+
+    public class DialogListAdapter extends BaseAdapter {
+        private LayoutInflater inflater;
+
+        public DialogListAdapter(Context context) {
+            inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount() {
+            return fileitems.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return fileitems[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view = inflater.inflate(R.layout.list_datamanger_dialog, null);
+            TextView textView = view.findViewById(R.id.tv_datamanager_dialog);
+            textView.setText(fileitems[position]);
+            return view;
+        }
+    }
     private class MyItemLongclick implements AdapterView.OnItemLongClickListener {
 
         @Override
@@ -478,10 +447,14 @@ public class LocalFragment extends Fragment implements View.OnClickListener {
         adapter.notifyDataSetChanged();
         for (int i = 0; i < mData.size(); i++) {
             listView.setItemChecked(i, false);
-            isSelectALL = false;
         }
     }
-
+private void importFile(Files files){
+        Intent intent=new Intent();
+        intent.setClass(getActivity(), ImportAcitivity.class);
+        intent.putExtra("id",files.getId());
+        startActivity(intent);
+}
     private FilesDao getFileDao() {
         return mDaoSession.getFilesDao();
     }
@@ -493,23 +466,29 @@ public class LocalFragment extends Fragment implements View.OnClickListener {
     }
 
     public void getListdata() {
-
+        if(mData!=null){
+            mData.clear();
+        }
         cursor = db.query(getFileDao().getTablename(), getFileDao().getAllColumns(), null, null, null, null, null);
         while (cursor.moveToNext()) {
             String filename;
             String data;
             long id;
+            int markercolor;
             int nameColumnIndex = cursor.getColumnIndex(FilesDao.Properties.Title.columnName);
             int dataColumnIndex = cursor.getColumnIndex(FilesDao.Properties.Date.columnName);
             int idColunmIndex = cursor.getColumnIndex(FilesDao.Properties.Id.columnName);
-            Map<String, Object> map = new HashMap<String, Object>();
-            filename = cursor.getString(nameColumnIndex);
-            data = cursor.getString(dataColumnIndex);
-            id = cursor.getLong(idColunmIndex);
-            map.put("filename", filename);
-            map.put("data", data);
-            map.put("id", id);
-            mData.add(map);
+            int color=cursor.getColumnIndex(FilesDao.Properties.Markerid.columnName);
+                Map<String, Object> map = new HashMap<String, Object>();
+                filename = cursor.getString(nameColumnIndex);
+                data = cursor.getString(dataColumnIndex);
+                id = cursor.getLong(idColunmIndex);
+                color=cursor.getInt(color);
+                map.put("filename", filename);
+                map.put("data", data);
+                map.put("id", id);
+                map.put("color", color);
+                mData.add(map);
         }
     }
 }

@@ -92,10 +92,25 @@ public class NonHierarchicalDistanceBasedAlgorithm<T extends ClusterItem> implem
 
         final Set<QuadItem<T>> visitedCandidates = new HashSet<QuadItem<T>>();
         final Set<Cluster<T>> results = new HashSet<Cluster<T>>();
+
         final Map<QuadItem<T>, Double> distanceToCluster = new HashMap<QuadItem<T>, Double>();
         final Map<QuadItem<T>, StaticCluster<T>> itemToCluster =
                 new HashMap<QuadItem<T>, StaticCluster<T>>();
-
+        /*
+        * 2018byfanweilin
+        * zoom>18 不聚合
+        * 数量小于100不聚合
+        * */
+        synchronized (mQuadTree) {
+            if (zoom > 18 ||mItems.size() < 100) {
+                for (QuadItem<T> candidate : mItems) {
+                    results.add(candidate);
+                    visitedCandidates.add(candidate);
+                    distanceToCluster.put(candidate, 0d);
+                }
+                return results;
+            }
+        }
         synchronized (mQuadTree) {
             for (QuadItem<T> candidate : mItems) {
                 if (visitedCandidates.contains(candidate)) {

@@ -1,37 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:applicationandroid="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.fanweilin.coordinatemap">
 
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true" />
+
     <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.ACCESS_GPS" />
-    <uses-permission android:name="android.permission.ACCESS_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- 这个权限用于进行网络定位 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- 这个权限用于访问GPS定位 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 用于读取手机当前的状态 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- 访问网络，网络定位需要上网 -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- SD卡读取权限，用户写入离线定位数据 -->
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 腾讯通信 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <permission
+        android:name="com.fanweilin.coordinatemap.permission.MIPUSH_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.fanweilin.coordinatemap.permission.MIPUSH_RECEIVE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name=".Activity.data"
@@ -39,10 +61,10 @@
         android:icon="@mipmap/earth_global"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:label,android:icon,android:allowBackup,android:name">
         <activity
-            android:name=".Activity.MainActivity"
-            android:launchMode="singleTask"
+            android:name=".Activity.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,33 +72,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <meta-data
-            android:name="BaiduMobAd_APP_ID"
-            android:value="ce2357ca" />
-
-        <!-- for baidu xadsdk internal web-browser -->
         <activity
-            android:name="com.baidu.mobads.AppActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:name=".Activity.MainMapsActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
         <activity
-            android:name="com.foamtrace.photopicker.PhotoPickerActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/PhotoPickerTheme" />
+            android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name="com.foamtrace.photopicker.PhotoPreviewActivity"
-            android:theme="@style/PhotoPickerTheme" />
-        <!-- <activity -->
-        <!-- android:name="c.b.a.A" -->
-        <!-- android:configChanges="orientation|keyboardHidden|navigation" -->
-        <!-- android:exported="false" -->
-        <!-- android:screenOrientation="behind" -->
-        <!-- android:windowSoftInputMode="adjustResize|stateHidden" /> -->
-        <!-- <activity -->
-        <!-- android:name="c.b.a.B" -->
-        <!-- android:screenOrientation="portrait" -->
-        <!-- android:theme="@android:style/Theme.Translucent" /> -->
+            android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <!-- 声明SDK所需要的组件 -->
+        <service
+            android:name="com.qq.e.comm.DownloadService"
+            android:exported="false" />
+        <!-- 请开发者注意字母的大小写，ADActivity，而不是AdActivity -->
+        <activity
+            android:name="com.qq.e.ads.ADActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
         <meta-data
             android:name="BDAPPID"
@@ -85,29 +98,6 @@
             android:name="BDAPPKEY"
             android:value="liVzL2XTz0ComDCCTtB01gNBdOKvOoPx" />
         <!-- abcd1234 -->
-        <!-- 渠道商编号 -->
-        <meta-data
-            android:name="BaiduMobAd_CHANNEL"
-            android:value="TengXun Market" />
-
-        <!-- 是否开启错误日志统计，默认为false -->
-        <meta-data
-            android:name="BaiduMobAd_EXCEPTION_LOG"
-            android:value="true" />
-        <!-- 日志发送策略，可选值：APP_START、ONCE_A_DAY、SET_TIME_INTERVAL，默认为APP_START -->
-        <meta-data
-            android:name="BaiduMobAd_SEND_STRATEGY"
-            android:value="APP_START" />
-        <!-- 日志发送策略 为SET_TIME_INTERVAL时，需设定时间间隔(取消下行注释)。取值为1-24的整数，默认为1 -->
-        <!-- <meta-data android:name="BaiduMobAd_TIME_INTERVAL" android:value="2" /> -->
-        <!-- 日志仅在wifi网络下发送，默认为false -->
-        <meta-data
-            android:name="BaiduMobAd_ONLY_WIFI"
-            android:value="false" />
-        <!-- 是否获取基站位置信息 ,默认为true -->
-        <meta-data
-            android:name="BaiduMobAd_CELL_LOCATION"
-            android:value="true" />
         <!-- 是否获取GPS位置信息，默认为true -->
         <meta-data
             android:name="BaiduMobAd_GPS_LOCATION"
@@ -118,79 +108,181 @@
             android:value="true" />
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="${baiduMapKey}" />
+            android:value="lt4XoemaT8uHuDiyALG9zf86duD6iWba" />
 
         <service
             android:name="com.baidu.location.f"
             android:enabled="true"
             android:process=":remote" />
 
-        <!--
-             ATTENTION: This was auto-generated to add Google Play services to your project for
-             App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
-        -->
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <activity
             android:name=".Activity.DataManagerActivity"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-        </activity>
+            android:launchMode="singleTop" />
+        <!-- 腾讯通信 -->
+        <!-- 【必须】消息收发service -->
+        <activity android:name="timchat.ui.HomeActivity" />
         <activity
-            android:name="com.baidu.autoupdatesdk.ConfirmDialoigActivity"
+            android:name="timchat.ui.ChatActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name="timchat.ui.SearchFriendActivity" />
+        <activity android:name="timchat.ui.AddFriendActivity" />
+        <activity
+            android:name="timchat.ui.ProfileActivity"
+            android:launchMode="singleTask" />
+        <activity android:name="timchat.ui.ManageFriendGroupActivity" />
+        <activity
+            android:name="timchat.ui.VideoActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="timchat.ui.CreateGroupActivity" />
+        <activity
+            android:name="timchat.ui.TCVideoRecordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="timchat.ui.TCVideoPreviewActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="timchat.ui.GroupProfileActivity"
+            android:launchMode="singleTask" />
+
+        <!-- 消息收发service -->
+        <service
+            android:name="com.tencent.qalsdk.service.QalService"
             android:exported="false"
-            android:screenOrientation="sensor" />
-
-        <!-- <receiver android:name="com.baidu.appx.app_download.CompleteReceiver"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.DOWNLOAD_COMPLETE" /> -->
-        <!-- <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" /> -->
-        <!-- </intent-filter> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.intent.action.PACKAGE_ADDED" /> -->
-
-
-        <!-- <data android:scheme="package" /> -->
-        <!-- &lt;!&ndash; 注意！！ 这句必须要加，否则接收不到安装完成广播 &ndash;&gt; -->
-        <!-- </intent-filter> -->
-        <!-- </receiver> -->
+            android:process=":QALSERVICE" />
+        <!-- 消息收发辅助service -->
+        <service
+            android:name="com.tencent.qalsdk.service.QalAssistService"
+            android:exported="false"
+            android:process=":QALSERVICE" />
+        <!-- 离线消息广播接收器 -->
         <receiver
-            android:name="com.baidu.autoupdatesdk.receiver.BDBroadcastReceiver"
+            android:name="com.tencent.qalsdk.QALBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.baidu.autoupdatesdk.ACTION_NEW_UPDATE" />
-                <action android:name="com.baidu.autoupdatesdk.ACTION_DOWNLOAD_COMPLETE" />
-                <action android:name="com.baidu.autoupdatesdk.ACTION_NEW_AS" />
-                <action android:name="com.baidu.autoupdatesdk.ACTION_AS_DOWNLOAD_COMPLETE" />
+                <action android:name="com.tencent.qalsdk.broadcast.qal" />
             </intent-filter>
         </receiver>
+        <!-- 系统消息广播接收器 -->
+        <receiver
+            android:name="com.tencent.qalsdk.core.NetConnInfoCenter"
+            android:process=":QALSERVICE">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <!-- 百度鹰眼 -->
+        <service
+            android:name="com.baidu.trace.LBSTraceService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote" />
 
+        <activity android:name="timchat.ui.ImageViewActivity" />
+        <activity android:name="timchat.ui.EditActivity" />
+        <activity android:name="timchat.ui.SearchGroupActivity" />
+        <activity android:name="timchat.ui.ApplyGroupActivity" />
+        <activity android:name="timchat.ui.GroupManageMessageActivity" />
+        <activity android:name="timchat.ui.FriendshipManageMessageActivity" />
+        <activity android:name="timchat.ui.GroupListActivity" />
+        <activity android:name="timchat.ui.ChooseFriendActivity" />
+        <activity android:name="timchat.ui.GroupMemberActivity" />
+        <activity
+            android:name="timchat.ui.customview.DialogActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name="timchat.ui.GroupMemberProfileActivity" />
+        <activity android:name="timchat.ui.FriendshipHandleActivity" />
+        <activity android:name="timchat.ui.AboutActivity" />
+        <activity android:name="timchat.ui.BlackListActivity" />
+        <activity android:name="timchat.ui.ImagePreviewActivity" />
+        <activity android:name="timchat.ui.MessageNotifySettingActivity" />
+        <!-- 腾讯通信 -->
         <activity android:name=".Activity.AddFileActivity" />
         <activity android:name=".Activity.Bdoffilin_activity" />
         <activity android:name=".toolActivity.ConvertActivity" />
-        <!-- //<activity android:name="com.baidu.appx.ui.BDInnerBrowser" /> -->
         <activity android:name=".Activity.WayponitActivity" />
-        <activity android:name=".Activity.FileActivity" />
-        <activity android:name=".toolActivity.CompassActivity" />
-        <activity android:name=".Activity.LoginActivity" />
-        <activity android:name=".Activity.ForgotPassActivity" />
-        <activity android:name=".Activity.RegisterActivity" />
-
-        <service
-            android:name=".Activity.LocationService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".Activity.ToolBoxActivity" />
         <activity android:name=".toolActivity.CoordinateActivity" />
         <activity android:name=".toolActivity.DistanceActivity" />
-        <activity android:name=".Activity.FileManagerActivity" />
-        <activity android:name=".Activity.DateServerMananerActivity" />
-        <activity android:name=".Activity.DataServerManagerActivity"></activity>
+        <activity
+            android:name=".Activity.FileManagerActivity"
+            android:launchMode="singleTask">
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/comma-separated-values" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/vnd.google-earth.kml+xml" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/vnd.google-earth.kmz" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Activity.DataServerManagerActivity" />
+        <activity android:name=".Activity.WebActivity" />
+        <activity android:name=".Activity.TaoBaoActivity" />
+        <activity android:name=".Activity.MapsActivity" />
+        <activity android:name=".Activity.GuassActivity" />
+        <activity android:name=".Activity.LocalFileActivity" />
+        <activity android:name=".Activity.AboutActivity" />
+        <activity android:name=".Activity.SettingActivity" />
+        <activity
+            android:name=".Activity.MeasureActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
+        <activity android:name=".Activity.OnlineMap" />
+        <activity
+            android:name="timchat.ui.customview.MapManagerActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".Activity.ImportAcitivity" />
+        <activity
+            android:name=".Activity.Payctivity"
+            android:label="@string/title_activity_payctivity"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".Activity.TracingActivity" />
+        <activity android:name=".Activity.OlWayActivity" />
+        <activity
+            android:name=".Activity.MainActivity1111"
+            android:label="@string/title_activity_main1111"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".gpsTest.GpsTestActivity"
+            android:label="@string/title_activity_gps_test"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".Compass.CompassActivity"
+          android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

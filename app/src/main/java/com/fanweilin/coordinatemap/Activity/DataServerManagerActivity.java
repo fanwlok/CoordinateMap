@@ -5,18 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,49 +28,45 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.mobstat.StatService;
-import com.fanweilin.coordinatemap.Class.CoordianteApi;
-import com.fanweilin.coordinatemap.Class.HttpControl;
-import com.fanweilin.coordinatemap.Class.Register;
-import com.fanweilin.coordinatemap.DataModel.FilesClass;
-import com.fanweilin.coordinatemap.DataModel.PointDataClient;
+import com.baidubce.auth.DefaultBceCredentials;
+import com.baidubce.services.bos.BosClient;
+import com.baidubce.services.bos.BosClientConfiguration;
+import com.baidubce.services.bos.model.BosObjectSummary;
+import com.baidubce.services.bos.model.ListObjectsRequest;
+import com.baidubce.services.bos.model.ListObjectsResponse;
+import com.fanweilin.coordinatemap.Class.SpfOlMap;
+import com.fanweilin.coordinatemap.DataModel.BaiduDataApi;
+import com.fanweilin.coordinatemap.DataModel.BaiduHttpControl;
+import com.fanweilin.coordinatemap.DataModel.Constants;
+import com.fanweilin.coordinatemap.DataModel.CoordianteApi;
+import com.fanweilin.coordinatemap.DataModel.HttpControl;
+import com.fanweilin.coordinatemap.DataModel.ReasonCreate;
+import com.fanweilin.coordinatemap.DataModel.RetryWithDelay;
 import com.fanweilin.coordinatemap.R;
-import com.fanweilin.coordinatemap.computing.ConvertLatlng;
-import com.fanweilin.greendao.Files;
+import com.fanweilin.greendao.Olfiles;
 import com.fanweilin.greendao.PointData;
-import com.fanweilin.greendao.PointDataDao;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import org.greenrobot.greendao.query.Query;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class DataServerManagerActivity extends AppCompatActivity implements View.OnClickListener, android.support.v7.widget.SearchView.OnQueryTextListener {
     private ListView mListView;
-    private TextView mTextView;
-    private String title;
     private DataAdpter mDataAdpter;
-    private ConvertLatlng convertLatlng;
     private boolean show = false;
     private List<Map<String, Object>> mData;
     private List<Map<String, Object>> mBackData;
@@ -80,23 +75,23 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
     private boolean isSelectALL;
     private Button btnEdit;
     private Button btnAll;
-    private Button btnDown;
     private Button btnCancle;
     private Button btndelete;
+    private String fileid;
     private String filename;
     private SQLiteDatabase db;
     private android.support.v7.widget.SearchView searchView;
-    private Files files;
+    private Olfiles files;
     private Toolbar toolbar;
-    List<PointDataClient> pointDatas;
+    private List<PointData> pointDatas;
     public static final String FILENAME = "filename";
     public static final String SUBTITLE = "subtitle";
-    public static final String PATH = "path";
     public static final String Id = "id";
     //服务器数据ID
     public static final String SERVERID = "SERVERID";
 
     private ProgressDialog dialog;
+    private int deleteNum=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,17 +111,17 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
 
     public void init() {
         db = data.getDb();
-        files = new Files();
+        files = new Olfiles();
         mData = new ArrayList<>();
-        convertLatlng = new ConvertLatlng();
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        rlEdit = (RelativeLayout) findViewById(R.id.rl_server);
-        btnEdit = (Button) findViewById(R.id.btn_edit);
-        btnCancle = (Button) findViewById(R.id.btn_cancel);
-        btnAll = (Button) findViewById(R.id.btn_all);
-        btndelete = (Button) findViewById(R.id.btn_delete);
-        mListView = (ListView) findViewById(R.id.data_manager_list);
-        layoutShow = (LinearLayout) findViewById(R.id.layoutshow);
+        toolbar =  findViewById(R.id.toolbar);
+        rlEdit =  findViewById(R.id.rl_server);
+        btnEdit = findViewById(R.id.btn_edit);
+        btnCancle =  findViewById(R.id.btn_cancel);
+        btnAll = findViewById(R.id.btn_all);
+        btndelete = findViewById(R.id.btn_delete);
+        mListView =  findViewById(R.id.data_manager_list);
+        mListView.setOnItemClickListener(new ListItemClick());
+        layoutShow =  findViewById(R.id.layoutshow);
         btnEdit.setOnClickListener(this);
         btnCancle.setOnClickListener(this);
         btnAll.setOnClickListener(this);
@@ -135,47 +130,49 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
         isSelectALL = false;
         dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
-
-
+        fileid=data.spfOlMapSet.getString(SpfOlMap.MAPID,"");
+        filename=data.spfOlMapSet.getString(SpfOlMap.MAPNAME,"");
+        files = data.findOrderOlByName(fileid);
+        files.resetPointolItems();
     }
-
 
     public void getData() {
         mData.clear();
-        Intent intent = getIntent();
-        filename = intent.getStringExtra(FILENAME);
-        File file = new File(intent.getStringExtra(PATH));
-        StringBuffer sb = new StringBuffer();
-        try {
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            String s;
-            while ((s = br.readLine()) != null) {
-                sb.append(s);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Gson gson = new Gson();
-        pointDatas = new ArrayList<PointDataClient>();
-        pointDatas = gson.fromJson(sb.toString(), new TypeToken<Collection<PointDataClient>>() {
-        }.getType());
+        mData.clear();
+        files.resetPointolItems();
+        pointDatas = files.getPointolItems();
         int count = pointDatas.size();
         for (int i = 0; i < count; i++) {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put(FILENAME, pointDatas.get(i).getPointname());
+            map.put(FILENAME, pointDatas.get(i).getName());
+       String s= pointDatas.get(i).getName();
             map.put(SUBTITLE, pointDatas.get(i).getAddress());
-            map.put(Id, i);
-            map.put(SERVERID,pointDatas.get(i).getId());
-            Log.d("dfd",String.valueOf(pointDatas.get(i).getId()));
+            map.put(Id,i);
+            map.put(SERVERID,pointDatas.get(i).getGuid());
             mData.add(map);
         }
         mBackData = mData;
     }
 
+    public class ListItemClick implements AdapterView.OnItemClickListener{
 
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if(!show){
+                int dataId= (int) mData.get(position).get(Id);
+                onListItemClick(dataId);
+            }
+
+        }
+    }
+    private void onListItemClick( int dataid ){
+        Intent intent=new Intent(DataServerManagerActivity.this,MainMapsActivity.class);
+        intent.putExtra("latitude",Double.valueOf(pointDatas.get(dataid).getGcjlatitude()));
+        intent.putExtra("longitude",Double.valueOf(pointDatas.get(dataid).getGcjlongitude()));
+        startActivity(intent);
+        finish();
+
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -186,7 +183,6 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
                     layoutShow.setVisibility(View.VISIBLE);
                     mDataAdpter.notifyDataSetChanged();
                     uncheckedAll();
-
                 }
                 break;
             case R.id.btn_cancel:
@@ -228,124 +224,103 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
         SparseBooleanArray checkedArray = new SparseBooleanArray();
         checkedArray = mListView.getCheckedItemPositions();
        int len = mListView.getCount();
-         final List<Long> ids = new ArrayList<Long>();
+        final List<String > ids = new ArrayList<String>();
         final List<Integer> deIds=new ArrayList<Integer>();
         for (int i = 0; i < len; i++) {
             if (checkedArray.valueAt(i)) {
                 int k = checkedArray.keyAt(i);
                 deIds.add(k);
-                Long id = (Long) mData.get(k).get(SERVERID);
+                String id = (String) mData.get(k).get(SERVERID);
                 ids.add(id);
             }
+        }
 
+        if(ids.size()>=1000){
+            Toast.makeText(this,"一次最多删除一千条数据",Toast.LENGTH_SHORT);
+            return;
+        }else if(ids.size()==0) {
+
+        }else {
+           deleteData(ids);
 
         }
-       final Long[] idss = ids.toArray(new Long[ids.size()]);
-        Retrofit retrofit = HttpControl.getInstance(DataServerManagerActivity.this).getRetrofit();
-        CoordianteApi deldatas = retrofit.create(CoordianteApi.class);
-        deldatas.Rxdeletedatas(filename, idss).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<FilesClass>() {
-            @Override
-            public void call(FilesClass filesClass) {
-                downFileData(filesClass.getFilename(),filesClass.getDate());
+    }
+    private void  deletPhotos(String id){
 
-                try {
-                    db.beginTransaction();
-                    for (Long id : idss) {
-                        Query query = getPointDataDao().queryBuilder().where(
-                                PointDataDao.Properties.Guid.eq(id))
-                                .build();
-                        List<PointData> pointDatas = query.list();
-                        for (PointData pointdata : pointDatas) {
-                            pointdata.setStatus(0);
-                            getPointDataDao().update(pointdata);
+    }
+    public void deleteData(final List<String> ids){
+        deleteNum=0;
+        BosClientConfiguration config = new BosClientConfiguration();
+        config.setCredentials(new DefaultBceCredentials(Constants.BOSAK, Constants.BOSSK));
+        config.setEndpoint(GZ);    //传入Bucket所在区域域名
+        final BosClient client = new BosClient(config);
+
+        Retrofit retrofit = BaiduHttpControl.getInstance(getApplicationContext()).getRetrofit();
+        final BaiduDataApi baiduDataApi = retrofit.create(BaiduDataApi.class);
+        Observable.fromIterable(ids).subscribeOn(Schedulers.io()).flatMap(new Function<String, Observable<String>>() {
+            @Override
+            public Observable<String> apply(String s) throws Exception {
+
+                // 构造ListObjectsRequest请求
+                ListObjectsRequest listObjectsRequest = new ListObjectsRequest(getBucketName());
+
+                // 设置参数
+                listObjectsRequest.setMaxKeys(100);
+                listObjectsRequest.setPrefix(getOlFileName(s));
+
+                // 获取指定Bucket下符合上述条件的所有Object信息
+                ListObjectsResponse listing = client.listObjects(listObjectsRequest);
+                List<BosObjectSummary> summaryList = listing.getContents();
+                for (BosObjectSummary objectSummary : summaryList) {
+                    client.deleteObject(getBucketName(),objectSummary.getKey());
+                }
+                return Observable.just(s);
+            }
+
+        }).flatMap(new Function<String, Observable<ReasonCreate>>() {
+            @Override
+            public Observable<ReasonCreate> apply(String s) throws Exception {
+                deletPhotos(s);
+                return baiduDataApi.Rxdeletedata(s, Constants.geomapid,Constants.ak);
+            }
+
+        }).retryWhen(new RetryWithDelay()).
+                observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ReasonCreate>() {
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(ReasonCreate reasonCreate) {
+                        deleteNum++;
+                        if(deleteNum==ids.size()){
+                            dialog.dismiss();
+                            setResult(RESULT_OK);
+                            finish();
+                        }else {
+                            dialog.setMessage("已删除"+String.valueOf(deleteNum)+"条数据");
                         }
 
                     }
-                    db.setTransactionSuccessful();
-                }
-                    finally {
-                        db.endTransaction();
-                    }
-
-
-
-
-            }
-//            @Override
-//            public void call(Register register) {
-//                  if(register.getCode()==200){
-//                      Toast.makeText(DataServerManagerActivity.this,"删除成功",Toast.LENGTH_SHORT).show();
-//                      dialog.dismiss();
-//
-//                  }
-//            }
-        });
+                });
     }
-    public PointDataDao getPointDataDao() {
-        return data.getmDaoSession().getPointDataDao();
-    }
-    private File downFileData(String filename, String date) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        try {
-            Date time = formatter.parse(date);
-            File dirs = new File(Environment.getExternalStorageDirectory(), "经纬度定位");
-            if (!dirs.exists()) {
-                dirs.mkdirs();
-            }
-            File filedirs = new File(dirs.getPath(), "backups");
-            if (!filedirs.exists()) {
-                filedirs.mkdirs();
-            }
-            File file = new File(filedirs.getPath(), filename + ".txt");
-            if (!file.exists()) {
-                file.createNewFile();
-                downFileData(file, filename);
-            } else if (time.getTime() > file.lastModified()) {
-                downFileData(file, filename);
-            }
-            return file;
-
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-    }
-    public void downFileData(final File file,String filename){
-
-        Retrofit retrofit = HttpControl.getInstance(DataServerManagerActivity.this).getRetrofit();
-        CoordianteApi getfiles= retrofit.create(CoordianteApi.class);
-        getfiles.Rxgetdata(filename).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ResponseBody>() {
-            @Override
-            public void call(ResponseBody responseBody) {
-                String content= null;
-                try {
-                    content = responseBody.string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                FileWriter fileWritter = null;
-                try {
-                    fileWritter = new FileWriter(file.getAbsolutePath());
-                    BufferedWriter bufferedWriter = new BufferedWriter(fileWritter);
-                    bufferedWriter.write(content);
-                    bufferedWriter.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                getData();
-                mDataAdpter.notifyDataSetChanged();
-                dialog.dismiss();
-            }
-
-        }) ;
+    public String getOlFileName(String pointID){
+        final String mapid=data.spfOlMapSet.getString(SpfOlMap.MAPID,null);
+        String key=mapid+"/"+pointID+"/";
+        return key;
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -418,9 +393,9 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
             if ((view == null)) {
                 holder = new ViewHolder();
                 view = inflater.inflate(R.layout.list_data, null);
-                holder.name = (TextView) view.findViewById(R.id.name);
-                holder.subtitle = (TextView) view.findViewById(R.id.tv_subtitle);
-                holder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);
+                holder.name = view.findViewById(R.id.name);
+                holder.subtitle = view.findViewById(R.id.tv_subtitle);
+                holder.checkBox = view.findViewById(R.id.checkbox);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -487,61 +462,10 @@ public class DataServerManagerActivity extends AppCompatActivity implements View
             }
         }
     }
-    public File newFile(String filename,long date){
-        try {
-            File dirs = new File(Environment.getExternalStorageDirectory(), "经纬度定位");
-            if (!dirs.exists()) {
-                dirs.mkdirs();
-            }
-            File filedirs = new File(dirs.getPath(), "backups");
-            if (!filedirs.exists()) {
-                filedirs.mkdirs();
-            }
-            File file = new File(filedirs.getPath(), filename + ".txt");
-            if (!file.exists()) {
-                file.createNewFile();
-                getFileData(file,filename);
-            }else if (date>file.lastModified()){
-                getFileData(file,filename);
-            }
-
-            return file;
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        }
+    private String GZ="gz.bcebos.com";
+    public String getBucketName(){
+        return "jwddw";
     }
-    public void getFileData(final File file,String filename) {
-
-        Retrofit retrofit = HttpControl.getInstance(DataServerManagerActivity.this).getRetrofit();
-        CoordianteApi getfiles = retrofit.create(CoordianteApi.class);
-        getfiles.Rxgetdata(filename).subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io()).subscribe(new Action1<ResponseBody>() {
-            @Override
-            public void call(ResponseBody responseBody) {
-                String content = null;
-                try {
-                    content = responseBody.string();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                FileWriter fileWritter = null;
-                try {
-                    fileWritter = new FileWriter(file.getAbsolutePath());
-                    BufferedWriter bufferedWriter = new BufferedWriter(fileWritter);
-                    bufferedWriter.write(content);
-                    bufferedWriter.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
-    }
-
-
-
 
     public void uncheckedAll(){
         for (int i = 0; i < mData.size(); i++) {

@@ -2,6 +2,7 @@ package com.fanweilin.coordinatemap.Class;
 
 /**
  * Created by Administrator on 2016/4/17 0017.
+ * 数据导出设置
  */
 public class FilesSetting {
     public static final  String NAME="name";

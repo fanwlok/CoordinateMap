@@ -1,11 +1,9 @@
 package com.fanweilin.coordinatemap.toolActivity;
 
-import android.graphics.AvoidXfermode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.text.method.HideReturnsTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,7 +14,6 @@ import android.widget.Toast;
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.coordinatemap.computing.Computer;
 import com.fanweilin.coordinatemap.computing.ConvertLatlng;
-import com.google.android.gms.common.server.FavaDiagnosticsEntity;
 
 import java.text.DecimalFormat;
 
@@ -46,20 +43,20 @@ public class CoordinateActivity extends AppCompatActivity {
     }
 
     private void init() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        beginx = (EditText) findViewById(R.id.et_coordinate_benginx);
-        beginy = (EditText) findViewById(R.id.et_coordinate_beginy);
-        endx = (EditText) findViewById(R.id.et_coordinate_endx);
-        endy = (EditText) findViewById(R.id.et_coordinate_endy);
-        etdu = (EditText) findViewById(R.id.et_coordinate_du);
-        etfen = (EditText) findViewById(R.id.et_coordinate_fen);
-        etmiao = (EditText) findViewById(R.id.et_et_coordinate_miao);
-        distance = (EditText) findViewById(R.id.et_coordinate_distance);
-        btn = (Button) findViewById(R.id.btn_coordinate_computer);
+        toolbar = findViewById(R.id.toolbar);
+        beginx = findViewById(R.id.et_coordinate_benginx);
+        beginy = findViewById(R.id.et_coordinate_beginy);
+        endx = findViewById(R.id.et_coordinate_endx);
+        endy = findViewById(R.id.et_coordinate_endy);
+        etdu = findViewById(R.id.et_coordinate_du);
+        etfen = findViewById(R.id.et_coordinate_fen);
+        etmiao = findViewById(R.id.et_et_coordinate_miao);
+        distance = findViewById(R.id.et_coordinate_distance);
+        btn = findViewById(R.id.btn_coordinate_computer);
         btn.setOnClickListener(new ButtonOnclick());
-        rbfront = (RadioButton) findViewById(R.id.rb_coordinate_front);
-        rbback = (RadioButton) findViewById(R.id.rb_coordinate_back);
-        radioGroup = (RadioGroup) findViewById(R.id.rg_coordinate);
+        rbfront = findViewById(R.id.rb_coordinate_front);
+        rbback = findViewById(R.id.rb_coordinate_back);
+        radioGroup = findViewById(R.id.rg_coordinate);
         radioGroup.setOnCheckedChangeListener(new RadioChange());
     }
 

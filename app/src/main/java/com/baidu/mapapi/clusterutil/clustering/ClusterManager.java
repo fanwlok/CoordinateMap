@@ -17,8 +17,13 @@ import com.baidu.mapapi.clusterutil.clustering.view.DefaultClusterRenderer;
 import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.Marker;
+import com.baidu.mapapi.map.OverlayOptions;
+import com.baidu.mapapi.map.TextOptions;
+import com.fanweilin.coordinatemap.fragment.BaiduMapFragment;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -48,11 +53,11 @@ public class ClusterManager<T extends ClusterItem> implements
     private OnClusterInfoWindowClickListener<T> mOnClusterInfoWindowClickListener;
     private OnClusterItemInfoWindowClickListener<T> mOnClusterItemInfoWindowClickListener;
     private OnClusterClickListener<T> mOnClusterClickListener;
-
+    private List<ClusterItem> myItems=new ArrayList<>();
     public ClusterManager(Context context, BaiduMap map) {
         this(context, map, new MarkerManager(map));
     }
-
+    private List<OverlayOptions> textOptions=new ArrayList<OverlayOptions >();
     public ClusterManager(Context context, BaiduMap map, MarkerManager markerManager) {
         mMap = map;
         mMarkerManager = markerManager;
@@ -107,6 +112,7 @@ public class ClusterManager<T extends ClusterItem> implements
     public void clearItems() {
         mAlgorithmLock.writeLock().lock();
         try {
+            myItems.clear();
             mAlgorithm.clearItems();
         } finally {
             mAlgorithmLock.writeLock().unlock();
@@ -116,6 +122,7 @@ public class ClusterManager<T extends ClusterItem> implements
     public void addItems(Collection<T> items) {
         mAlgorithmLock.writeLock().lock();
         try {
+            myItems.addAll(items);
             mAlgorithm.addItems(items);
         } finally {
             mAlgorithmLock.writeLock().unlock();
@@ -126,6 +133,7 @@ public class ClusterManager<T extends ClusterItem> implements
     public void addItem(T myItem) {
         mAlgorithmLock.writeLock().lock();
         try {
+            myItems.add(myItem);
             mAlgorithm.addItem(myItem);
         } finally {
             mAlgorithmLock.writeLock().unlock();
@@ -135,6 +143,7 @@ public class ClusterManager<T extends ClusterItem> implements
     public void removeItem(T item) {
         mAlgorithmLock.writeLock().lock();
         try {
+            myItems.remove(item);
             mAlgorithm.removeItem(item);
         } finally {
             mAlgorithmLock.writeLock().unlock();
@@ -168,6 +177,11 @@ public class ClusterManager<T extends ClusterItem> implements
     }
 
     @Override
+    public void onMapStatusChangeStart(MapStatus mapStatus, int i) {
+
+    }
+
+    @Override
     public void onMapStatusChange(MapStatus mapStatus) {
         if (mRenderer instanceof BaiduMap.OnMapStatusChangeListener) {
             ((BaiduMap.OnMapStatusChangeListener) mRenderer).onMapStatusChange(mapStatus);
@@ -175,14 +189,13 @@ public class ClusterManager<T extends ClusterItem> implements
 
         // Don't re-compute clusters if the map has just been panned/tilted/rotated.
         MapStatus position = mMap.getMapStatus();
+
         if (mPreviousCameraPosition != null && mPreviousCameraPosition.zoom == position.zoom) {
             return;
         }
         mPreviousCameraPosition = mMap.getMapStatus();
-
         cluster();
     }
-
     @Override
     public void onMapStatusChangeFinish(MapStatus mapStatus) {
 

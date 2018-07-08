@@ -25,12 +25,12 @@ public class PictureDataDao extends AbstractDao<PictureData, Long> {
     /**
      * Properties of entity PictureData.<br/>
      * Can be used for QueryBuilder and for referencing column names.
-    */
+     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Path = new Property(1, String.class, "path", false, "PATH");
         public final static Property PointId = new Property(2, Long.class, "pointId", false, "POINT_ID");
-    };
+    }
 
     private DaoSession daoSession;
 
@@ -49,7 +49,7 @@ public class PictureDataDao extends AbstractDao<PictureData, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"PICTURE_DATA\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"PATH\" TEXT," + // 1: path
                 "\"POINT_ID\" INTEGER);"); // 2: pointId
     }
@@ -141,6 +141,11 @@ public class PictureDataDao extends AbstractDao<PictureData, Long> {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean hasKey(PictureData entity) {
+        return entity.getId() != null;
     }
 
     @Override

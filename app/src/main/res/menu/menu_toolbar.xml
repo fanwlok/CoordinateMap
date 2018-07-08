@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_search"
+        android:title="经纬度查询"
+        android:icon="@mipmap/ic_search_white_36dp"
+        android:orderInCategory="120"
+        app:showAsAction="collapseActionView"/>
+    <item android:id="@+id/add_file"
+        android:icon="@mipmap/ic_folder_white_36dp"
+        android:title="@string/add_file"
+        android:orderInCategory="110"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/menu_main_compass"
+        android:icon="@mipmap/ic_wallet_travel_white_36dp"
+        android:orderInCategory="140"
+        android:title="工具箱"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_search"
+        android:icon="@mipmap/ic_search_white_36dp"
+        android:orderInCategory="130"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        android:title="位置查询"
+        app:showAsAction="ifRoom|collapseActionView"/>
+
+</menu>

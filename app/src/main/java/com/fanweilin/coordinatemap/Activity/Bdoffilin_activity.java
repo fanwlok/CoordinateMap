@@ -60,10 +60,10 @@ public class Bdoffilin_activity extends FragmentActivity implements MKOfflineMap
         City = new ArrayList<String>();
         Hotcity = new ArrayList<String>();
         AllCity = new HashMap<String, List<String>>();
-        segmentgroup = (SegmentedGroup) findViewById(R.id.segmented2);
-        rbCity = (RadioButton) findViewById(R.id.rb_city);
-        rbDown = (RadioButton) findViewById(R.id.rb_down);
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        segmentgroup = findViewById(R.id.segmented2);
+        rbCity = findViewById(R.id.rb_city);
+        rbDown = findViewById(R.id.rb_down);
+        mViewPager = findViewById(R.id.viewpager);
         GetFragList();
         FragmentAdapter Fadpter = new FragmentAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(Fadpter);

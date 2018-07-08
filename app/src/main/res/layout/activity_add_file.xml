@@ -7,6 +7,7 @@
     android:orientation="vertical"
     tools:context=".Activity.AddFileActivity">
     <android.support.v7.widget.Toolbar
+        android:layout_alignParentTop="true"
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,8 +15,97 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
     </android.support.v7.widget.Toolbar>
     <ListView
+        android:layout_below="@+id/toolbar"
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:choiceMode="singleChoice"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_above="@+id/rl_server"
+        >
+    </ListView>
+    <RelativeLayout
+       android:layout_alignParentBottom="true"
+        android:id="@+id/rl_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentTop="true"
+            android:background="@color/subbar" />
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/maginparent"
+            android:background="@drawable/noaccount_background"
+            android:text="编辑" />
+    </RelativeLayout>
 
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/layoutshow"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/subbar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/cancle"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_delete"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/share"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_show"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/importdata"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+            <Button
+                android:id="@+id/btn_all"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/noaccount_background"
+                android:gravity="center"
+                android:text="@string/all"
+                android:textColor="@color/textcolor"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

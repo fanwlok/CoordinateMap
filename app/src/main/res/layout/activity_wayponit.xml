@@ -23,8 +23,13 @@
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:orientation="vertical">
-             <android.support.design.widget.TextInputLayout
+             <LinearLayout
                  android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:orientation="horizontal">
+             <android.support.design.widget.TextInputLayout
+                 android:layout_width="0dp"
+                 android:layout_weight="1"
                  android:layout_height="wrap_content">
              <AutoCompleteTextView
                  android:id="@+id/edt_pointname"
@@ -33,6 +38,16 @@
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content" />
              </android.support.design.widget.TextInputLayout>
+                 <ImageButton
+                     android:layout_gravity="center_vertical"
+                     android:id="@+id/img_btn_marker"
+                     android:layout_width="80dp"
+                      android:scaleType="centerInside"
+                     android:layout_height="wrap_content"
+                     android:background="#00000000"
+                     android:src="@mipmap/blu_blank_map_pin_48px_552642_easyicon"
+                     />
+             </LinearLayout>
              <android.support.design.widget.TextInputLayout
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content">
@@ -70,7 +85,7 @@
                        android:gravity="center_vertical"
                        android:textColor="@color/colorPrimary"
                        android:layout_height="wrap_content"
-                       android:text="WGS84经纬度"/>
+                       android:text="经纬度"/>
                    <EditText
                        android:id="@+id/edt_wgs"
                        android:layout_width="0dp"
@@ -80,6 +95,7 @@
                        android:layout_height="wrap_content" />
                </LinearLayout>
                <LinearLayout
+                   android:visibility="gone"
                    android:layout_width="match_parent"
                    android:layout_height="@dimen/waypoint_ll_listdimen"
                    android:orientation="horizontal">
@@ -89,7 +105,7 @@
                        android:gravity="center_vertical"
                        android:textColor="@color/colorPrimary"
                        android:layout_height="wrap_content"
-                       android:text="Baidu经纬度"/>
+                       android:text="Baidu"/>
                    <EditText
                        android:id="@+id/edt_baidu"
                        android:layout_width="0dp"
@@ -99,6 +115,7 @@
                        android:layout_height="wrap_content" />
                </LinearLayout>
                <LinearLayout
+                   android:visibility="gone"
                    android:layout_width="match_parent"
                    android:layout_height="@dimen/waypoint_ll_listdimen"
                    android:orientation="horizontal">
@@ -126,7 +143,6 @@
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                >
-
                <Button
                 android:id="@+id/btn_cameral"
                    android:layout_width="match_parent"
@@ -143,7 +159,6 @@
                android:layout_height="wrap_content"
                android:layout_width="match_parent" />
 </RelativeLayout>
-
    </RelativeLayout>
 </ScrollView>
 

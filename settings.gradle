@@ -1,1 +1,1 @@
-include ':app', ':daogenerator',':bDIntegrationSDK_LibProject'
+include ':app', ':daogenerator', ':sdk', ':presentation', ':tlslibrary', ':ui', ':WatermarkCamera-master', ':baidulibrary'

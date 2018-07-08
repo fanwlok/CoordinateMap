@@ -36,27 +36,26 @@
         <item name="android:windowExitAnimation">@anim/menu_bottombar_out</item>
     </style>
 
+    <style name="anim_menu_topbar">
+        <item name="android:windowEnterAnimation">@anim/rl_top_out</item>
+        <item name="android:windowExitAnimation">@anim/rl_top_in</item>
+    </style>
+
     <style name="anim_popupwindow_center">
         <item name="android:windowEnterAnimation">@anim/popupwindow_center_show</item>
         <item name="android:windowExitAnimation">@anim/popupwindow_destroy</item>
     </style>
 
-    <style name="ActionMenuTextStyle" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
-        <item name="android:textSize">@dimen/action_text_size</item>
-        <item name="android:textStyle">normal</item>
+    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">@android:color/primary_text_light</item>
+        <item name="actionBarSize">@dimen/actionBarSize</item>
     </style>
 
-    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar"></style>
-
-    <style name="actionBarPopupTheme" parent="ThemeOverlay.AppCompat.Light"></style>
-
-    <style name="PhotoPickerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/photopicker_background</item>
-        <item name="actionMenuTextAppearance">@style/ActionMenuTextStyle</item>
-        <!--<item name="actionBarTheme">@style/actionBarTheme</item>-->
-        <!--<item name="actionBarPopupTheme">@style/actionBarPopupTheme</item>-->
+    <style name="customTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="actionBarTheme">@style/actionBarTheme</item>
+        <item name="colorPrimary">#FFA500</item>
+        <item name="actionBarSize">@dimen/actionBarSize</item>
+        <item name="colorPrimaryDark">#CCa500</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -86,6 +85,98 @@
         <item name="android:minHeight">8dip</item>
         <item name="android:maxHeight">8dip</item>
     </style>
+    <!--腾讯通信-->
+    <style name="dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">#00000000</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
+    <style name="video_publish_prompt_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/text_gray1</item>
+        <item name="android:layout_marginLeft">15dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
+    <style name="video_publish_share_layout">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="video_publish_share_checkbox">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginTop">15dp</item>
+    </style>
+
+    <style name="video_publish_share_text">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_marginBottom">15dp</item>
+    </style>
+
+    <style name="BottomDialog" parent="AppTheme">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+<!--gpstest-->
+
+    <!-- GNSS Status view -->
+    <style name="info_label">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/status_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingRight">4dip</item>
+    </style>
+
+    <style name="info_value">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/status_text_size</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- GNSS Sky view -->
+    <style name="sky_legend_label">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/sky_legend_text_size_large</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="sky_legend_value">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/sky_legend_text_size_small</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="cn0_avg_value_in_view">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:background">@drawable/cn0_round_corner_background_in_view</item>
+    </style>
+
+    <style name="cn0_avg_value_used" parent="cn0_avg_value_in_view">
+        <item name="android:background">@drawable/cn0_round_corner_background_used</item>
+    </style>
 </resources>

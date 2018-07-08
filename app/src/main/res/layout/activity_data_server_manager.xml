@@ -14,35 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:visibility="gone" />
-
-    <com.fanweilin.coordinatemap.widget.CheckableRelativeLayout
-        android:id="@+id/select_all"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/subbar"
-        android:onClick="checkall"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/maginparent"
-            android:text="@string/all"
-            android:textColor="@color/textcolor"
-            android:textSize="18sp" />
-
-        <android.support.v7.widget.AppCompatCheckBox
-            android:id="@+id/iv_check"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/maginparent"
-            android:clickable="false"
-            android:focusable="false" />
-    </com.fanweilin.coordinatemap.widget.CheckableRelativeLayout>
-
     <ListView
         android:id="@+id/data_manager_list"
         android:layout_width="match_parent"
@@ -69,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="@dimen/maginparent"
-            android:background="@drawable/noaccount_background"
+            android:background="?android:selectableItemBackground"
             android:text="编辑" />
     </RelativeLayout>
 
@@ -95,7 +66,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/cancle"
                 android:textColor="@color/textcolor"
@@ -106,30 +77,18 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/delete"
                 android:textColor="@color/textcolor"
                 android:textSize="14sp" />
-
-            <!--<Button-->
-                <!--android:id="@+id/btn_down"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="match_parent"-->
-                <!--android:layout_weight="1"-->
-                <!--android:background="@drawable/noaccount_background"-->
-                <!--android:gravity="center"-->
-                <!--android:text="@string/down"-->
-                <!--android:textColor="@color/textcolor"-->
-                <!--android:textSize="14sp" />-->
-
             <Button
                 android:id="@+id/btn_all"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@drawable/noaccount_background"
+                android:background="?android:selectableItemBackground"
                 android:gravity="center"
                 android:text="@string/all"
                 android:textColor="@color/textcolor"

@@ -23,7 +23,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/dms" />
+        <RadioButton
+            android:id="@+id/radio_xy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/xy" />
     </RadioGroup>
+    <LinearLayout
+        android:id="@+id/ll_latlon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
     <RelativeLayout
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
@@ -45,13 +55,36 @@
             android:layout_height="wrap_content"
             android:entries="@array/coordstyle"
             android:layout_centerVertical="true"/>
-    </RelativeLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rel_name"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textSize="18sp"
+            android:text="名称:" />
+
+        <EditText
+            android:id="@+id/edt_name"
+            android:layout_width="match_parent"
+            android:layout_toRightOf="@+id/tv_name"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:singleLine="true"
+            />
+        </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/rel_lat"
         android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
         <TextView
             android:id="@+id/tv_latitude"
             android:layout_width="wrap_content"
@@ -66,14 +99,61 @@
             android:layout_toRightOf="@+id/tv_latitude"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:inputType="numberDecimal"
+            android:inputType="numberDecimal|numberSigned"
             android:singleLine="true"
             android:hint="39.9631757"
             android:textColorHint="@color/textcontent"
             />
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_latitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/tv_latitude"
+            android:layout_centerVertical="true">
+            <EditText
+                android:id="@+id/latidude_du"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"
+                android:singleLine="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="度" />
+
+            <EditText
+                android:id="@+id/latidude_fen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分" />
+
+            <EditText
+                android:id="@+id/latidude_miao"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="秒" />
+        </LinearLayout>
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rel_lon"
         android:layout_marginRight="24dp"
         android:layout_marginLeft="24dp"
         android:layout_width="wrap_content"
@@ -94,9 +174,160 @@
             android:layout_width="match_parent"
             android:layout_centerVertical="true"
             android:hint="116.4002442"
-            android:inputType="numberDecimal"
+            android:inputType="numberDecimal|numberSigned"
             android:singleLine="true"
             android:textColorHint="@color/textcontent"
             android:layout_height="wrap_content" />
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/ll_longitude"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/tv_longtitude"
+            android:layout_centerVertical="true">
+            <EditText
+                android:id="@+id/longgitude_du"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"
+                android:singleLine="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="度" />
+
+            <EditText
+                android:id="@+id/longgitude_fen"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分" />
+
+            <EditText
+                android:id="@+id/longgitude_miao"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="秒" />
+        </LinearLayout>
     </RelativeLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/ll_xy"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_coord_xy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="18sp"
+                android:text="坐标系:" />
+
+            <Spinner
+                android:id="@+id/spn_xy"
+                android:layout_width="match_parent"
+                android:layout_toRightOf="@+id/tv_coord_xy"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_xyname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textSize="18sp"
+                android:text="名称:" />
+
+            <EditText
+                android:id="@+id/edt_xyname"
+                android:layout_width="match_parent"
+                android:layout_toRightOf="@+id/tv_xyname"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:singleLine="true"
+                />
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rel_X"
+            android:layout_marginRight="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textSize="18sp"
+            android:text="X:" />
+
+        <EditText
+            android:id="@+id/editx"
+            android:layout_toRightOf="@+id/tv_x"
+            android:layout_width="match_parent"
+            android:layout_centerVertical="true"
+            android:hint="3399466.6"
+            android:inputType="numberDecimal|numberSigned"
+            android:singleLine="true"
+            android:textColorHint="@color/textcontent"
+            android:layout_height="wrap_content" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/rel_y"
+            android:layout_marginRight="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_y"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textSize="18sp"
+                android:text="Y:" />
+
+            <EditText
+                android:id="@+id/edity"
+                android:layout_toRightOf="@+id/tv_y"
+                android:layout_width="match_parent"
+                android:layout_centerVertical="true"
+                android:hint="567750.3"
+                android:inputType="numberDecimal|numberSigned"
+                android:singleLine="true"
+                android:textColorHint="@color/textcontent"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+    </LinearLayout>
 </LinearLayout>

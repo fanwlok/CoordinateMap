@@ -2,29 +2,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
+        <item android:id="@+id/nav_taobao"
+            android:icon="@mipmap/ic_settings_white_36dp"
+            android:title="重要通知" />
         <item
             android:id="@+id/nav_computer"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="计算工具" />
+            android:icon="@mipmap/ic_folder_grey600_36dp"
+            android:title="本地文件管理" />
+        <item
+            android:id="@+id/nav_maptype"
+            android:icon="@mipmap/ic_map_grey600_36dp"
+            android:title="坐标系管理" />
         <item
             android:id="@+id/nav_down"
-            android:icon="@mipmap/ic_file_download_black_36dp"
+            android:icon="@mipmap/ic_file_download_grey600_36dp"
             android:title="下载离线地图" />
-
-        <item
-            android:id="@+id/nav_quit"
-            android:icon="@mipmap/ic_assignment_return_black_36dp"
-            android:title="退出" />
-
     </group>
-    <group android:checkableBehavior="single">
+    <group
+
+        android:id="@+id/goup1"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_about"
-            android:icon="@mipmap/ic_person_black_36dp"
-            android:title="关于" />
+            android:title="设置" />
         <item
-            android:id="@+id/nav_update"
-            android:icon="@mipmap/ic_system_update_black_36dp"
-            android:title="版本更新" />
+            android:id="@+id/nav_help"
+            android:title="帮助及常见问题解答" />
+        <item
+            android:id="@+id/nav_back"
+            android:title="退出登陆" />
     </group>
 </menu>

@@ -59,8 +59,8 @@ public class CityList_Fragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_city_list, container, false);
         CityExAdapter myadpter = new CityExAdapter(getActivity());
         HotCityAdapter hotCityAdapter = new HotCityAdapter(getActivity());
-        mListView = (ListView) view.findViewById(R.id.lv_hotcity);
-        mExlistVIEW = (ExpandableListView) view.findViewById(R.id.el_city);
+        mListView = view.findViewById(R.id.lv_hotcity);
+        mExlistVIEW = view.findViewById(R.id.el_city);
         mListView.setAdapter(hotCityAdapter);
         mExlistVIEW.setAdapter(myadpter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -155,9 +155,9 @@ public class CityList_Fragment extends Fragment {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.list_child, null);
             }
-            Button btndown = (Button) convertView.findViewById(R.id.btn_down);
-            TextView tvchild = (TextView) convertView.findViewById(R.id.tv_childcity);
-            TextView tvsize = (TextView) convertView.findViewById(R.id.tv_size);
+            Button btndown = convertView.findViewById(R.id.btn_down);
+            TextView tvchild = convertView.findViewById(R.id.tv_childcity);
+            TextView tvsize = convertView.findViewById(R.id.tv_size);
            String city = HotCity.get(position);
             Map<String, Object> map = new HashMap<String, Object>();
             map = getcity(city);
@@ -219,7 +219,7 @@ public class CityList_Fragment extends Fragment {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.list_parent, null);
             }
-            TextView tv = (TextView) convertView
+            TextView tv = convertView
                     .findViewById(R.id.tv_city);
             tv.setText(City.get(groupPosition));
             return convertView;
@@ -230,9 +230,9 @@ public class CityList_Fragment extends Fragment {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.list_child, null);
             }
-            Button btndown = (Button) convertView.findViewById(R.id.btn_down);
-            TextView tvchild = (TextView) convertView.findViewById(R.id.tv_childcity);
-            TextView tvsize = (TextView) convertView.findViewById(R.id.tv_size);
+            Button btndown = convertView.findViewById(R.id.btn_down);
+            TextView tvchild = convertView.findViewById(R.id.tv_childcity);
+            TextView tvsize = convertView.findViewById(R.id.tv_size);
             String city = AllCity.get(City.get(groupPosition)).get(childPosition);
             tvchild.setText((String) getcity(city).get("cityname"));
             tvsize.setText((String) getcity(city).get("citysize"));

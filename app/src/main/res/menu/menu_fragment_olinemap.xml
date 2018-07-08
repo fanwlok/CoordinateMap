@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="新建"
+        android:id="@+id/item_new"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:title="加入"
+        android:id="@+id/item_jion"
+        app:showAsAction="ifRoom"
+        />
+</menu>

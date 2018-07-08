@@ -1,6 +1,7 @@
 package com.fanweilin.coordinatemap.computing;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import static java.lang.Math.*;
 
@@ -37,5 +38,23 @@ public class Computer {
             textDistance = "距离:" + String.valueOf(df.format(distance)) + "m" + "  ";
         }
         return textDistance;
+    }
+    //VIP设置
+    public static String getvip(String appID){
+        String s=appID.substring(2,9);
+        Integer vip=Integer.parseInt(s)*2-4;
+        return String.valueOf(vip);
+    }
+    public static double area(List<Point> points){
+         double area=0;
+        int j,i;
+        int N=points.size();
+        for (i=0;i<N;i++){
+            j = (i + 1) % N;
+            area += points.get(i).x * points.get(j).y;
+            area -= points.get(i).y * points.get(j).x;
+        }
+        area /= 2;
+        return(area < 0 ? -area : area);
     }
 }

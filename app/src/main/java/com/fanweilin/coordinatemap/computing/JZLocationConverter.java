@@ -64,9 +64,7 @@ public class JZLocationConverter {
     public static boolean outOfChina(double lat, double lon) {
         if (lon < RANGE_LON_MIN || lon > RANGE_LON_MAX)
             return true;
-        if (lat < RANGE_LAT_MIN || lat > RANGE_LAT_MAX)
-            return true;
-        return false;
+        return lat < RANGE_LAT_MIN || lat > RANGE_LAT_MAX;
     }
 
     public static LatLng gcj02Encrypt(double ggLat, double ggLon) {

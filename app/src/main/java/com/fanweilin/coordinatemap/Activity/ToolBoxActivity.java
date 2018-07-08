@@ -13,8 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fanweilin.coordinatemap.Compass.CompassActivity;
 import com.fanweilin.coordinatemap.R;
-import com.fanweilin.coordinatemap.toolActivity.CompassActivity;
 import com.fanweilin.coordinatemap.toolActivity.ConvertActivity;
 import com.fanweilin.coordinatemap.toolActivity.CoordinateActivity;
 import com.fanweilin.coordinatemap.toolActivity.DistanceActivity;
@@ -43,8 +43,8 @@ public class ToolBoxActivity extends AppCompatActivity {
         gridView.setAdapter(gridAdapter);
     }
     private void init(){
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        gridView= (MyGridView) findViewById(R.id.line_grideview);
+        toolbar = findViewById(R.id.toolbar);
+        gridView= findViewById(R.id.line_grideview);
         gridView.setOnItemClickListener(new GridItemClick());
     }
     private void getadpterdata(){
@@ -83,8 +83,8 @@ public class ToolBoxActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
            convertView=inflater.inflate(R.layout.griditem,null);
-            ImageView iv= (ImageView) convertView.findViewById(R.id.iv);
-            TextView tv= (TextView) convertView.findViewById(R.id.tv);
+            ImageView iv= convertView.findViewById(R.id.iv);
+            TextView tv= convertView.findViewById(R.id.tv);
             iv.setImageResource((Integer) mapList.get(position).get("iv"));
             tv.setText((String)mapList.get(position).get("tv"));
             return convertView;

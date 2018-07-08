@@ -33,14 +33,14 @@ public class ConvertActivity extends AppCompatActivity implements View.OnClickLi
     public void init()
 
     {
-        btnDic = (Button) findViewById(R.id.btn_dci);
-        btnDms = (Button) findViewById(R.id.btn_dms);
-        tvDic = (TextView) findViewById(R.id.tv_dic);
-        tvDms = (TextView) findViewById(R.id.tv_dms);
-        etDic = (EditText) findViewById(R.id.et_dic);
-        etdu = (EditText) findViewById(R.id.et_du);
-        etmiao = (EditText) findViewById(R.id.et_miao);
-        etfen = (EditText) findViewById(R.id.et_fen);
+        btnDic = findViewById(R.id.btn_dci);
+        btnDms = findViewById(R.id.btn_dms);
+        tvDic = findViewById(R.id.tv_dic);
+        tvDms = findViewById(R.id.tv_dms);
+        etDic = findViewById(R.id.et_dic);
+        etdu = findViewById(R.id.et_du);
+        etmiao = findViewById(R.id.et_miao);
+        etfen = findViewById(R.id.et_fen);
         btnDms.setOnClickListener(this);
         btnDic.setOnClickListener(this);
     }
@@ -56,7 +56,7 @@ public class ConvertActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.btn_dci:
                 if (!etDic.getText().toString().equals("")) {
                     double dic = Double.parseDouble(etDic.getText().toString());
-                    tvDic.setText(convertLatlng.convertToSexagesimal(dic));
+                    tvDic.setText(ConvertLatlng.convertToSexagesimal(dic));
                 }
                 break;
             case R.id.btn_dms:
@@ -78,7 +78,7 @@ public class ConvertActivity extends AppCompatActivity implements View.OnClickLi
                 } else {
                     miao = 0;
                 }
-                tvDms.setText(String.valueOf(convertLatlng.convertToDecimal(du, fen, miao)));
+                tvDms.setText(String.valueOf(ConvertLatlng.convertToDecimal(du, fen, miao)));
 
                 break;
         }

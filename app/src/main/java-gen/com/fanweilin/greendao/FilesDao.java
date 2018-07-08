@@ -20,7 +20,7 @@ public class FilesDao extends AbstractDao<Files, Long> {
     /**
      * Properties of entity Files.<br/>
      * Can be used for QueryBuilder and for referencing column names.
-    */
+     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "_id");
         public final static Property Title = new Property(1, String.class, "title", false, "TITLE");
@@ -30,7 +30,8 @@ public class FilesDao extends AbstractDao<Files, Long> {
         public final static Property Datastyle = new Property(5, Integer.class, "datastyle", false, "DATASTYLE");
         public final static Property Status = new Property(6, Integer.class, "status", false, "STATUS");
         public final static Property Anchor = new Property(7, java.util.Date.class, "anchor", false, "ANCHOR");
-    };
+        public final static Property Markerid = new Property(8, Integer.class, "markerid", false, "MARKERID");
+    }
 
     private DaoSession daoSession;
 
@@ -48,14 +49,15 @@ public class FilesDao extends AbstractDao<Files, Long> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"FILES\" (" + //
-                "\"_id\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: id
                 "\"TITLE\" TEXT NOT NULL ," + // 1: title
                 "\"PATH\" TEXT," + // 2: path
                 "\"DATE\" TEXT," + // 3: date
                 "\"CDSTYLE\" INTEGER," + // 4: cdstyle
                 "\"DATASTYLE\" INTEGER," + // 5: datastyle
                 "\"STATUS\" INTEGER," + // 6: status
-                "\"ANCHOR\" INTEGER);"); // 7: anchor
+                "\"ANCHOR\" INTEGER," + // 7: anchor
+                "\"MARKERID\" INTEGER);"); // 8: markerid
     }
 
     /** Drops the underlying database table. */
@@ -103,6 +105,11 @@ public class FilesDao extends AbstractDao<Files, Long> {
         if (anchor != null) {
             stmt.bindLong(8, anchor.getTime());
         }
+ 
+        Integer markerid = entity.getMarkerid();
+        if (markerid != null) {
+            stmt.bindLong(9, markerid);
+        }
     }
 
     @Override
@@ -144,6 +151,11 @@ public class FilesDao extends AbstractDao<Files, Long> {
         if (anchor != null) {
             stmt.bindLong(8, anchor.getTime());
         }
+ 
+        Integer markerid = entity.getMarkerid();
+        if (markerid != null) {
+            stmt.bindLong(9, markerid);
+        }
     }
 
     @Override
@@ -167,7 +179,8 @@ public class FilesDao extends AbstractDao<Files, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getInt(offset + 4), // cdstyle
             cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5), // datastyle
             cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6), // status
-            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)) // anchor
+            cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)), // anchor
+            cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8) // markerid
         );
         return entity;
     }
@@ -182,6 +195,7 @@ public class FilesDao extends AbstractDao<Files, Long> {
         entity.setDatastyle(cursor.isNull(offset + 5) ? null : cursor.getInt(offset + 5));
         entity.setStatus(cursor.isNull(offset + 6) ? null : cursor.getInt(offset + 6));
         entity.setAnchor(cursor.isNull(offset + 7) ? null : new java.util.Date(cursor.getLong(offset + 7)));
+        entity.setMarkerid(cursor.isNull(offset + 8) ? null : cursor.getInt(offset + 8));
      }
     
     @Override
@@ -197,6 +211,11 @@ public class FilesDao extends AbstractDao<Files, Long> {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public boolean hasKey(Files entity) {
+        return entity.getId() != null;
     }
 
     @Override

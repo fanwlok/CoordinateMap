@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="新增"
+        android:orderInCategory="120"
+        android:id="@+id/item_add"
+        android:icon="@mipmap/ic_add_white_36dp"
+        app:showAsAction="ifRoom"
+        />
+</menu>

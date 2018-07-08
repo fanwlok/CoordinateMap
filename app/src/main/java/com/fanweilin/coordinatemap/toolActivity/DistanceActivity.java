@@ -1,22 +1,19 @@
 package com.fanweilin.coordinatemap.toolActivity;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fanweilin.coordinatemap.Activity.MainActivity;
+import com.fanweilin.coordinatemap.Activity.MainMapsActivity;
 import com.fanweilin.coordinatemap.R;
 import com.fanweilin.coordinatemap.computing.Distance;
 
@@ -51,14 +48,14 @@ public class DistanceActivity extends AppCompatActivity implements View.OnClickL
     public void init()
 
     {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        beginLatitude = (EditText) findViewById(R.id.begin_latitude);
-        beginLongitude = (EditText) findViewById(R.id.begin_longitude);
-        endLatitude = (EditText) findViewById(R.id.end_latitude);
-        endlongitude = (EditText) findViewById(R.id.end_longitude);
-        btnComputer = (Button) findViewById(R.id.btn_distance_computer);
-        btnShow = (Button) findViewById(R.id.btn_distance_show);
-        textView = (TextView) findViewById(R.id.tv_distance_content);
+        toolbar = findViewById(R.id.toolbar);
+        beginLatitude = findViewById(R.id.begin_latitude);
+        beginLongitude = findViewById(R.id.begin_longitude);
+        endLatitude = findViewById(R.id.end_latitude);
+        endlongitude = findViewById(R.id.end_longitude);
+        btnComputer = findViewById(R.id.btn_distance_computer);
+        btnShow = findViewById(R.id.btn_distance_show);
+        textView = findViewById(R.id.tv_distance_content);
         btnShow.setOnClickListener(this);
         btnComputer.setOnClickListener(this);
         spf = getSharedPreferences(SPFNAME, Context.MODE_APPEND);
@@ -111,9 +108,9 @@ public class DistanceActivity extends AppCompatActivity implements View.OnClickL
                     double[] data = {beginWgsLat, beginWgsLon, endWgsLat, endWgsLon};
                     puteditor();
                     Intent intent = new Intent();
-                    intent.putExtra(MainActivity.DISTANCELAT, data);
-                    intent.putExtra(MainActivity.DISTANCEACTIVITY, "DistanceActivity");
-                    intent.setClass(DistanceActivity.this, MainActivity.class);
+                    intent.putExtra(MainMapsActivity.DISTANCELAT, data);
+                    intent.putExtra(MainMapsActivity.DISTANCEACTIVITY, "DistanceActivity");
+                    intent.setClass(DistanceActivity.this, MainMapsActivity.class);
                     startActivity(intent);
                 }
 

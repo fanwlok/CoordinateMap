@@ -23,14 +23,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.fanweilin.coordinatemap.Activity.DataManagerActivity;
 import com.fanweilin.coordinatemap.Activity.DataServerManagerActivity;
 import com.fanweilin.coordinatemap.Activity.FileManagerActivity;
 import com.fanweilin.coordinatemap.Activity.data;
-import com.fanweilin.coordinatemap.Class.CoordianteApi;
-import com.fanweilin.coordinatemap.Class.HttpControl;
-import com.fanweilin.coordinatemap.Class.LatStyle;
-import com.fanweilin.coordinatemap.Class.Register;
+import com.fanweilin.coordinatemap.DataModel.CoordianteApi;
+import com.fanweilin.coordinatemap.DataModel.HttpControl;
+import com.fanweilin.coordinatemap.DataModel.Register;
 import com.fanweilin.coordinatemap.DataModel.FilesClass;
 import com.fanweilin.coordinatemap.DataModel.IdsClass;
 import com.fanweilin.coordinatemap.DataModel.PointDataClient;
@@ -40,7 +38,6 @@ import com.fanweilin.greendao.Files;
 import com.fanweilin.greendao.FilesDao;
 import com.fanweilin.greendao.PointData;
 import com.fanweilin.greendao.PointDataDao;
-import com.fanweilin.greendao.ShowData;
 
 import org.greenrobot.greendao.query.Join;
 import org.greenrobot.greendao.query.QueryBuilder;
@@ -57,13 +54,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class CloudFragmen extends Fragment implements View.OnClickListener {
     ListView listView;
@@ -111,14 +109,14 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         init();
         View view = inflater.inflate(R.layout.fragment_cloud, container, false);
-        rl = (RelativeLayout) view.findViewById(R.id.rl_local);
-        ll = (LinearLayout) view.findViewById(R.id.ll_local);
-        listView = (ListView) view.findViewById(R.id.lv_fragment);
-        btnEdit = (Button) view.findViewById(R.id.btn_local_edit);
-        btnCancel = (Button) view.findViewById(R.id.btn_local_cancel);
-        btndelete = (Button) view.findViewById(R.id.btn_local_delete);
-        btnput = (Button) view.findViewById(R.id.btn_local_put);
-        btnAll = (Button) view.findViewById(R.id.btn_local_all);
+        rl = view.findViewById(R.id.rl_local);
+        ll = view.findViewById(R.id.ll_local);
+        listView = view.findViewById(R.id.lv_fragment);
+        btnEdit = view.findViewById(R.id.btn_local_edit);
+        btnCancel = view.findViewById(R.id.btn_local_cancel);
+        btndelete = view.findViewById(R.id.btn_local_delete);
+        btnput = view.findViewById(R.id.btn_local_put);
+        btnAll = view.findViewById(R.id.btn_local_all);
         btnEdit.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         btndelete.setOnClickListener(this);
@@ -170,39 +168,30 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                     if( data.findOrderByName(mData.get(k).get("filename").toString())!=null){
                         long id = data.findOrderByName(mData.get(k).get("filename").toString()).getId();
                         QueryBuilder qb = getPointDataDao().queryBuilder().where(PointDataDao.Properties.Status.eq(9));
-                        Join file = qb.join(PointDataDao.Properties.Fileid, Files.class);
+                        Join file = qb.join(PointDataDao.Properties.FileId, Files.class);
                         file.where(FilesDao.Properties.Id.eq(id));
                         List<PointData> list = qb.list();
                         for (PointData pointData : list) {
                             PointDataClient pointDataClient = new PointDataClient();
                             pointDataClient.setFilename(data.findOrderById(id).getTitle());
-                            pointDataClient.setGuid(pointData.getGuid());
                             listdata.add(pointDataClient);
                         }
                     }
+                    down.Rxdownmydatas(filename,listdata)
+                            .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<List<PointDataClient>>() {
 
-//                    down.Rxdownmydatas(filename,listdata).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<List<PointDataClient>>() {
-//                        @Override
-//                        public void call(List<PointDataClient> pointDataClients) {
-//                            if(data.findOrderByName(filename)!=null){
-//                                Files files=data.findOrderByName(filename);
-//                                copydata(files,pointDataClients);
-//
-//                            }else {
-//                                Files files=data.createFiles(filename);
-//                                copydata(files,pointDataClients);
-//                            }
-//                            fileManagerActivity.localFragment.fresh();
-//                        }
-//                    });
-                    down.Rxdownmydatas(filename,listdata).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<PointDataClient>>() {
                         @Override
-                        public void onCompleted() {
+                        public void onError(Throwable e) {
 
                         }
 
                         @Override
-                        public void onError(Throwable e) {
+                        public void onComplete() {
+
+                        }
+
+                        @Override
+                        public void onSubscribe(Disposable d) {
 
                         }
 
@@ -240,7 +229,6 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                pointData.setWgslatitude(pointDataClient.getWgslatitude());
                pointData.setBaidulongitude(pointDataClient.getBaidulongitude());
                pointData.setBaidulatitude(pointDataClient.getBaidulatitude());
-               pointData.setGuid(pointDataClient.getId());
                Log.d("dfd",String.valueOf(pointDataClient.getId()));
                data.createPointData(files, pointData);
                pointData.setStatus(9);
@@ -289,43 +277,12 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                 }
             }
             final int size = list.size();
-            final String[] files = (String[]) list.toArray(new String[size]);
+            final String[] files = list.toArray(new String[size]);
             Retrofit retrofit = HttpControl.getInstance(getContext()).getRetrofit();
             CoordianteApi deletefiles = retrofit.create(CoordianteApi.class);
-//            deletefiles.Rxdeletefiles(files).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Register>() {
-//                @Override
-//                public void call(Register register) {
-//                    if (register.getCode() == 200) {
-//                        try {
-//                            db.beginTransaction();
-//                            for (int i = 0; i < size; i++) {
-//                                if (data.findOrderByName(files[i]) != null) {
-//                                    Files file = data.findOrderByName(files[i]);
-//                                    List<PointData> pointDatas = file.getPointItems();
-//                                    for (PointData pointData : pointDatas) {
-//                                        pointData.setStatus(0);
-//                                        getPointDataDao().update(pointData);
-//                                    }
-//                                }
-//
-//                            }
-//                            db.setTransactionSuccessful();
-//                        } finally {
-//                            db.endTransaction();
-//                        }
-//                        getListdata();
-//                        dialog.dismiss();
-//                    }
-//                }
-//            });
-            deletefiles.Rxdeletefiles(files).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Register>() {
+            deletefiles.Rxdeletefiles(files).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<Register>() {
                 @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
+                public void onSubscribe(Disposable d) {
 
                 }
 
@@ -343,7 +300,6 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                                         getPointDataDao().update(pointData);
                                     }
                                 }
-
                             }
                             db.setTransactionSuccessful();
                         } finally {
@@ -352,7 +308,19 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                         getListdata();
                         dialog.dismiss();
                     }
+
                 }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+
             });
         }else{
             Toast.makeText(getActivity(),"请选择文件",Toast.LENGTH_SHORT).show();
@@ -412,9 +380,9 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
             if ((view == null)) {
                 holder = new ViewHolder();
                 view = inflater.inflate(R.layout.list_data, null);
-                holder.name = (TextView) view.findViewById(R.id.name);
-                holder.subtitle = (TextView) view.findViewById(R.id.tv_subtitle);
-                holder.checkBox = (CheckBox) view.findViewById(R.id.checkbox);
+                holder.name = view.findViewById(R.id.name);
+                holder.subtitle = view.findViewById(R.id.tv_subtitle);
+                holder.checkBox = view.findViewById(R.id.checkbox);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -442,7 +410,6 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
                 title = mData.get(i).get("filename").toString();
                 path = mData.get(i).get("path").toString();
                 Intent intent = new Intent();
-                intent.putExtra(DataServerManagerActivity.PATH, path);
                 intent.putExtra(DataServerManagerActivity.FILENAME, title);
                 intent.setClass(getActivity(), DataServerManagerActivity.class);
                 startActivity(intent);
@@ -469,14 +436,20 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
         Retrofit retrofit = HttpControl.getInstance(getContext()).getRetrofit();
         CoordianteApi getfiles= retrofit.create(CoordianteApi.class);
         getfiles.Rxgetfiles().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<List<FilesClass>>() {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<List<FilesClass>>() {
+
             @Override
-            public void onCompleted() {
+            public void onError(Throwable e) {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onSubscribe(Disposable d) {
 
             }
 
@@ -532,37 +505,22 @@ public class CloudFragmen extends Fragment implements View.OnClickListener {
 
             Retrofit retrofit = HttpControl.getInstance(getContext()).getRetrofit();
             CoordianteApi getfiles= retrofit.create(CoordianteApi.class);
-//            getfiles.Rxgetdata(filename).subscribeOn(Schedulers.io())
-//                    .observeOn(Schedulers.io()).subscribe(new Action1<ResponseBody>() {
-//                    @Override
-//                public void call(ResponseBody responseBody) {
-//                    String content= null;
-//                    try {
-//                        content = responseBody.string();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    FileWriter fileWritter = null;
-//                    try {
-//                        fileWritter = new FileWriter(file.getAbsolutePath());
-//                        BufferedWriter bufferedWriter = new BufferedWriter(fileWritter);
-//                        bufferedWriter.write(content);
-//                        bufferedWriter.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }) ;
         getfiles.Rxgetdata(filename).subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io()).subscribe(new Subscriber<ResponseBody>() {
+                .observeOn(Schedulers.io()).subscribe(new Observer<ResponseBody>() {
+
+
             @Override
-            public void onCompleted() {
+            public void onError(Throwable e) {
 
             }
 
             @Override
-            public void onError(Throwable e) {
+            public void onComplete() {
+
+            }
+
+            @Override
+            public void onSubscribe(Disposable d) {
 
             }
 
