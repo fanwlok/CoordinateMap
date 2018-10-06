@@ -8,10 +8,11 @@ import org.osmdroid.util.MapTileIndex;
  */
 public class GoogleMapsTileSource extends OnlineTileSourceBase  {
     private static final String[] BASE_URL = {
-            "http://mt0.google.cn/vt/lyrs=y&hl=zh-CN&gl=CN&scale=2"
-//            "http://mt1.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app",
-//            "http://mt2.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app",
-//            "http://mt3.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app"
+            "http://mt0.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app&scale=2&src=app",
+           "http://mt1.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app&scale=2&src=app",
+           "http://mt2.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app&scale=2&src=app",
+            "http://mt3.google.cn/vt/lyrs=y&hl=zh-CN&gl=cn&src=app&scale=2&src=app"
+
 
     };
     private static final String NAME ="google混合地图";

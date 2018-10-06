@@ -565,7 +565,7 @@ public class WayponitActivity extends AppCompatActivity implements View.OnClickL
         switch (v.getId()) {
             case R.id.btn_cameral:
                 PhotoPicker.builder()
-                        .setPhotoCount(20)
+                        .setPhotoCount(1000)
                         .setShowCamera(true)
                         .setShowGif(true)
                         .setPreviewEnabled(false)

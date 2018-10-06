@@ -9,7 +9,11 @@ import org.osmdroid.util.MapTileIndex;
  */
 public class GoolgeMapsTerrain extends OnlineTileSourceBase {
     private static final String[] BASE_URL = {
-            "http://mt0.google.cn/vt/lyrs=t,r&hl=zh-CN&gl=cn&scale=2",
+            "http://mt0.google.cn/vt/lyrs=t,r&hl=zh-CN&gl=cn&scale=4&src=app",
+            "http://mt1.google.cn/vt/lyrs=t,r&hl=zh-CN&gl=cn&scale=4&src=app",
+            "http://mt2.google.cn/vt/lyrs=t,r&hl=zh-CN&gl=cn&scale=4&src=app",
+            "http://mt3.google.cn/vt/lyrs=t,r&hl=zh-CN&gl=cn&scale=4&src=app",
+
 
     };
     private static final String NAME ="google地形图";
